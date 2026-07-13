@@ -1,5 +1,5 @@
 /* Minimal offline shell. Data caching is handled in-page via localStorage. */
-var CACHE = "orthodox-readings-v9";
+var CACHE = "orthodox-readings-v10";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./fathers.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-32.png"

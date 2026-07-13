@@ -269,6 +269,7 @@
     <section class="card lives hidden" id="livesCard">
       <p class="label">Lives of the Saints</p>
       <div id="livesList"></div>
+      <p class="tattr">From “Lives of the Saints” by John Brady (Abbamoses.com), used with permission via orthocal.info.</p>
     </section>
 
     <section class="card hidden" id="notesCard">
@@ -280,8 +281,8 @@
 
     <section class="card theophan" id="troparCard">
       <p class="label">Troparia &amp; Kontakia</p>
-      <a class="tbtn" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Today’s troparia on the Jordanville calendar →</a>
-      <p class="tattr">Opens the Holy Trinity (Jordanville) calendar page for this day, with the troparia and kontakia and their tones.</p>
+      <a class="tbtn" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Today’s troparia on the Holy Trinity calendar →</a>
+      <p class="tattr">Opens the Holy Trinity Orthodox Calendar (holytrinityorthodox.com) for this day — the calendar referenced by Holy Trinity Monastery, Jordanville — with the troparia and kontakia and their tones.</p>
     </section>
 
     <section class="card theophan" id="theophanCard">
@@ -300,8 +301,8 @@
 
   <footer class="footer">
     <a class="support hidden" id="supportLink" href="#" target="_blank" rel="noopener noreferrer">♡ Support Holy Dormition, Corrimal</a>
-    Readings &amp; calendar from <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a><br>
-    Old-Calendar reckoning of Holy Trinity Monastery, Jordanville.<br>
+    Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition (KJV text).<br>
+    Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal.<br>
     <span id="nkjvNote" class="hidden">New King James Version® © Thomas Nelson (unofficial text; KJV shown if unavailable).<br></span>
     <span id="stamp"></span>
   </footer>
@@ -431,7 +432,14 @@
     readings.forEach(function(r){
       var card=document.createElement("div"); card.className="reading";
       var head=document.createElement("div"); head.className="head";
-      if(r.source){ var s=document.createElement("div"); s.className="src"; s.textContent=r.source; head.appendChild(s); }
+      // Full lectionary label: e.g. "Vespers", "6th Matins Gospel", "Epistle — Apostles"
+      var qual = String(r.desc || r.description || r.commemorated || "").trim();
+      var srcLabel = String(r.source || "").trim();
+      if(srcLabel.indexOf(",") > -1 && !qual){
+        var sp = srcLabel.split(/,\s*/); srcLabel = sp[0]; qual = sp.slice(1).join(", ");
+      }
+      var fullLabel = srcLabel + (qual ? " — " + qual : "");
+      if(fullLabel){ var s=document.createElement("div"); s.className="src"; s.textContent=fullLabel; head.appendChild(s); }
       var ref=document.createElement("div"); ref.className="ref";
       ref.textContent = r.display||r.short_display||"Reading";
       var badge=document.createElement("span"); badge.className="ver"; badge.textContent="KJV";

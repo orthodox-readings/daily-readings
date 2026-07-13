@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily Orthodox Readings</title>
+<meta name="description" content="Daily Orthodox calendar, saints and Scripture readings (Old Calendar).">
+
+<!-- Home-screen app behaviour -->
+<meta name="theme-color" content="#5c161c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Readings">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
+
+<style>
+  :root{
+    /* base (parchment) */
+    --bg:#f4eddf; --card:#fffdf8; --ink:#2b2320; --muted:#7c7063;
+    --gold:#a9791f; --gold-soft:#c79a3a; --line:#e7dcc8; --pill:#efe6d4;
+    --shadow:0 1px 3px rgba(50,30,10,.12), 0 8px 24px rgba(50,30,10,.06);
+    /* liturgical set — BURGUNDY default (ordinary days) */
+    --accent:#6b1414; --accent-2:#8a2b2b;
+    --bar1:#5c161c; --bar2:#3f0d12;
+    --btn1:#6b1414; --btn2:#8a2b2b;
+  }
+  /* Liturgical overrides — Russian (ROCOR) practice; adjust freely */
+  [data-lit="blue"]{   --accent:#1e3a76; --accent-2:#2c4d92; --bar1:#1e3357; --bar2:#10203e; --btn1:#24427c; --btn2:#31569e}
+  [data-lit="red"]{    --accent:#9e1f1f; --accent-2:#bb3030; --bar1:#7d1518; --bar2:#4d0b0e; --btn1:#9e1f1f; --btn2:#bb3030}
+  [data-lit="green"]{  --accent:#1f5c31; --accent-2:#2d7a44; --bar1:#1e4d2b; --bar2:#11311b; --btn1:#25603a; --btn2:#337a4b}
+  [data-lit="violet"]{ --accent:#4d2a78; --accent-2:#65409a; --bar1:#46246b; --bar2:#2c1546; --btn1:#53307f; --btn2:#6a459e}
+  [data-lit="white"]{  --accent:#8a6a14; --accent-2:#a8842e; --bar1:#9a8a5c; --bar2:#6f6340; --btn1:#8a6a14; --btn2:#a8842e}
+  [data-lit="gold"]{   --accent:#7c5c10; --accent-2:#9a7418; --bar1:#8a6a14; --bar2:#5f470c; --btn1:#8a6a14; --btn2:#a9831f}
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#151010; --card:#211917; --ink:#ece3d5; --muted:#a89a8c;
+      --gold:#e2be6c; --gold-soft:#d4ab52; --line:#352a25; --pill:#2c2320;
+      --shadow:0 1px 3px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
+      --accent:#d98f8f; --accent-2:#e0a0a0;
+    }
+    [data-lit="blue"]{   --accent:#9db8e8; --accent-2:#b3c8ee}
+    [data-lit="red"]{    --accent:#e08a8a; --accent-2:#e8a0a0}
+    [data-lit="green"]{  --accent:#8fce9f; --accent-2:#a5dcb3}
+    [data-lit="violet"]{ --accent:#b79ade; --accent-2:#c8b0e8}
+    [data-lit="white"]{  --accent:#e2be6c; --accent-2:#ecc96a}
+    [data-lit="gold"]{   --accent:#e2be6c; --accent-2:#ecc96a}
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55; -webkit-text-size-adjust:100%;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:680px;margin:0 auto}
+  .hidden{display:none !important}
+  .vh{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+
+  /* App bar — liturgical colour */
+  .appbar{position:sticky;top:0;z-index:20;
+    background:linear-gradient(135deg,var(--bar1) 0%,var(--bar2) 100%);
+    color:#f3e4c4; box-shadow:0 2px 10px rgba(0,0,0,.25);
+    padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;
+    transition:background .6s ease}
+  .appbar .row{display:flex;align-items:center;gap:10px;max-width:680px;margin:0 auto;position:relative}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.2px;font-size:17px}
+  .brand .cross{color:#e6c56e;font-size:19px;line-height:1}
+  .brand b{color:#e6c56e;font-weight:800}
+  .spacer{flex:1}
+  .iconbtn,.gearbtn{border:0;background:rgba(255,255,255,.14);color:#f0e2c2;border-radius:12px;
+    width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+  .iconbtn:active,.gearbtn:active{transform:translateY(1px)}
+  .iconbtn.done{background:#2e8b4f;color:#fff}
+
+  /* Settings sheet */
+  .sheet{position:absolute;right:0;top:calc(100% + 10px);background:var(--card);border:1px solid var(--line);
+    border-radius:16px;box-shadow:0 12px 44px rgba(30,15,5,.35);padding:6px 14px;z-index:60;min-width:242px;color:var(--ink)}
+  .sheet .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .sheet .srow:last-child{border-bottom:0}
+  .sheet .lbl{font-size:12.5px;color:var(--muted);font-weight:700}
+  .seg,.seg2{display:inline-flex;background:var(--pill);border-radius:11px;padding:2px}
+  .seg button,.seg2 button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;
+    padding:5px 11px;border-radius:9px;cursor:pointer}
+  .seg button.active,.seg2 button.active{background:var(--card);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+
+  /* Headpiece ornament */
+  .headpiece{display:flex;align-items:center;gap:10px;margin:8px 22px 0;color:var(--gold)}
+  .headpiece::before,.headpiece::after{content:"";flex:1;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold-soft) 25%,var(--gold-soft) 75%,transparent);opacity:.6}
+  .headpiece span{font-size:11px;opacity:.95;line-height:1}
+
+  /* Hero */
+  .hero{padding:12px 20px 4px;text-align:left}
+  .herobar{display:flex;align-items:flex-start;gap:10px}
+  .hbtn{background:var(--card);border:1px solid var(--line);color:var(--accent);border-radius:12px;
+    width:42px;height:42px;font-size:20px;display:inline-flex;align-items:center;justify-content:center;
+    padding:0;cursor:pointer;flex:0 0 auto;margin-top:2px;box-shadow:var(--shadow)}
+  .hbtn:active{transform:translateY(1px)}
+  .date{font-size:26px;font-weight:800;letter-spacing:.2px;margin:0;color:var(--ink);padding:0 4px;flex:1;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1.25}
+  .todaybtn{border:0;background:none;color:var(--accent);font:inherit;font-size:12.5px;font-weight:700;
+    cursor:pointer;padding:6px 2px 0;text-align:left}
+  .altdate{color:var(--muted);font-size:13px;margin:6px 0 8px}
+  .summary{color:var(--accent);font-size:16px;font-weight:700;margin:0;line-height:1.5}
+
+  /* Fast + tracker */
+  .fast{display:flex;align-items:center;gap:10px;margin:14px 20px 0;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:9px;padding:9px 14px;border-radius:999px;
+    background:var(--pill);border:1px solid var(--line);font-weight:600;font-size:14px;box-shadow:var(--shadow);color:var(--ink)}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+  .fast .exc{color:var(--muted);font-size:13px}
+  .tracker{margin:8px 20px 0;color:var(--muted);font-size:12.5px;line-height:1.85}
+  .tracker .chip{display:inline;color:var(--muted);font-size:12.5px}
+  .tracker .chip b{color:var(--accent)}
+  .tracker .chip+.chip::before{content:"   ·   "}
+  .tracker .chip.today{color:var(--accent);font-weight:700}
+  .tracker .chip.today b{color:var(--accent)}
+
+  /* Cards */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:12px 16px;padding:16px;box-shadow:var(--shadow)}
+  .label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 8px}
+
+  /* Collapsible commemorations */
+  .commem .label{cursor:pointer;position:relative;margin-bottom:0;padding-right:30px;-webkit-tap-highlight-color:transparent}
+  .cchev{position:absolute;right:2px;top:-1px;color:var(--gold);font-size:12px;transition:transform .15s}
+  .commem.collapsible #commemList,.commem.collapsible .clink{display:none}
+  .commem.collapsible.open #commemList{display:block;margin-top:10px}
+  .commem.collapsible.open .clink{display:inline-block}
+  .commem.collapsible.open .cchev{transform:rotate(180deg)}
+  .commem ul{margin:0;padding:0;list-style:none}
+  .commem li{padding:7px 0;border-bottom:1px solid var(--line);font-size:15.5px}
+  .commem li:last-child{border-bottom:0}
+  .commem li::before{content:"☦";color:var(--gold);margin-right:9px;font-size:13px;vertical-align:1px}
+  .commem .clink{margin-top:11px;color:var(--gold);font-size:12.5px;font-weight:700;text-decoration:none}
+
+  /* Lives */
+  .lives details{border-bottom:1px solid var(--line);padding:4px 0}
+  .lives details:last-of-type{border-bottom:0}
+  .lives summary{cursor:pointer;font-size:15px;font-weight:650;padding:7px 0;color:var(--ink);list-style-position:outside}
+  .lives summary::marker{color:var(--gold)}
+  .lives .ltext{font-family:Georgia,"Times New Roman",serif;font-size:15.5px;line-height:1.65;padding:2px 0 10px}
+  .lives .ltext p{margin:0 0 9px}
+
+  /* Readings */
+  .reading{margin:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .reading .head{padding:14px 44px 12px 16px;border-bottom:1px solid var(--line);cursor:pointer;
+    position:relative;-webkit-tap-highlight-color:transparent;
+    background:linear-gradient(0deg,transparent,rgba(169,121,31,.05))}
+  .reading .chev{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--gold);
+    font-size:13px;transition:transform .15s}
+  .reading.open .chev{transform:translateY(-50%) rotate(180deg)}
+  .reading .body{display:none}
+  .reading.open .body{display:block}
+  .reading .src{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .reading .ref{font-size:17px;font-weight:700;margin-top:2px;color:var(--ink)}
+  .reading .ver{font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-left:8px;vertical-align:2px}
+  .reading .body{padding:12px 16px 16px;font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.7;color:var(--ink)}
+  .reading .body .v{margin:0 0 2px}
+  .reading .body sup{color:var(--gold);font-weight:700;font-size:11px;font-family:-apple-system,sans-serif;margin-right:3px;vertical-align:6px}
+  .reading .body .v:first-child::first-letter{font-family:Georgia,"Times New Roman",serif;font-size:44px;
+    line-height:.8;float:left;color:var(--accent);padding:3px 7px 0 0;font-weight:700}
+  .reading .none{color:var(--muted);font-style:italic;font-family:inherit;font-size:14px}
+
+  /* Link-out cards */
+  .theophan .tsub{color:var(--ink);font-size:15.5px;line-height:1.55;margin:0 0 14px}
+  .theophan .tsub b{color:var(--accent);font-weight:700}
+  .tbtn{display:inline-block;background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#f3e4c4;
+    text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px;border-radius:12px;box-shadow:var(--shadow);
+    transition:background .6s ease}
+  .tbtn:active{transform:translateY(1px)}
+  .tattr{color:var(--muted);font-size:11.5px;line-height:1.5;margin:13px 0 0;border-top:1px solid var(--line);padding-top:10px}
+
+  /* Wisdom of the Fathers */
+  .quote .qtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.65;color:var(--ink);margin:0 0 10px}
+  .quote .qby{color:var(--gold);font-size:13px;font-weight:700;margin:0}
+
+  /* States */
+  .banner{margin:12px 16px 0;padding:10px 14px;border-radius:12px;font-size:13.5px;display:none}
+  .banner.show{display:block}
+  .banner.offline{background:#fcefcf;color:#6b4d00;border:1px solid #e2cf8f}
+  @media (prefers-color-scheme: dark){.banner.offline{background:#3a2f12;color:#f0d78a;border-color:#5a4a1e}}
+  .banner.error{background:#f7dcdc;color:#7a1a1a;border:1px solid #e6b3b3}
+  @media (prefers-color-scheme: dark){.banner.error{background:#3a1c1c;color:#f0b3b3;border-color:#5a2a2a}}
+  .banner a{color:inherit;font-weight:700}
+  .loading{padding:40px 16px;text-align:center;color:var(--muted)}
+  .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;margin:0 auto 12px;animation:spin .9s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Footer + support */
+  .footer{padding:18px 20px 30px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
+  .footer a{color:var(--gold);text-decoration:none}
+  .support{display:block;width:-moz-fit-content;width:fit-content;margin:0 auto 16px;padding:9px 16px;
+    border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--gold);
+    text-decoration:none;font-size:12.5px;font-weight:700;box-shadow:var(--shadow)}
+  .support:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="row">
+    <span class="brand"><span class="cross">☦</span><span>Daily<b>Readings</b></span></span>
+    <span class="spacer"></span>
+    <button class="gearbtn" id="gearBtn" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19.4 13c0-.3.1-.6.1-1s0-.7-.1-1l2.1-1.6c.2-.2.2-.4.1-.6l-2-3.5c-.1-.2-.4-.3-.6-.2l-2.5 1c-.5-.4-1.1-.7-1.7-1l-.4-2.6c0-.2-.2-.4-.5-.4h-4c-.2 0-.4.2-.5.4l-.4 2.6c-.6.2-1.1.6-1.7 1l-2.5-1c-.2-.1-.5 0-.6.2l-2 3.5c-.1.2-.1.5.1.6L4.5 11c0 .3-.1.6-.1 1s0 .7.1 1l-2.1 1.6c-.2.2-.2.4-.1.6l2 3.5c.1.2.4.3.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.2 0 .4-.2.5-.4l.4-2.6c.6-.2 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.5c.1-.2.1-.5-.1-.6L19.4 13zM12 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"/></svg>
+    </button>
+    <button class="iconbtn" id="shareBtn" aria-label="Share this day">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7 0-.2 0-.5-.1-.7L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.9C7.5 9.4 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.4 2-.9l7.2 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 2.9 2.9 1.6 0 2.9-1.3 2.9-2.9 0-1.6-1.3-2.8-2.9-2.8z"/></svg>
+    </button>
+    <div class="sheet hidden" id="sheet">
+      <div class="srow"><span class="lbl">Calendar</span>
+        <span class="seg" id="calSeg">
+          <button data-cal="julian" class="active">Old Cal.</button>
+          <button data-cal="gregorian">New Cal.</button>
+        </span></div>
+      <div class="srow"><span class="lbl">Bible text</span>
+        <span class="seg2" id="txtSeg">
+          <button data-txt="kjv">KJV</button>
+          <button data-txt="nkjv" class="active">NKJV</button>
+        </span></div>
+      <div class="srow"><span class="lbl">Text size</span>
+        <span class="seg2" id="sizeSeg">
+          <button data-sz="-" aria-label="Smaller text">A−</button>
+          <button data-sz="+" aria-label="Larger text">A+</button>
+        </span></div>
+    </div>
+  </div>
+</header>
+
+<div class="headpiece" aria-hidden="true"><span>☦</span></div>
+
+<main class="wrap" id="app">
+  <section class="hero">
+    <div class="herobar">
+      <button id="prev" class="hbtn" aria-label="Previous day">‹</button>
+      <h1 class="date" id="date" title="Tap to jump to a date">—</h1>
+      <button id="next" class="hbtn" aria-label="Next day">›</button>
+    </div>
+    <button id="today" class="todaybtn hidden">Go to today</button>
+    <p class="altdate" id="altdate"></p>
+    <p class="summary" id="summary"></p>
+  </section>
+  <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
+
+  <div class="banner offline" id="offlineBanner">Showing saved copy — you appear to be offline.</div>
+  <div class="banner error" id="errorBanner"></div>
+
+  <div id="loading" class="loading"><div class="spin"></div>Loading the day’s readings…</div>
+
+  <div id="content" class="hidden">
+    <div class="fast" id="fastWrap">
+      <span class="pill"><span class="dot" id="fastDot"></span><span id="fastText">—</span></span>
+      <span class="exc" id="fastExc"></span>
+    </div>
+
+    <div class="tracker" id="tracker"></div>
+
+    <section class="card commem collapsible hidden" id="commemCard">
+      <p class="label" id="commemHead">Commemorations<span class="cchev">▼</span></p>
+      <ul id="commemList"></ul>
+      <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Full list for this day on OrthoChristian →</a>
+    </section>
+
+    <section class="card lives hidden" id="livesCard">
+      <p class="label">Lives of the Saints</p>
+      <div id="livesList"></div>
+    </section>
+
+    <section class="card hidden" id="notesCard">
+      <p class="label">Service Notes</p>
+      <div id="notesText"></div>
+    </section>
+
+    <div id="readings"></div>
+
+    <section class="card theophan" id="troparCard">
+      <p class="label">Troparia &amp; Kontakia</p>
+      <a class="tbtn" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Today’s troparia on the Jordanville calendar →</a>
+      <p class="tattr">Opens the Holy Trinity (Jordanville) calendar page for this day, with the troparia and kontakia and their tones.</p>
+    </section>
+
+    <section class="card theophan" id="theophanCard">
+      <p class="label">A Thought for the Day · St Theophan the Recluse</p>
+      <p class="tsub" id="theophanSub">His reflection follows the daily Gospel.</p>
+      <a class="tbtn" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Read the full reflection on OrthoChristian →</a>
+      <p class="tattr">Opens St Theophan the Recluse, “Thoughts for Each Day of the Year” (official English text) on OrthoChristian.</p>
+    </section>
+
+    <section class="card quote hidden" id="quoteCard">
+      <p class="label">Wisdom of the Fathers</p>
+      <p class="qtext" id="quoteText"></p>
+      <p class="qby" id="quoteBy"></p>
+    </section>
+  </div>
+
+  <footer class="footer">
+    <a class="support hidden" id="supportLink" href="#" target="_blank" rel="noopener noreferrer">♡ Support Holy Dormition, Corrimal</a>
+    Readings &amp; calendar from <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a><br>
+    Old-Calendar reckoning of Holy Trinity Monastery, Jordanville.<br>
+    <span id="nkjvNote" class="hidden">New King James Version® © Thomas Nelson (unofficial text; KJV shown if unavailable).<br></span>
+    <span id="stamp"></span>
+  </footer>
+</main>
+
+<script>
+(function(){
+  "use strict";
+  // Storage shim: real localStorage where available, in-memory fallback where it's blocked
+  // (sandboxed previews, some private-browsing modes) so the app always boots.
+  var store = (function(){
+    try{ var t="__probe"; localStorage.setItem(t,t); localStorage.removeItem(t); return localStorage; }
+    catch(e){
+      var m = {};
+      return {
+        getItem: function(k){ return Object.prototype.hasOwnProperty.call(m,k) ? m[k] : null; },
+        setItem: function(k,v){ m[k] = String(v); },
+        removeItem: function(k){ delete m[k]; }
+      };
+    }
+  })();
+
+  var API = "https://orthocal.info/api";      // {cal}/{yyyy}/{m}/{d}/
+  var PROXY = "https://api.allorigins.win/raw?url="; // fallback if direct fetch is blocked
+  var state = {
+    cal: store.getItem("pref:cal") || "julian",
+    txt: store.getItem("pref:txt") || "nkjv",   // Bible text: "kjv" (bundled data) or "nkjv" (fetched)
+    scale: parseInt(store.getItem("pref:scale")||"100",10) || 100,
+    date: startOfToday(),
+    renderSeq: 0
+  };
+  var lastRender = null;
+
+  // ── Optional donations: set DONATE_URL to your Ko-fi / PayPal.me / parish donation link to show a
+  //    discreet "Support this app" button in the footer. Leave it "" to hide the button entirely.
+  var DONATE_URL = "https://wollongong.cerkov.ru/";  // Holy Dormition, Corrimal (parish site — swap for a giving page when one exists)
+
+  // ---------- helpers ----------
+  function startOfToday(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+  function keyOf(cal,d){ return "day:"+cal+":"+d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate(); }
+  function apiUrl(cal,d){ return API+"/"+cal+"/"+d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate()+"/"; }
+  function isToday(d){ var t=startOfToday(); return d.getTime()===t.getTime(); }
+  function fmtDate(d){
+    try{ return d.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long",year:"numeric"}); }
+    catch(e){ return d.toDateString(); }
+  }
+  function el(id){ return document.getElementById(id); }
+  function show(node,on){ node.classList[on?"remove":"add"]("hidden"); }
+
+  // ---------- fasting colour ----------
+  function fastColour(desc){
+    var s=(desc||"").toLowerCase();
+    if(s.indexOf("no fast")>-1 || s.indexOf("fast-free")>-1 || s.indexOf("fast free")>-1) return "#2e8b4f"; // green
+    if(s.indexOf("fish")>-1) return "#3f7fbf";       // blue
+    if(s.indexOf("wine")>-1 || s.indexOf("oil")>-1) return "#c79a3a"; // gold
+    if(s.indexOf("caviar")>-1) return "#3f7fbf";
+    if(s.indexOf("fast")>-1) return "#8a2b2b";       // strict-ish red
+    return "#a9791f";
+  }
+
+  // ---------- rendering ----------
+  function render(data, opts){
+    opts = opts || {};
+    state.renderSeq++;                       // invalidates any in-flight NKJV swaps from a previous day
+    lastRender = { data: data, opts: opts }; // lets the KJV/NKJV toggle re-render instantly
+    el("date").textContent = fmtDate(state.date);
+
+    // Optional alternate (Julian civil) date if the API supplies it
+    var alt = data && (data.julian_calendar_date || data.date_julian || data.jdate);
+    el("altdate").textContent = alt ? ("Old-Calendar date: "+alt) : (state.cal==="julian" ? "Old Calendar (Julian)" : "New Calendar (Revised Julian)");
+
+    el("summary").textContent = (data && (data.summary_title || (data.titles && data.titles[0]))) || "";
+
+    // Fast — when the calendar notes no relaxation, the traditional strict norm applies; say so.
+    var fdesc = (data && (data.fast_level_desc || data.fast_level_description)) || "";
+    var fexc  = (data && (data.fast_exception_desc || (data.fast_exception && String(data.fast_exception)))) || "";
+    var isFastDay = /fast/i.test(fdesc) && !/no fast|fast[\s-]?free/i.test(fdesc);
+    var hasExc = !!(fexc && fexc !== "0");
+    el("fastText").textContent = fdesc || "—";
+    if(hasExc){
+      el("fastDot").style.background = fastColour(fdesc + " " + fexc); // colour reflects what is permitted
+      el("fastExc").textContent = "· " + fexc;
+    } else if(isFastDay){
+      el("fastDot").style.background = "#8a2b2b";
+      el("fastExc").textContent = "· Strict fast — traditionally no meat, dairy, fish, wine or oil";
+    } else {
+      el("fastDot").style.background = fastColour(fdesc);
+      el("fastExc").textContent = "";
+    }
+
+    // Commemorations — show the FULL list: union of titles + feasts + saints (deduped), minus the headline
+    var summary = el("summary").textContent;
+    var seen = {}, list = [];
+    function addCommem(v){
+      if(v==null) return;
+      v = String(v).trim(); if(!v) return;
+      var k = v.toLowerCase();
+      if(seen[k]) return; seen[k] = 1;
+      if(v === summary) return;         // already shown as the headline
+      list.push(v);
+    }
+    (data && Array.isArray(data.titles) ? data.titles : []).forEach(addCommem);
+    ["feasts","saints"].forEach(function(k){
+      if(data && Array.isArray(data[k])) data[k].forEach(function(x){
+        addCommem(typeof x === "string" ? x : (x && (x.title || x.name || x.feast_name)));
+      });
+    });
+    var ul = el("commemList"); ul.innerHTML="";
+    list.forEach(function(t){ var li=document.createElement("li"); li.textContent=t; ul.appendChild(li); });
+    el("commemLink").setAttribute("href", orthoChristianURL(state.date));
+    show(el("commemCard"), list.length>0);
+
+    // Service notes
+    var notes = data && data.service_notes;
+    if(Array.isArray(notes)) notes = notes.filter(Boolean).join(" · ");
+    if(notes){ el("notesText").textContent = notes; show(el("notesCard"), true); }
+    else show(el("notesCard"), false);
+
+    // Readings
+    var wrap = el("readings"); wrap.innerHTML="";
+    var readings = (data && data.readings) || [];
+    if(readings.length===0){
+      var none=document.createElement("div"); none.className="card"; none.style.color="var(--muted)";
+      none.textContent="No readings are listed for this day.";
+      wrap.appendChild(none);
+    }
+    readings.forEach(function(r){
+      var card=document.createElement("div"); card.className="reading";
+      var head=document.createElement("div"); head.className="head";
+      if(r.source){ var s=document.createElement("div"); s.className="src"; s.textContent=r.source; head.appendChild(s); }
+      var ref=document.createElement("div"); ref.className="ref";
+      ref.textContent = r.display||r.short_display||"Reading";
+      var badge=document.createElement("span"); badge.className="ver"; badge.textContent="KJV";
+      ref.appendChild(badge); head.appendChild(ref);
+      var chev=document.createElement("span"); chev.className="chev"; chev.textContent="▼"; head.appendChild(chev);
+      head.addEventListener("click", function(){ card.classList.toggle("open"); });
+      card.appendChild(head);
+
+      var body=document.createElement("div"); body.className="body";
+      renderPassageKJV(body, r);
+      card.appendChild(body);
+      wrap.appendChild(card);
+
+      if(state.txt==="nkjv"){
+        applyNKJV(body, badge, r.display||r.short_display, state.renderSeq);
+      }
+    });
+
+    // Liturgical colour, lives, tracker, troparia, quote, St Theophan
+    applyLit(liturgicalKey(state.date, data, fdesc));
+    renderLives(data);
+    renderTracker(fdesc);
+    el("troparLink").setAttribute("href", htmURL(state.date));
+    renderQuote();
+    renderTheophan(readings);
+
+    // stamp
+    var stamp = opts.cached ? ("Saved copy" + (opts.when? " · "+opts.when : "")) : ("Updated " + new Date().toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"}));
+    el("stamp").textContent = stamp;
+
+    show(el("content"), true);
+    el("loading").classList.add("hidden");
+  }
+
+  // ---------- Paschalion + feast & fast tracker (Old Calendar, civil dates, valid 1900–2099) ----------
+  function paschaCivil(y){
+    var a=y%4, b=y%7, c=y%19;
+    var d=(19*c+15)%30, e=(2*a+4*b-d+34)%7;
+    var mo=Math.floor((d+e+114)/31), da=((d+e+114)%31)+1;   // Julian-calendar date
+    return new Date(y, mo-1, da+13);                        // +13 days → civil date
+  }
+  function feastsFor(y){
+    var P=paschaCivil(y);
+    function f(n,m,d){ return {n:n, d:new Date(y,m-1,d)}; }
+    function pf(n,off){ return {n:n, d:new Date(P.getFullYear(),P.getMonth(),P.getDate()+off)}; }
+    return [
+      f("Nativity of Christ",1,7), f("Theophany",1,19), f("Meeting of the Lord",2,15),
+      f("Annunciation",4,7), pf("Palm Sunday",-7), pf("Pascha",0), pf("Ascension",39),
+      pf("Pentecost",49), f("Ss Peter & Paul",7,12), f("Transfiguration",8,19),
+      f("Dormition",8,28), f("Nativity of the Theotokos",9,21), f("Exaltation of the Cross",9,27),
+      f("Entry of the Theotokos",12,4)
+    ];
+  }
+  function seasonInfo(t, fdesc){
+    var s=(fdesc||"").toLowerCase(), y=t.getFullYear();
+    function dayN(start){ return Math.round((t-start)/86400000)+1; }
+    if(s.indexOf("lent")>-1){
+      var P=paschaCivil(y); if(P<t) P=paschaCivil(y+1);
+      var st=new Date(P.getFullYear(),P.getMonth(),P.getDate()-48);
+      return (t>=st) ? {name:"Great Lent", day:dayN(st)} : null;
+    }
+    if(s.indexOf("apostles")>-1){
+      var Pp=paschaCivil(y); if(Pp>t) Pp=paschaCivil(y-1);
+      var st2=new Date(Pp.getFullYear(),Pp.getMonth(),Pp.getDate()+57); // Monday after All Saints
+      return (t>=st2) ? {name:"Apostles’ Fast", day:dayN(st2)} : null;
+    }
+    if(s.indexOf("dormition")>-1){
+      var st3=new Date(y,7,14); if(t<st3) st3=new Date(y-1,7,14);
+      return {name:"Dormition Fast", day:dayN(st3)};
+    }
+    if(s.indexOf("nativity")>-1){
+      var st4=new Date(y,10,28); if(t<st4) st4=new Date(y-1,10,28);
+      return {name:"Nativity Fast", day:dayN(st4)};
+    }
+    return null;
+  }
+  function renderTracker(fdesc){
+    var t=new Date(state.date.getFullYear(), state.date.getMonth(), state.date.getDate());
+    var wrap=el("tracker"); wrap.innerHTML="";
+    function chip(html, isToday){
+      var c=document.createElement("span"); c.className="chip"+(isToday?" today":"");
+      c.innerHTML=html; wrap.appendChild(c);
+    }
+    var season=seasonInfo(t,fdesc);
+    if(season) chip("<b>"+season.name+"</b> · day "+season.day);
+    var all=feastsFor(t.getFullYear()).concat(feastsFor(t.getFullYear()+1));
+    var today=null, next=null;
+    all.forEach(function(fx){
+      var diff=Math.round((fx.d-t)/86400000);
+      if(diff===0) today=fx;
+      if(diff>0 && (!next || fx.d<next.d)) next=fx;
+    });
+    if(today) chip("☀ <b>"+today.n+"</b> — today", true);
+    if(next){
+      var nd=Math.round((next.d-t)/86400000);
+      chip("Next feast: <b>"+next.n+"</b> in "+nd+(nd===1?" day":" days"));
+    }
+    var P=paschaCivil(t.getFullYear()); if(P<=t) P=paschaCivil(t.getFullYear()+1);
+    var pd=Math.round((P-t)/86400000);
+    if(pd>0) chip("Pascha in <b>"+pd+"</b> days");
+  }
+
+  // ---------- Liturgical colour of the day (Russian/ROCOR practice; adjust the table freely) ----------
+  // Colours: burgundy (default) · blue Theotokos · red martyrs & Paschaltide · green prophets/venerables/Pentecost
+  //          violet Cross & Lent · white Lord's great feasts · gold apostles & hierarchs
+  var LIT_BARS = { burgundy:"#5c161c", blue:"#1e3357", red:"#7d1518", green:"#1e4d2b",
+                   violet:"#46246b", white:"#9a8a5c", gold:"#8a6a14" };
+  function litFixed(y){
+    return {
+      blue:   [[9,21],[12,4],[4,7],[8,28],[2,15],[10,14]],       // Nat. Theotokos, Entry, Annunc., Dormition, Meeting, Protection
+      white:  [[1,7],[1,19],[8,19]],                              // Nativity, Theophany, Transfiguration
+      violet: [[9,27],[8,14]],                                    // Exaltation, Procession of the Cross
+      gold:   [[7,12]]                                            // Ss Peter & Paul
+    };
+  }
+  function liturgicalKey(d, data, fdesc){
+    var t=new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var P=paschaCivil(t.getFullYear());
+    var diff=Math.round((t-P)/86400000);
+    if(diff===-7) return "green";                                  // Palm Sunday
+    if(diff>=0 && diff<39) return "red";                           // Pascha to Ascension eve (Russian: red)
+    if(diff===39) return "white";                                  // Ascension
+    if(diff>=48 && diff<=55) return "green";                       // Pentecost + week
+    var fx=litFixed(t.getFullYear());
+    for(var k in fx){ for(var i=0;i<fx[k].length;i++){
+      if(t.getMonth()+1===fx[k][i][0] && t.getDate()===fx[k][i][1]) return k; } }
+    var head=String((data && (data.summary_title || (data.titles&&data.titles[0]))) || "");
+    if(/theotokos|mother of god|most holy lady/i.test(head)) return "blue";
+    if(/\bcross\b/i.test(head)) return "violet";
+    if(/martyr/i.test(head)) return "red";
+    if(/prophet/i.test(head)) return "green";
+    if(/\bven\.|venerable|abbots? of|ascetic|recluse/i.test(head)) return "green";
+    if(/apostle|equal-to-the-apostles/i.test(head)) return "gold";
+    if(/hierarch|archbishop|metropolitan of|bishop of|wonderworker/i.test(head)) return "gold";
+    if(/lent/i.test(fdesc||"")) return "violet";                   // Great Lent weekdays/Sundays
+    return "burgundy";
+  }
+  function applyLit(key){
+    document.documentElement.setAttribute("data-lit", key);
+    var meta=document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.setAttribute("content", LIT_BARS[key] || LIT_BARS.burgundy);
+  }
+
+  // ---------- Wisdom of the Fathers (bundled, rotates with the viewed day) ----------
+  var FATHERS=null;
+  function loadFathers(){
+    fetch("fathers.json").then(function(r){ return r.ok? r.json():null; }).then(function(j){
+      FATHERS=j; if(lastRender) renderQuote();
+    }).catch(function(){});
+  }
+  function renderQuote(){
+    var card=el("quoteCard");
+    if(!FATHERS || !FATHERS.quotes || !FATHERS.quotes.length){ card.classList.add("hidden"); return; }
+    var d=state.date, start=new Date(d.getFullYear(),0,1);
+    var doy=Math.round((d-start)/86400000);
+    var q=FATHERS.quotes[((doy % FATHERS.quotes.length)+FATHERS.quotes.length) % FATHERS.quotes.length];
+    el("quoteText").textContent="“"+q.q+"”";
+    el("quoteBy").textContent="— "+q.by+(q.src? (" · "+q.src):"");
+    card.classList.remove("hidden");
+  }
+
+  // ---------- Lives of the Saints (Jordanville notes carried by orthocal) ----------
+  function renderLives(data){
+    var stories=(data && (data.stories || data.lives)) || [];
+    var lw=el("livesList"); lw.innerHTML="";
+    (Array.isArray(stories)?stories:[]).forEach(function(st){
+      var title=String((st && (st.title||st.name))||"").trim() || "Life";
+      var text=String((st && (st.story||st.content||st.text))||"")
+        .replace(/<br\s*\/?>/gi,"\n").replace(/<\/p>/gi,"\n\n")
+        .replace(/<[^>]*>/g," ").replace(/[ \t]+/g," ").trim();
+      if(!text) return;
+      var det=document.createElement("details"); det.className="life";
+      var sum=document.createElement("summary"); sum.textContent=title; det.appendChild(sum);
+      var dv=document.createElement("div"); dv.className="ltext";
+      text.split(/\n{2,}/).forEach(function(par){
+        par=par.trim(); if(!par) return;
+        var p=document.createElement("p"); p.textContent=par; dv.appendChild(p);
+      });
+      det.appendChild(dv); lw.appendChild(det);
+    });
+    show(el("livesCard"), lw.childNodes.length>0);
+  }
+
+  // ---------- Troparia link (Holy Trinity Jordanville calendar, civil-date params) ----------
+  function htmURL(d){
+    return "https://www.holytrinityorthodox.com/calendar/calendar.php?month="+(d.getMonth()+1)+
+      "&today="+d.getDate()+"&year="+d.getFullYear()+"&dt=1&header=1&lives=1&trp=1&scripture=1";
+  }
+
+  // ---------- Share ----------
+  function shareDay(){
+    var d=(lastRender && lastRender.data)||{};
+    var refs=((d.readings)||[]).map(function(r){ return r.display; }).filter(Boolean).join(" · ");
+    var txt="☦ "+el("date").textContent+" ("+(state.cal==="julian"?"Old Calendar":"New Calendar")+")\n"+
+      (d.summary_title? d.summary_title+"\n":"")+
+      (el("fastText").textContent && el("fastText").textContent!=="—" ? "Fast: "+el("fastText").textContent+"\n" : "")+
+      (refs? "Readings: "+refs+"\n" : "")+ location.href;
+    if(navigator.share){
+      navigator.share({title:"Daily Orthodox Readings", text:txt}).catch(function(){});
+    } else if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){
+        var b=el("shareBtn"); b.classList.add("done");
+        setTimeout(function(){ b.classList.remove("done"); },1200);
+      }).catch(function(){});
+    }
+  }
+
+  // ---------- Text size ----------
+  var SCALES=[90,100,110,120,130];
+  function applyScale(){ document.body.style.zoom = (state.scale/100); }
+  function bumpScale(dir){
+    var i=SCALES.indexOf(state.scale); if(i<0) i=1;
+    i=Math.max(0, Math.min(SCALES.length-1, i+dir));
+    state.scale=SCALES[i]; store.setItem("pref:scale", String(state.scale)); applyScale();
+  }
+
+  // ---------- St Theophan: link to the official English reflection for the day ----------
+  // OrthoChristian publishes the official English "Thoughts for Each Day"; the reflection follows
+  // the movable cycle, which is shared by Old- and New-Calendar parishes, so "today" is correct.
+  // OrthoChristian calendar pages are keyed by the OLD-CALENDAR (Julian) date: /calendar/YYYYMMDD.html
+  // Julian date = civil date − 13 days (valid 1900–2100). St Theophan's reflection is on each page.
+  function orthoChristianURL(civilDate){
+    var j = new Date(civilDate.getFullYear(), civilDate.getMonth(), civilDate.getDate() - 13);
+    var mm = ("0"+(j.getMonth()+1)).slice(-2), dd = ("0"+j.getDate()).slice(-2);
+    return "https://orthochristian.com/calendar/" + j.getFullYear() + mm + dd + ".html";
+  }
+  function findGospelRef(readings){
+    var g = null;
+    (readings||[]).forEach(function(r){
+      if(g) return;
+      var src = (r.source||"").toLowerCase();
+      var disp = r.display || r.short_display || "";
+      var bookish = disp.replace(/^\s*(i{1,3}|1|2|3)\s+/i,"");
+      if(/gospel/.test(src) || /^(matthew|mark|luke|john|matt|mk|lk|jn)\b/i.test(bookish)) g = disp;
+    });
+    return g;
+  }
+  function renderTheophan(readings){
+    var g = findGospelRef(readings);
+    var sub = el("theophanSub");
+    sub.textContent = "";
+    if(g){
+      sub.appendChild(document.createTextNode("His reflection follows the day’s Gospel, "));
+      var b = document.createElement("b"); b.textContent = g; sub.appendChild(b);
+      sub.appendChild(document.createTextNode("."));
+    } else {
+      sub.textContent = "His reflection follows the day’s Gospel and Epistle.";
+    }
+    el("theophanLink").setAttribute("href", orthoChristianURL(state.date));
+  }
+
+  // ---------- Bible text: KJV (bundled in the calendar data) / NKJV (fetched per chapter) ----------
+  function renderPassageKJV(body, r){
+    body.innerHTML="";
+    var passage = r.passage || r.verses || [];
+    if(passage && passage.length){
+      passage.forEach(function(v){
+        var p=document.createElement("p"); p.className="v";
+        var num=(v.verse!=null)?v.verse:(v.number!=null?v.number:"");
+        if(num!==""){ var sup=document.createElement("sup"); sup.textContent=num; p.appendChild(sup); }
+        p.appendChild(document.createTextNode((v.content!=null?v.content:(v.text||"")).trim()));
+        body.appendChild(p);
+      });
+    } else {
+      var n=document.createElement("div"); n.className="none";
+      n.textContent="Full text not provided — see the reference above.";
+      body.appendChild(n);
+    }
+  }
+
+  var BOOKS = {gen:1,genesis:1,ex:2,exod:2,exodus:2,lev:3,leviticus:3,num:4,numbers:4,deut:5,deuteronomy:5,
+    josh:6,joshua:6,judg:7,judges:7,ruth:8,"1sam":9,"1samuel":9,"2sam":10,"2samuel":10,
+    "1kgs":11,"1kings":11,"2kgs":12,"2kings":12,"1chr":13,"1chron":13,"1chronicles":13,"2chr":14,"2chron":14,"2chronicles":14,
+    ezra:15,neh:16,nehemiah:16,esth:17,esther:17,job:18,ps:19,psalm:19,psalms:19,prov:20,proverbs:20,
+    eccl:21,ecclesiastes:21,song:22,songofsolomon:22,songofsongs:22,isa:23,isaiah:23,jer:24,jeremiah:24,
+    lam:25,lamentations:25,ezek:26,ezekiel:26,dan:27,daniel:27,hos:28,hosea:28,joel:29,amos:30,
+    obad:31,obadiah:31,jonah:32,mic:33,micah:33,nah:34,nahum:34,hab:35,habakkuk:35,zeph:36,zephaniah:36,
+    hag:37,haggai:37,zech:38,zechariah:38,mal:39,malachi:39,
+    matt:40,matthew:40,mt:40,mark:41,mk:41,luke:42,lk:42,john:43,jn:43,acts:44,
+    rom:45,romans:45,"1cor":46,"1corinthians":46,"2cor":47,"2corinthians":47,gal:48,galatians:48,
+    eph:49,ephesians:49,phil:50,philippians:50,php:50,col:51,colossians:51,
+    "1thess":52,"1thessalonians":52,"1th":52,"2thess":53,"2thessalonians":53,"2th":53,
+    "1tim":54,"1timothy":54,"2tim":55,"2timothy":55,titus:56,tit:56,phlm:57,philem:57,philemon:57,
+    heb:58,hebrews:58,jas:59,james:59,"1pet":60,"1peter":60,"2pet":61,"2peter":61,
+    "1john":62,"1jn":62,"2john":63,"2jn":63,"3john":64,"3jn":64,jude:65,rev:66,revelation:66};
+
+  function bookNum(s){
+    s = String(s).toLowerCase().replace(/\./g,"").replace(/\s+/g," ").trim();
+    s = s.replace(/^iii\b/,"3").replace(/^ii\b/,"2").replace(/^i\b/,"1");
+    return BOOKS[s.replace(/\s+/g,"")] || null;
+  }
+
+  // Parses "Romans 9:1-5", "1 Corinthians 7.12-24", "Matthew 14:35-15:11", "Luke 1:39-49, 56",
+  // "John 7:37-52, 8:12" → {book, segs:[{c,a,b}]} (b=-1 means "to end of chapter"). Null if unparseable.
+  function parseRef(display){
+    if(!display) return null;
+    var str = String(display).replace(/[–—−]/g,"-").trim();
+    var m = str.match(/^((?:[123]|I{1,3})?\s*[A-Za-z][A-Za-z .]*?)\s+(\d[\d:.,;\s-]*)$/);
+    if(!m) return null;
+    var book = bookNum(m[1]); if(!book) return null;
+    var parts = m[2].replace(/\s+/g,"").split(/[,;]/);
+    var segs=[], ch=null;
+    for(var i=0;i<parts.length;i++){
+      var p = parts[i]; if(!p) continue;
+      p = p.replace(/\./g,":");
+      var a = p.split("-"); if(a.length>2) return null;
+      var c1,v1, s1=a[0], s2=(a.length===2)?a[1]:null;
+      if(s1.indexOf(":")>-1){ var x=s1.split(":"); c1=parseInt(x[0],10); v1=parseInt(x[1],10); ch=c1; }
+      else { if(ch==null) return null; c1=ch; v1=parseInt(s1,10); }
+      if(!c1||!v1) return null;
+      if(s2==null){ segs.push({c:c1,a:v1,b:v1}); continue; }
+      if(s2.indexOf(":")>-1){
+        var y=s2.split(":"); var c2=parseInt(y[0],10), v2=parseInt(y[1],10);
+        if(!c2||!v2) return null;
+        if(c2===c1){ segs.push({c:c1,a:v1,b:v2}); }
+        else{
+          segs.push({c:c1,a:v1,b:-1});
+          for(var cc=c1+1;cc<c2;cc++) segs.push({c:cc,a:1,b:-1});
+          segs.push({c:c2,a:1,b:v2}); ch=c2;
+        }
+      } else {
+        var v2b=parseInt(s2,10); if(!v2b) return null;
+        segs.push({c:c1,a:v1,b:v2b});
+      }
+    }
+    return segs.length ? {book:book, segs:segs} : null;
+  }
+
+  var NKJV_API = "https://bolls.life/get-text/NKJV/"; // + book/chapter/
+  function fetchNKJVChapter(book, ch){
+    var key = "nkjv:"+book+":"+ch;
+    try{ var raw=store.getItem(key); if(raw) return Promise.resolve(JSON.parse(raw)); }catch(e){}
+    var url = NKJV_API + book + "/" + ch + "/";
+    return fetchJSON(url).catch(function(){ return fetchJSON(PROXY+encodeURIComponent(url)); })
+      .then(function(arr){
+        if(!Array.isArray(arr) || !arr.length) throw new Error("empty chapter");
+        var slim = arr.map(function(v){ return {verse:v.verse, text:v.text}; });
+        try{ store.setItem(key, JSON.stringify(slim)); }catch(e){}
+        return slim;
+      });
+  }
+
+  function buildNKJVFragment(parsed, chaptersMap){
+    var frag = document.createDocumentFragment();
+    parsed.segs.forEach(function(sg){
+      var arr = chaptersMap[sg.c] || [];
+      var end = (sg.b===-1) ? (arr.length ? arr[arr.length-1].verse : 0) : sg.b;
+      arr.forEach(function(v){
+        if(v.verse < sg.a || v.verse > end) return;
+        var p=document.createElement("p"); p.className="v";
+        var sup=document.createElement("sup"); sup.textContent=v.verse; p.appendChild(sup);
+        var txt=String(v.text||"").replace(/<[^>]*>/g," ").replace(/\s+/g," ").trim();
+        p.appendChild(document.createTextNode(txt));
+        frag.appendChild(p);
+      });
+    });
+    return frag;
+  }
+
+  function applyNKJV(bodyEl, badgeEl, display, seq){
+    var parsed = parseRef(display);
+    if(!parsed) return; // unparseable (e.g. composite/apocryphal reading) — KJV stays
+    var chs=[]; parsed.segs.forEach(function(s){ if(chs.indexOf(s.c)<0) chs.push(s.c); });
+    Promise.all(chs.map(function(c){
+      return fetchNKJVChapter(parsed.book, c).then(function(a){ return [c,a]; });
+    })).then(function(pairs){
+      if(seq!==state.renderSeq || state.txt!=="nkjv") return; // day changed or toggled meanwhile
+      var map={}; pairs.forEach(function(p){ map[p[0]]=p[1]; });
+      var frag = buildNKJVFragment(parsed, map);
+      if(!frag.childNodes.length) return; // verses not found — keep KJV
+      bodyEl.innerHTML=""; bodyEl.appendChild(frag);
+      badgeEl.textContent="NKJV";
+    }).catch(function(){ /* fetch failed — KJV stays, badge already says so */ });
+  }
+
+  function setTxt(t){
+    state.txt = t; store.setItem("pref:txt", t);
+    Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
+      b.classList.toggle("active", b.getAttribute("data-txt")===t);
+    });
+    show(el("nkjvNote"), t==="nkjv");
+    if(lastRender) render(lastRender.data, lastRender.opts);
+  }
+
+  // ---------- data ----------
+  function readCache(cal,d){
+    try{ var raw=store.getItem(keyOf(cal,d)); return raw?JSON.parse(raw):null; }catch(e){ return null; }
+  }
+  function writeCache(cal,d,data){
+    try{ store.setItem(keyOf(cal,d), JSON.stringify({t:Date.now(), data:data})); }catch(e){}
+  }
+
+  function fetchJSON(url){
+    return fetch(url, {headers:{Accept:"application/json"}}).then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status); return r.json();
+    });
+  }
+  function fetchDay(cal,d){
+    var url=apiUrl(cal,d);
+    return fetchJSON(url).catch(function(){
+      // fallback through a CORS proxy (covers unusual networks / transient blocks)
+      return fetchJSON(PROXY+encodeURIComponent(url));
+    });
+  }
+
+  function load(){
+    el("offlineBanner").classList.remove("show");
+    el("errorBanner").classList.remove("show");
+
+    // instant paint from cache if we have it
+    var cached = readCache(state.cal, state.date);
+    if(cached && cached.data){
+      render(cached.data, {cached:true, when:new Date(cached.t).toLocaleDateString("en-AU")});
+    } else {
+      show(el("content"), false);
+      el("loading").classList.remove("hidden");
+    }
+
+    fetchDay(state.cal, state.date).then(function(data){
+      writeCache(state.cal, state.date, data);
+      render(data, {cached:false});
+    }).catch(function(err){
+      if(cached && cached.data){
+        el("offlineBanner").classList.add("show");   // showing saved copy
+      } else {
+        el("loading").classList.add("hidden");
+        var b=el("errorBanner");
+        b.innerHTML = "Couldn’t load the readings. Check your connection, or open "+
+          "<a href='https://orthocal.info/' target='_blank' rel='noopener'>orthocal.info</a>.";
+        b.classList.add("show");
+      }
+    });
+  }
+
+  // ---------- navigation ----------
+  function goDays(n){ state.date=new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()+n); syncTodayBtn(); load(); }
+  function goToday(){ state.date=startOfToday(); syncTodayBtn(); load(); }
+  function syncTodayBtn(){ el("today").classList.toggle("hidden", isToday(state.date)); }
+
+  function setCal(cal){
+    state.cal=cal; store.setItem("pref:cal",cal);
+    Array.prototype.forEach.call(document.querySelectorAll("#calSeg button"), function(b){
+      b.classList.toggle("active", b.getAttribute("data-cal")===cal);
+    });
+    load();
+  }
+
+  el("prev").addEventListener("click", function(){ goDays(-1); });
+  el("next").addEventListener("click", function(){ goDays(1); });
+  el("today").addEventListener("click", goToday);
+  Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
+    b.addEventListener("click", function(){ setTxt(b.getAttribute("data-txt")); });
+  });
+  el("shareBtn").addEventListener("click", shareDay);
+  el("gearBtn").addEventListener("click", function(){ el("sheet").classList.toggle("hidden"); });
+  el("commemHead").addEventListener("click", function(){ el("commemCard").classList.toggle("open"); });
+  el("date").addEventListener("click", function(){
+    var dp=el("datePick"), d=state.date;
+    dp.value = d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);
+    if(dp.showPicker){ try{ dp.showPicker(); }catch(e){ dp.click(); } } else { dp.click(); }
+  });
+  el("datePick").addEventListener("change", function(){
+    var v=el("datePick").value; if(!v) return;
+    var p=v.split("-");
+    state.date=new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+    syncTodayBtn(); load();
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("#sizeSeg button"), function(b){
+    b.addEventListener("click", function(){ bumpScale(b.getAttribute("data-sz")==="+" ? 1 : -1); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll("#calSeg button"), function(b){
+    b.addEventListener("click", function(){ setCal(b.getAttribute("data-cal")); });
+  });
+
+  // swipe left/right to change day
+  var tx=0, ty=0;
+  document.addEventListener("touchstart", function(e){ tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+  document.addEventListener("touchend", function(e){
+    var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.6){ goDays(dx<0?1:-1); }
+  }, {passive:true});
+
+  // ---------- boot ----------
+  if(DONATE_URL){ var _sl=el("supportLink"); _sl.setAttribute("href", DONATE_URL); _sl.classList.remove("hidden"); }
+  Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
+    b.classList.toggle("active", b.getAttribute("data-txt")===state.txt);
+  });
+  show(el("nkjvNote"), state.txt==="nkjv");
+  if(SCALES.indexOf(state.scale)<0) state.scale=100;
+  applyScale();
+  loadFathers();
+  window.__parseRef = parseRef;       // exposed for automated tests
+  window.__paschaCivil = paschaCivil; // exposed for automated tests
+  window.__litKey = liturgicalKey;    // exposed for automated tests
+  setCal(state.cal);   // paints active state + triggers first load
+  syncTodayBtn();
+
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -529,17 +529,31 @@
     var mo=Math.floor((d+e+114)/31), da=((d+e+114)%31)+1;   // Julian-calendar date
     return new Date(y, mo-1, da+13);                        // +13 days → civil date
   }
+  // Calendar reckoning: nominal (menaion) church dates + offset. Old Calendar: +13 days; New: 0.
+  function calOffsetDays(){ return state.cal==="julian" ? 13 : 0; }
+  function menaionOf(d){ var o=calOffsetDays(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()-o); }
+  // Fixed Great Feasts by NOMINAL (menaion) date [month, day, name]
+  var FIXED_FEASTS = [
+    [9,8,"Nativity of the Theotokos"],[9,14,"Exaltation of the Cross"],[11,21,"Entry of the Theotokos"],
+    [12,25,"Nativity of Christ"],[1,6,"Theophany"],[2,2,"Meeting of the Lord"],[3,25,"Annunciation"],
+    [6,29,"Ss Peter & Paul"],[8,6,"Transfiguration"],[8,15,"Dormition"]
+  ];
   function feastsFor(y){
-    var P=paschaCivil(y);
-    function f(n,m,d){ return {n:n, d:new Date(y,m-1,d)}; }
-    function pf(n,off){ return {n:n, d:new Date(P.getFullYear(),P.getMonth(),P.getDate()+off)}; }
-    return [
-      f("Nativity of Christ",1,7), f("Theophany",1,19), f("Meeting of the Lord",2,15),
-      f("Annunciation",4,7), pf("Palm Sunday",-7), pf("Pascha",0), pf("Ascension",39),
-      pf("Pentecost",49), f("Ss Peter & Paul",7,12), f("Transfiguration",8,19),
-      f("Dormition",8,28), f("Nativity of the Theotokos",9,21), f("Exaltation of the Cross",9,27),
-      f("Entry of the Theotokos",12,4)
-    ];
+    var P=paschaCivil(y), off=calOffsetDays(), out=[];
+    FIXED_FEASTS.forEach(function(fx){ out.push({n:fx[2], d:new Date(y, fx[0]-1, fx[1]+off)}); });
+    [["Palm Sunday",-7],["Pascha",0],["Ascension",39],["Pentecost",49]].forEach(function(pf){
+      out.push({n:pf[0], d:new Date(P.getFullYear(),P.getMonth(),P.getDate()+pf[1])});
+    });
+    return out;
+  }
+  function feastOn(d){
+    var y=d.getFullYear(), hit=null;
+    [y-1,y,y+1].forEach(function(yy){
+      feastsFor(yy).forEach(function(fx){
+        if(fx.d.getFullYear()===d.getFullYear() && fx.d.getMonth()===d.getMonth() && fx.d.getDate()===d.getDate()) hit=fx.n;
+      });
+    });
+    return hit;
   }
   function seasonInfo(t, fdesc){
     var s=(fdesc||"").toLowerCase(), y=t.getFullYear();
@@ -555,11 +569,11 @@
       return (t>=st2) ? {name:"Apostles’ Fast", day:dayN(st2)} : null;
     }
     if(s.indexOf("dormition")>-1){
-      var st3=new Date(y,7,14); if(t<st3) st3=new Date(y-1,7,14);
+      var st3=new Date(y,7,1+calOffsetDays()); if(t<st3) st3=new Date(y-1,7,1+calOffsetDays());
       return {name:"Dormition Fast", day:dayN(st3)};
     }
     if(s.indexOf("nativity")>-1){
-      var st4=new Date(y,10,28); if(t<st4) st4=new Date(y-1,10,28);
+      var st4=new Date(y,10,15+calOffsetDays()); if(t<st4) st4=new Date(y-1,10,15+calOffsetDays());
       return {name:"Nativity Fast", day:dayN(st4)};
     }
     return null;
@@ -573,7 +587,7 @@
     }
     var season=seasonInfo(t,fdesc);
     if(season) chip("<b>"+season.name+"</b> · day "+season.day);
-    var all=feastsFor(t.getFullYear()).concat(feastsFor(t.getFullYear()+1));
+    var all=feastsFor(t.getFullYear()-1).concat(feastsFor(t.getFullYear()), feastsFor(t.getFullYear()+1));
     var today=null, next=null;
     all.forEach(function(fx){
       var diff=Math.round((fx.d-t)/86400000);
@@ -595,14 +609,13 @@
   //          violet Cross & Lent · white Lord's great feasts · gold apostles & hierarchs
   var LIT_BARS = { burgundy:"#5c161c", blue:"#1e3357", red:"#7d1518", green:"#1e4d2b",
                    violet:"#46246b", white:"#9a8a5c", gold:"#8a6a14" };
-  function litFixed(y){
-    return {
-      blue:   [[9,21],[12,4],[4,7],[8,28],[2,15],[10,14]],       // Nat. Theotokos, Entry, Annunc., Dormition, Meeting, Protection
-      white:  [[1,7],[1,19],[8,19]],                              // Nativity, Theophany, Transfiguration
-      violet: [[9,27],[8,14]],                                    // Exaltation, Procession of the Cross
-      gold:   [[7,12]]                                            // Ss Peter & Paul
-    };
-  }
+  // Fixed-feast colours by NOMINAL (menaion) date — correct on either calendar reckoning
+  var LIT_FIXED = {
+    blue:   [[9,8],[11,21],[3,25],[8,15],[2,2],[10,1]],          // Nat. Theotokos, Entry, Annunc., Dormition, Meeting, Protection
+    white:  [[12,25],[1,6],[8,6]],                                // Nativity, Theophany, Transfiguration
+    violet: [[9,14],[8,1]],                                       // Exaltation, Procession of the Cross
+    gold:   [[6,29]]                                              // Ss Peter & Paul
+  };
   function liturgicalKey(d, data, fdesc){
     var t=new Date(d.getFullYear(), d.getMonth(), d.getDate());
     var P=paschaCivil(t.getFullYear());
@@ -610,10 +623,10 @@
     if(diff===-7) return "green";                                  // Palm Sunday
     if(diff>=0 && diff<39) return "red";                           // Pascha to Ascension eve (Russian: red)
     if(diff===39) return "white";                                  // Ascension
-    if(diff>=48 && diff<=55) return "green";                       // Pentecost + week
-    var fx=litFixed(t.getFullYear());
-    for(var k in fx){ for(var i=0;i<fx[k].length;i++){
-      if(t.getMonth()+1===fx[k][i][0] && t.getDate()===fx[k][i][1]) return k; } }
+    if(diff>=49 && diff<=55) return "green";                       // Pentecost + week
+    var md=menaionOf(t), mm=md.getMonth()+1, mday=md.getDate();
+    for(var k in LIT_FIXED){ for(var i=0;i<LIT_FIXED[k].length;i++){
+      if(mm===LIT_FIXED[k][i][0] && mday===LIT_FIXED[k][i][1]) return k; } }
     var head=String((data && (data.summary_title || (data.titles&&data.titles[0]))) || "");
     if(/theotokos|mother of god|most holy lady/i.test(head)) return "blue";
     if(/\bcross\b/i.test(head)) return "violet";
@@ -635,37 +648,42 @@
   // Returns {f:0|1|2, fish:bool, feast:string|null} — 0 no fast, 1 fast, 2 strict fast season/day.
   function fastRule(d){
     var y=d.getFullYear(), P=paschaCivil(y), diff=Math.round((d-P)/86400000);
-    var m=d.getMonth()+1, day=d.getDate(), dow=d.getDay(); // 0=Sun
-    var feast=null;
-    feastsFor(y).forEach(function(fx){
-      if(fx.d.getMonth()===d.getMonth() && fx.d.getDate()===day && fx.d.getFullYear()===y) feast=fx.n;
-    });
-    function btw(m1,d1,m2,d2){ var a=new Date(y,m1-1,d1), b=new Date(y,m2-1,d2,23,59); return d>=a&&d<=b; }
-    // Fast-free weeks
-    if(diff>=0&&diff<=6)   return {f:0,fish:false,feast:feast};      // Bright Week
-    if(diff>=50&&diff<=55) return {f:0,fish:false,feast:feast};      // Trinity week
+    var dow=d.getDay(); // 0=Sun — weekdays are the same on either reckoning
+    var md=menaionOf(d), mm=md.getMonth()+1, mday=md.getDate(); // nominal (menaion) date
+    var feast=feastOn(d);
+    var x=mm*100+mday;
+    function mbtw(m1,d1,m2,d2){ var a=m1*100+d1, b=m2*100+d2; return (a<=b) ? (x>=a&&x<=b) : (x>=a||x<=b); }
+    var weekend=(dow===0||dow===6);
+    // Fast-free weeks (movable + Svyatki)
+    if(diff>=0&&diff<=6)     return {f:0,fish:false,feast:feast};    // Bright Week
+    if(diff>=50&&diff<=55)   return {f:0,fish:false,feast:feast};    // Trinity week
     if(diff>=-69&&diff<=-63) return {f:0,fish:false,feast:feast};    // week after Publican & Pharisee
-    if(btw(1,7,1,17))      return {f:0,fish:false,feast:feast};      // Nativity to Theophany eve (Svyatki)
-    // Cheesefare week (no meat; dairy, eggs, fish allowed)
+    if(mbtw(12,25,1,4))      return {f:0,fish:false,feast:feast};    // Nativity to Theophany eve (Svyatki)
+    // Cheesefare week (no meat; dairy, eggs and fish allowed)
     if(diff>=-55&&diff<=-49) return {f:1,fish:true,feast:feast};
-    // Great Lent + Holy Week
+    // Great Lent + Holy Week (strict; fish on Annunciation & Palm Sunday; wine & oil weekends & Lazarus Saturday)
     if(diff>=-48&&diff<=-1){
-      var fish=(m===4&&day===7)||(diff===-7);                        // Annunciation, Palm Sunday
-      return {f:2,fish:fish,wineOil:(dow===0||dow===6)&&!fish,feast:feast};
+      var fishL=(mm===3&&mday===25)||(diff===-7);
+      return {f:2,fish:fishL,wineOil:(weekend||diff===-8)&&!fishL,feast:feast};
     }
-    // Dormition Fast
-    if(btw(8,14,8,27)) return {f:2,fish:(m===8&&day===19),wineOil:(dow===0||dow===6)&&!(m===8&&day===19),feast:feast};
-    // Apostles' Fast: Monday after All Saints (P+57) to 11 July civil
+    // Dormition Fast: 1–14 August nominal (fish on Transfiguration; wine & oil weekends)
+    if(mbtw(8,1,8,14)){
+      var fishD=(mm===8&&mday===6);
+      return {f:2,fish:fishD,wineOil:weekend&&!fishD,feast:feast};
+    }
+    // Apostles' Fast: Monday after All Saints (P+57) to 28 June nominal
+    // (common Slavic rule: fish Tue/Thu/Sat/Sun; wine & oil Monday; Wed/Fri stricter)
     var ap=new Date(P.getFullYear(),P.getMonth(),P.getDate()+57);
-    if(d>=ap && (m===6||(m===7&&day<=11)||(m===5&&d>=ap))) return {f:1,fish:(dow===0||dow===6),feast:feast};
-    // Nativity Fast: 28 Nov – 6 Jan civil (stricter final days)
-    if(btw(11,28,12,31)) return {f:1,fish:(dow===0||dow===6),feast:feast};
-    if(btw(1,2,1,6))     return {f:2,fish:false,feast:feast};
-    if(m===1&&day===1)   return {f:1,fish:(dow===0||dow===6),feast:feast};
+    if(d>=ap && x<=628 && mm>=5){
+      return {f:1,fish:(dow===0||dow===2||dow===4||dow===6),wineOil:(dow===1),feast:feast};
+    }
+    // Nativity Fast: 15 Nov – 24 Dec nominal (same weekday rule until 19 Dec; strict final days)
+    if(mbtw(11,15,12,19)) return {f:1,fish:(dow===0||dow===2||dow===4||dow===6),wineOil:(dow===1),feast:feast};
+    if(mbtw(12,20,12,24)) return {f:2,fish:false,wineOil:weekend,feast:feast};
     // One-day strict fasts
-    if(m===1&&day===18) return {f:2,fish:false,feast:feast};         // Eve of Theophany
-    if(m===9&&day===11) return {f:2,fish:false,feast:"Beheading of St John the Baptist"};
-    if(m===9&&day===27) return {f:2,fish:false,feast:feast};         // Exaltation
+    if(mm===1&&mday===5)  return {f:2,fish:false,feast:feast};       // Eve of Theophany
+    if(mm===8&&mday===29) return {f:2,fish:false,feast:"Beheading of St John the Baptist"};
+    if(mm===9&&mday===14) return {f:2,fish:false,feast:feast};       // Exaltation of the Cross
     // Ordinary Wednesdays and Fridays
     if(dow===3||dow===5) return {f:1,fish:false,feast:feast};
     return {f:0,fish:false,feast:feast};
@@ -755,8 +773,10 @@
 
   // ---------- Troparia link (Holy Trinity Jordanville calendar, civil-date params) ----------
   function htmURL(d){
-    return "https://www.holytrinityorthodox.com/calendar/calendar.php?month="+(d.getMonth()+1)+
-      "&today="+d.getDate()+"&year="+d.getFullYear()+"&dt=1&header=1&lives=1&trp=1&scripture=1";
+    // HTM's calendar is OS-keyed by civil date: on New Calendar, shift so its OS content matches the viewed menaion day
+    var h = new Date(d.getFullYear(), d.getMonth(), d.getDate() + (13 - calOffsetDays()));
+    return "https://www.holytrinityorthodox.com/calendar/calendar.php?month="+(h.getMonth()+1)+
+      "&today="+h.getDate()+"&year="+h.getFullYear()+"&dt=1&header=1&lives=1&trp=1&scripture=1";
   }
 
   // ---------- Share ----------
@@ -792,7 +812,8 @@
   // OrthoChristian calendar pages are keyed by the OLD-CALENDAR (Julian) date: /calendar/YYYYMMDD.html
   // Julian date = civil date − 13 days (valid 1900–2100). St Theophan's reflection is on each page.
   function orthoChristianURL(civilDate){
-    var j = new Date(civilDate.getFullYear(), civilDate.getMonth(), civilDate.getDate() - 13);
+    // OrthoChristian pages are keyed by the menaion (OS) date — subtract the active reckoning's offset
+    var j = menaionOf(civilDate);
     var mm = ("0"+(j.getMonth()+1)).slice(-2), dd = ("0"+j.getDate()).slice(-2);
     return "https://orthochristian.com/calendar/" + j.getFullYear() + mm + dd + ".html";
   }
@@ -1014,6 +1035,7 @@
     Array.prototype.forEach.call(document.querySelectorAll("#calSeg button"), function(b){
       b.classList.toggle("active", b.getAttribute("data-cal")===cal);
     });
+    if(calMonth && !el("calOverlay").classList.contains("hidden")) renderCal(); // month grid follows the reckoning
     load();
   }
 

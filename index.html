@@ -179,6 +179,31 @@
   .quote .qtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.65;color:var(--ink);margin:0 0 10px}
   .quote .qby{color:var(--gold);font-size:13px;font-weight:700;margin:0}
 
+  /* Month calendar overlay */
+  .calov{position:fixed;inset:0;z-index:100;background:rgba(20,10,8,.45);display:flex;align-items:flex-start;justify-content:center;padding:14px}
+  .calpanel{background:var(--bg);border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.4);
+    max-width:420px;width:100%;margin-top:calc(env(safe-area-inset-top) + 40px);padding:14px 14px 10px}
+  .calhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .caltitle{flex:1;border:0;background:none;font:inherit;font-size:17px;font-weight:800;color:var(--ink);cursor:pointer;text-align:center}
+  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .cwd{text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);padding:2px 0 6px}
+  .cd{position:relative;aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:var(--card);
+    font:inherit;cursor:pointer;padding:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+  .cd .n{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1}
+  .cd .mk{font-size:9px;line-height:1;min-height:10px}
+  .cd .ld{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%}
+  .cd.f1{background:color-mix(in srgb, var(--accent) 12%, var(--card))}
+  .cd.f2{background:color-mix(in srgb, var(--accent) 26%, var(--card))}
+  .cd.om{opacity:.35}
+  .cd.tod{outline:2px solid var(--gold);outline-offset:1px}
+  .cd.sel .n{color:var(--accent)}
+  .cd:active{transform:translateY(1px)}
+  .callegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 4px 0;color:var(--muted);font-size:11.5px;font-weight:600}
+  .lg{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid var(--line);vertical-align:-1px}
+  .lg1{background:color-mix(in srgb, var(--accent) 12%, var(--card))}
+  .lg2{background:color-mix(in srgb, var(--accent) 26%, var(--card))}
+  .calnote{color:var(--muted);font-size:10.5px;margin:8px 4px 4px;line-height:1.5}
+
   /* States */
   .banner{margin:12px 16px 0;padding:10px 14px;border-radius:12px;font-size:13.5px;display:none}
   .banner.show{display:block}
@@ -246,6 +271,25 @@
     <p class="summary" id="summary"></p>
   </section>
   <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
+
+  <div class="calov hidden" id="calOverlay">
+    <div class="calpanel">
+      <div class="calhead">
+        <button id="calPrev" class="hbtn" aria-label="Previous month">‹</button>
+        <button id="calTitle" class="caltitle" title="Tap for year picker">Month</button>
+        <button id="calNext" class="hbtn" aria-label="Next month">›</button>
+        <button id="calClose" class="hbtn" aria-label="Close">✕</button>
+      </div>
+      <div class="calgrid" id="calGrid"></div>
+      <div class="callegend">
+        <span><i class="lg lg1"></i> fast day</span>
+        <span><i class="lg lg2"></i> strict fast</span>
+        <span>🐟 fish allowed</span>
+        <span>✚ great feast</span>
+      </div>
+      <p class="calnote">The grid shows the general rule of the Church — open any day for its precise fast and feast.</p>
+    </div>
+  </div>
 
   <div class="banner offline" id="offlineBanner">Showing saved copy — you appear to be offline.</div>
   <div class="banner error" id="errorBanner"></div>
@@ -583,6 +627,88 @@
     if(meta) meta.setAttribute("content", LIT_BARS[key] || LIT_BARS.burgundy);
   }
 
+  // ---------- Fasting rule of the day (offline; the general rule — open a day for the precise fast) ----------
+  // Returns {f:0|1|2, fish:bool, feast:string|null} — 0 no fast, 1 fast, 2 strict fast season/day.
+  function fastRule(d){
+    var y=d.getFullYear(), P=paschaCivil(y), diff=Math.round((d-P)/86400000);
+    var m=d.getMonth()+1, day=d.getDate(), dow=d.getDay(); // 0=Sun
+    var feast=null;
+    feastsFor(y).forEach(function(fx){
+      if(fx.d.getMonth()===d.getMonth() && fx.d.getDate()===day && fx.d.getFullYear()===y) feast=fx.n;
+    });
+    function btw(m1,d1,m2,d2){ var a=new Date(y,m1-1,d1), b=new Date(y,m2-1,d2,23,59); return d>=a&&d<=b; }
+    // Fast-free weeks
+    if(diff>=0&&diff<=6)   return {f:0,fish:false,feast:feast};      // Bright Week
+    if(diff>=50&&diff<=55) return {f:0,fish:false,feast:feast};      // Trinity week
+    if(diff>=-69&&diff<=-63) return {f:0,fish:false,feast:feast};    // week after Publican & Pharisee
+    if(btw(1,7,1,17))      return {f:0,fish:false,feast:feast};      // Nativity to Theophany eve (Svyatki)
+    // Cheesefare week (no meat; dairy, eggs, fish allowed)
+    if(diff>=-55&&diff<=-49) return {f:1,fish:true,feast:feast};
+    // Great Lent + Holy Week
+    if(diff>=-48&&diff<=-1){
+      var fish=(m===4&&day===7)||(diff===-7);                        // Annunciation, Palm Sunday
+      return {f:2,fish:fish,feast:feast};
+    }
+    // Dormition Fast
+    if(btw(8,14,8,27)) return {f:2,fish:(m===8&&day===19),feast:feast};
+    // Apostles' Fast: Monday after All Saints (P+57) to 11 July civil
+    var ap=new Date(P.getFullYear(),P.getMonth(),P.getDate()+57);
+    if(d>=ap && (m===6||(m===7&&day<=11)||(m===5&&d>=ap))) return {f:1,fish:(dow===0||dow===6),feast:feast};
+    // Nativity Fast: 28 Nov – 6 Jan civil (stricter final days)
+    if(btw(11,28,12,31)) return {f:1,fish:(dow===0||dow===6),feast:feast};
+    if(btw(1,2,1,6))     return {f:2,fish:false,feast:feast};
+    if(m===1&&day===1)   return {f:1,fish:(dow===0||dow===6),feast:feast};
+    // One-day strict fasts
+    if(m===1&&day===18) return {f:2,fish:false,feast:feast};         // Eve of Theophany
+    if(m===9&&day===11) return {f:2,fish:false,feast:"Beheading of St John the Baptist"};
+    if(m===9&&day===27) return {f:2,fish:false,feast:feast};         // Exaltation
+    // Ordinary Wednesdays and Fridays
+    if(dow===3||dow===5) return {f:1,fish:false,feast:feast};
+    return {f:0,fish:false,feast:feast};
+  }
+
+  // ---------- Month calendar overlay ----------
+  var calMonth=null;
+  function openCal(){
+    calMonth=new Date(state.date.getFullYear(), state.date.getMonth(), 1);
+    renderCal(); show(el("calOverlay"), true);
+  }
+  function closeCal(){ show(el("calOverlay"), false); }
+  function renderCal(){
+    var y=calMonth.getFullYear(), mo=calMonth.getMonth();
+    el("calTitle").textContent = calMonth.toLocaleDateString("en-AU",{month:"long",year:"numeric"});
+    var first=new Date(y,mo,1);
+    var startOffset=(first.getDay()+6)%7;                            // Monday-start grid
+    var start=new Date(y,mo,1-startOffset);
+    var today=startOfToday();
+    var grid=el("calGrid"); grid.innerHTML="";
+    ["M","T","W","T","F","S","S"].forEach(function(wd){
+      var h=document.createElement("div"); h.className="cwd"; h.textContent=wd; grid.appendChild(h);
+    });
+    for(var i=0;i<42;i++){
+      var d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);
+      var r=fastRule(d);
+      var cell=document.createElement("button");
+      cell.className="cd"+(r.f===1?" f1":"")+(r.f===2?" f2":"")+
+        (d.getMonth()!==mo?" om":"")+
+        (d.getTime()===today.getTime()?" tod":"")+
+        (d.getTime()===new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()).getTime()?" sel":"");
+      var lit=liturgicalKey(d, null, r.f===2?"Lenten Fast":"");
+      var n=document.createElement("span"); n.className="n"; n.textContent=d.getDate(); cell.appendChild(n);
+      var mk=document.createElement("span"); mk.className="mk";
+      mk.textContent=(r.feast?"✚":"")+(r.fish?"🐟":""); cell.appendChild(mk);
+      if(lit!=="burgundy"&&LIT_BARS[lit]){
+        var dot=document.createElement("span"); dot.className="ld"; dot.style.background=LIT_BARS[lit]; cell.appendChild(dot);
+      }
+      if(r.feast) cell.title=r.feast;
+      (function(dd){ cell.addEventListener("click", function(){
+        state.date=dd; syncTodayBtn(); closeCal(); load();
+      }); })(d);
+      grid.appendChild(cell);
+    }
+  }
+  function calNav(n){ calMonth=new Date(calMonth.getFullYear(), calMonth.getMonth()+n, 1); renderCal(); }
+
   // ---------- Wisdom of the Fathers (bundled, rotates with the viewed day) ----------
   var FATHERS=null;
   function loadFathers(){
@@ -896,7 +1022,12 @@
   el("shareBtn").addEventListener("click", shareDay);
   el("gearBtn").addEventListener("click", function(){ el("sheet").classList.toggle("hidden"); });
   el("commemHead").addEventListener("click", function(){ el("commemCard").classList.toggle("open"); });
-  el("date").addEventListener("click", function(){
+  el("date").addEventListener("click", openCal);
+  el("calPrev").addEventListener("click", function(){ calNav(-1); });
+  el("calNext").addEventListener("click", function(){ calNav(1); });
+  el("calClose").addEventListener("click", closeCal);
+  el("calOverlay").addEventListener("click", function(e){ if(e.target===el("calOverlay")) closeCal(); });
+  el("calTitle").addEventListener("click", function(){
     var dp=el("datePick"), d=state.date;
     dp.value = d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);
     if(dp.showPicker){ try{ dp.showPicker(); }catch(e){ dp.click(); } } else { dp.click(); }
@@ -905,7 +1036,7 @@
     var v=el("datePick").value; if(!v) return;
     var p=v.split("-");
     state.date=new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
-    syncTodayBtn(); load();
+    syncTodayBtn(); closeCal(); load();
   });
   Array.prototype.forEach.call(document.querySelectorAll("#sizeSeg button"), function(b){
     b.addEventListener("click", function(){ bumpScale(b.getAttribute("data-sz")==="+" ? 1 : -1); });
@@ -934,6 +1065,7 @@
   window.__parseRef = parseRef;       // exposed for automated tests
   window.__paschaCivil = paschaCivil; // exposed for automated tests
   window.__litKey = liturgicalKey;    // exposed for automated tests
+  window.__fastRule = fastRule;       // exposed for automated tests
   setCal(state.cal);   // paints active state + triggers first load
   syncTodayBtn();
 

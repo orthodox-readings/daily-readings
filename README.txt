@@ -39,9 +39,11 @@ A gold-cross icon appears on your home screen. Tap it each morning.
 
 
 USING IT
-  - ‹ › arrows beside the date (or swipe) move a day; TAP THE DATE to jump
-    to any day with a date picker; "Go to today" appears when you're away
-    from today.
+  - ‹ › arrows beside the date (or swipe) move a day; TAP THE DATE to open
+    the visual month calendar — fast days shaded, fish-allowed marks, great
+    feasts marked with a cross, liturgical-colour dots; tap any day to open
+    it. (Tap the month title for a quick year picker.) "Go to today" appears
+    when you're away from today.
   - Settings live behind the GEAR (top right): Old/New Calendar,
     Bible text (KJV / NKJV), and A−/A+ text size — all remembered.
   - NKJV loads per reading (unofficial source; © Thomas Nelson) and falls

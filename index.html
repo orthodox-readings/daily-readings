@@ -94,19 +94,22 @@
     background:linear-gradient(90deg,transparent,var(--gold-soft) 25%,var(--gold-soft) 75%,transparent);opacity:.6}
   .headpiece span{font-size:11px;opacity:.95;line-height:1}
 
-  /* Hero */
-  .hero{padding:12px 20px 4px;text-align:left}
-  .herobar{display:flex;align-items:flex-start;gap:10px}
-  .hbtn{background:var(--card);border:1px solid var(--line);color:var(--accent);border-radius:12px;
+  /* Hero — the day card, crowned with the liturgical colour */
+  .hero{padding:12px 16px 2px}
+  .datecard{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--accent);
+    border-radius:18px;box-shadow:var(--shadow);padding:12px 12px 13px;text-align:center;
+    transition:border-color .6s ease}
+  .herobar{display:flex;align-items:center;gap:8px}
+  .hbtn{background:var(--pill);border:1px solid var(--line);color:var(--accent);border-radius:12px;
     width:42px;height:42px;font-size:20px;display:inline-flex;align-items:center;justify-content:center;
-    padding:0;cursor:pointer;flex:0 0 auto;margin-top:2px;box-shadow:var(--shadow)}
+    padding:0;cursor:pointer;flex:0 0 auto}
   .hbtn:active{transform:translateY(1px)}
-  .date{font-size:26px;font-weight:800;letter-spacing:.2px;margin:0;color:var(--ink);padding:0 4px;flex:1;
-    cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1.25}
-  .todaybtn{border:0;background:none;color:var(--accent);font:inherit;font-size:12.5px;font-weight:700;
-    cursor:pointer;padding:6px 2px 0;text-align:left}
-  .altdate{color:var(--muted);font-size:13px;margin:6px 0 8px}
-  .summary{color:var(--accent);font-size:16px;font-weight:700;margin:0;line-height:1.5}
+  .date{font-size:23px;font-weight:800;letter-spacing:.2px;margin:0;color:var(--ink);padding:0 2px;flex:1;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1.25;text-align:center}
+  .altdate{color:var(--muted);font-size:12.5px;margin:8px 0 0}
+  .summary{color:var(--accent);font-size:15.5px;font-weight:700;margin:9px 0 0;line-height:1.5}
+  .todaybtn{border:0;background:none;color:var(--gold);font:inherit;font-size:12.5px;font-weight:700;
+    cursor:pointer;padding:9px 2px 0;display:inline-block}
 
   /* Fast + tracker */
   .fast{display:flex;align-items:center;gap:10px;margin:14px 20px 0;flex-wrap:wrap}
@@ -264,14 +267,16 @@
 
 <main class="wrap" id="app">
   <section class="hero">
-    <div class="herobar">
-      <button id="prev" class="hbtn" aria-label="Previous day">‹</button>
-      <h1 class="date" id="date" title="Tap to jump to a date">—</h1>
-      <button id="next" class="hbtn" aria-label="Next day">›</button>
+    <div class="datecard">
+      <div class="herobar">
+        <button id="prev" class="hbtn" aria-label="Previous day">‹</button>
+        <h1 class="date" id="date" title="Tap to open the calendar">—</h1>
+        <button id="next" class="hbtn" aria-label="Next day">›</button>
+      </div>
+      <p class="altdate" id="altdate"></p>
+      <p class="summary" id="summary"></p>
+      <button id="today" class="todaybtn hidden">Go to today</button>
     </div>
-    <button id="today" class="todaybtn hidden">Go to today</button>
-    <p class="altdate" id="altdate"></p>
-    <p class="summary" id="summary"></p>
   </section>
   <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
 
@@ -614,6 +619,7 @@
     blue:   [[9,8],[11,21],[3,25],[8,15],[2,2],[10,1]],          // Nat. Theotokos, Entry, Annunc., Dormition, Meeting, Protection
     white:  [[12,25],[1,6],[8,6]],                                // Nativity, Theophany, Transfiguration
     violet: [[9,14],[8,1]],                                       // Exaltation, Procession of the Cross
+    red:    [[8,29]],                                             // Beheading of St John the Baptist
     gold:   [[6,29]]                                              // Ss Peter & Paul
   };
   function liturgicalKey(d, data, fdesc){
@@ -627,6 +633,7 @@
     var md=menaionOf(t), mm=md.getMonth()+1, mday=md.getDate();
     for(var k in LIT_FIXED){ for(var i=0;i<LIT_FIXED[k].length;i++){
       if(mm===LIT_FIXED[k][i][0] && mday===LIT_FIXED[k][i][1]) return k; } }
+    if(/lent/i.test(fdesc||"")) return "violet";                   // Lenten weekdays keep the dark colour, whoever is commemorated
     var head=String((data && (data.summary_title || (data.titles&&data.titles[0]))) || "");
     if(/theotokos|mother of god|most holy lady/i.test(head)) return "blue";
     if(/\bcross\b/i.test(head)) return "violet";
@@ -635,7 +642,6 @@
     if(/\bven\.|venerable|abbots? of|ascetic|recluse/i.test(head)) return "green";
     if(/apostle|equal-to-the-apostles/i.test(head)) return "gold";
     if(/hierarch|archbishop|metropolitan of|bishop of|wonderworker/i.test(head)) return "gold";
-    if(/lent/i.test(fdesc||"")) return "violet";                   // Great Lent weekdays/Sundays
     return "burgundy";
   }
   function applyLit(key){

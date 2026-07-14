@@ -190,18 +190,18 @@
   .cd{position:relative;aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:var(--card);
     font:inherit;cursor:pointer;padding:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
   .cd .n{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1}
-  .cd .mk{font-size:9px;line-height:1;min-height:10px}
-  .cd .ld{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%}
-  .cd.f1{background:color-mix(in srgb, var(--accent) 12%, var(--card))}
-  .cd.f2{background:color-mix(in srgb, var(--accent) 26%, var(--card))}
+  .cd .mk{font-size:12px;line-height:1;min-height:13px}
+  .cd .ld{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%}
+  .cd.f1{background:color-mix(in srgb, var(--accent) 20%, var(--card));border-color:color-mix(in srgb, var(--accent) 35%, var(--line))}
+  .cd.f2{background:color-mix(in srgb, var(--accent) 38%, var(--card));border-color:color-mix(in srgb, var(--accent) 55%, var(--line))}
   .cd.om{opacity:.35}
   .cd.tod{outline:2px solid var(--gold);outline-offset:1px}
   .cd.sel .n{color:var(--accent)}
   .cd:active{transform:translateY(1px)}
   .callegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 4px 0;color:var(--muted);font-size:11.5px;font-weight:600}
   .lg{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid var(--line);vertical-align:-1px}
-  .lg1{background:color-mix(in srgb, var(--accent) 12%, var(--card))}
-  .lg2{background:color-mix(in srgb, var(--accent) 26%, var(--card))}
+  .lg1{background:color-mix(in srgb, var(--accent) 20%, var(--card))}
+  .lg2{background:color-mix(in srgb, var(--accent) 38%, var(--card))}
   .calnote{color:var(--muted);font-size:10.5px;margin:8px 4px 4px;line-height:1.5}
 
   /* States */
@@ -231,6 +231,9 @@
   <div class="row">
     <span class="brand"><span class="cross">☦</span><span>Daily<b>Readings</b></span></span>
     <span class="spacer"></span>
+    <button class="gearbtn" id="calBtn" aria-label="Open the month calendar">
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm4 6h2v2H9v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM9 17h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg>
+    </button>
     <button class="gearbtn" id="gearBtn" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19.4 13c0-.3.1-.6.1-1s0-.7-.1-1l2.1-1.6c.2-.2.2-.4.1-.6l-2-3.5c-.1-.2-.4-.3-.6-.2l-2.5 1c-.5-.4-1.1-.7-1.7-1l-.4-2.6c0-.2-.2-.4-.5-.4h-4c-.2 0-.4.2-.5.4l-.4 2.6c-.6.2-1.1.6-1.7 1l-2.5-1c-.2-.1-.5 0-.6.2l-2 3.5c-.1.2-.1.5.1.6L4.5 11c0 .3-.1.6-.1 1s0 .7.1 1l-2.1 1.6c-.2.2-.2.4-.1.6l2 3.5c.1.2.4.3.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.2 0 .4-.2.5-.4l.4-2.6c.6-.2 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.5c.1-.2.1-.5-.1-.6L19.4 13zM12 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"/></svg>
     </button>
@@ -285,6 +288,7 @@
         <span><i class="lg lg1"></i> fast day</span>
         <span><i class="lg lg2"></i> strict fast</span>
         <span>🐟 fish allowed</span>
+        <span>🍇 wine &amp; oil</span>
         <span>✚ great feast</span>
       </div>
       <p class="calnote">The grid shows the general rule of the Church — open any day for its precise fast and feast.</p>
@@ -647,10 +651,10 @@
     // Great Lent + Holy Week
     if(diff>=-48&&diff<=-1){
       var fish=(m===4&&day===7)||(diff===-7);                        // Annunciation, Palm Sunday
-      return {f:2,fish:fish,feast:feast};
+      return {f:2,fish:fish,wineOil:(dow===0||dow===6)&&!fish,feast:feast};
     }
     // Dormition Fast
-    if(btw(8,14,8,27)) return {f:2,fish:(m===8&&day===19),feast:feast};
+    if(btw(8,14,8,27)) return {f:2,fish:(m===8&&day===19),wineOil:(dow===0||dow===6)&&!(m===8&&day===19),feast:feast};
     // Apostles' Fast: Monday after All Saints (P+57) to 11 July civil
     var ap=new Date(P.getFullYear(),P.getMonth(),P.getDate()+57);
     if(d>=ap && (m===6||(m===7&&day<=11)||(m===5&&d>=ap))) return {f:1,fish:(dow===0||dow===6),feast:feast};
@@ -696,7 +700,7 @@
       var lit=liturgicalKey(d, null, r.f===2?"Lenten Fast":"");
       var n=document.createElement("span"); n.className="n"; n.textContent=d.getDate(); cell.appendChild(n);
       var mk=document.createElement("span"); mk.className="mk";
-      mk.textContent=(r.feast?"✚":"")+(r.fish?"🐟":""); cell.appendChild(mk);
+      mk.textContent=(r.feast?"✚":"")+(r.fish?"🐟":(r.wineOil?"🍇":"")); cell.appendChild(mk);
       if(lit!=="burgundy"&&LIT_BARS[lit]){
         var dot=document.createElement("span"); dot.className="ld"; dot.style.background=LIT_BARS[lit]; cell.appendChild(dot);
       }
@@ -1023,6 +1027,7 @@
   el("gearBtn").addEventListener("click", function(){ el("sheet").classList.toggle("hidden"); });
   el("commemHead").addEventListener("click", function(){ el("commemCard").classList.toggle("open"); });
   el("date").addEventListener("click", openCal);
+  el("calBtn").addEventListener("click", openCal);
   el("calPrev").addEventListener("click", function(){ calNav(-1); });
   el("calNext").addEventListener("click", function(){ calNav(1); });
   el("calClose").addEventListener("click", closeCal);

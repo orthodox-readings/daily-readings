@@ -338,6 +338,12 @@
       <p class="tattr">Opens the Holy Trinity Orthodox Calendar (holytrinityorthodox.com) for this day — the calendar referenced by Holy Trinity Monastery, Jordanville — with the troparia and kontakia and their tones.</p>
     </section>
 
+    <section class="card theophan hidden" id="azbykaCard">
+      <p class="label">Full Service Texts · Church Slavonic</p>
+      <a class="tbtn" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">This day’s full services on Azbyka →</a>
+      <p class="tattr">Opens azbyka.ru with the complete ordered texts of this day’s services — Vespers, Matins and Divine Liturgy — in Church Slavonic, for readers and choir. Follows the Old Calendar.</p>
+    </section>
+
     <section class="card theophan" id="theophanCard">
       <p class="label">A Thought for the Day · St Theophan the Recluse</p>
       <p class="tsub" id="theophanSub">His reflection follows the daily Gospel.</p>
@@ -516,6 +522,7 @@
     renderLives(data);
     renderTracker(fdesc);
     el("troparLink").setAttribute("href", htmURL(state.date));
+    renderAzbyka();
     renderQuote();
     renderTheophan(readings);
 
@@ -783,6 +790,21 @@
     var h = new Date(d.getFullYear(), d.getMonth(), d.getDate() + (13 - calOffsetDays()));
     return "https://www.holytrinityorthodox.com/calendar/calendar.php?month="+(h.getMonth()+1)+
       "&today="+h.getDate()+"&year="+h.getFullYear()+"&dt=1&header=1&lives=1&trp=1&scripture=1";
+  }
+
+  // ---------- Azbyka daily service texts (Church Slavonic; OS civil-date keyed) ----------
+  function azbykaURL(d){
+    var m=String(d.getMonth()+1); if(m.length<2) m="0"+m;
+    var da=String(d.getDate()); if(da.length<2) da="0"+da;
+    return "https://azbyka.ru/worships/?date="+d.getFullYear()+"-"+m+"-"+da;
+  }
+  function renderAzbyka(){
+    // Azbyka assembles the whole day (movable + fixed cycles) on the Old Calendar.
+    // On the New Calendar the two cycles cannot both be matched to one azbyka date,
+    // so the link is offered on the Old Calendar only.
+    var on = state.cal==="julian";
+    show(el("azbykaCard"), on);
+    if(on) el("azbykaLink").setAttribute("href", azbykaURL(state.date));
   }
 
   // ---------- Share ----------
@@ -1099,6 +1121,7 @@
   window.__paschaCivil = paschaCivil; // exposed for automated tests
   window.__litKey = liturgicalKey;    // exposed for automated tests
   window.__fastRule = fastRule;       // exposed for automated tests
+  window.__azbykaURL = azbykaURL;     // exposed for automated tests
   setCal(state.cal);   // paints active state + triggers first load
   syncTodayBtn();
 

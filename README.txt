@@ -55,11 +55,15 @@ USING IT
     Pascha countdown.
   - Lives of the Saints: tap a name to read the Jordanville note.
   - Troparia & Kontakia: opens the day's hymns on the Jordanville calendar.
+  - Full Service Texts: opens the complete ordered services for the day
+    (Vespers, Matins, Liturgy) in Church Slavonic on azbyka.ru — for readers
+    and choir. Shown in Old Calendar mode.
   - "A Thought for the Day": St Theophan's reflection on OrthoChristian.
   - Wisdom of the Fathers: a daily rotating saying (bundled, offline).
   - Share button (top right): send the day to WhatsApp, Signal, etc.
   - Days you've already opened are saved, so they still show offline.
-  - Design: black & gold, always — made for OLED screens and easy eyes.
+  - Design: burgundy & parchment, with liturgical colours that follow the
+    feast day; dark mode follows your phone.
 
 
 NOTES

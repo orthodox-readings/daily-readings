@@ -461,10 +461,14 @@
     var fexc  = (data && (data.fast_exception_desc || (data.fast_exception && String(data.fast_exception)))) || "";
     var isFastDay = /fast/i.test(fdesc) && !/no fast|fast[\s-]?free/i.test(fdesc);
     var hasExc = !!(fexc && fexc !== "0");
-    var fico = hasExc ? (/fish/i.test(fexc) ? "🐟" : (/wine|oil/i.test(fexc) ? "🍇" : "")) : "";
+    // An allowance only means something on an actual fast day. Some calendar records
+    // carry a great saint's allowance (e.g. St Vladimir: fish) that applies only when
+    // his feast falls on a Wednesday or Friday — on non-fast years it must be suppressed.
+    var showExc = hasExc && isFastDay;
+    var fico = showExc ? (/fish/i.test(fexc) ? "🐟" : (/wine|oil/i.test(fexc) ? "🍇" : "")) : "";
     el("fastWrap").classList.remove("hidden","strict");
     el("fastText").textContent = fdesc || "—";
-    if(hasExc){
+    if(showExc){
       el("fastDot").style.background = fastColour(fdesc + " " + fexc); // colour reflects what is permitted
       el("fastExc").textContent = fexc;
     } else if(isFastDay){
@@ -473,7 +477,7 @@
       el("fastExc").textContent = "no meat, dairy, fish, wine or oil";
     } else {
       el("fastDot").style.background = fastColour(fdesc);
-      el("fastExc").textContent = "";
+      el("fastExc").textContent = (hasExc && /fast[\s-]?free/i.test(fexc)) ? "fast-free week" : "";
     }
     el("fastIco").textContent = fico;
 

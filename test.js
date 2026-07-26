@@ -45,7 +45,9 @@ const MOCK = {
 const MOCK_STRICT = JSON.parse(JSON.stringify(MOCK));
 MOCK_STRICT.fast_level_desc = "Fast"; MOCK_STRICT.fast_exception_desc = "";
 const MOCK_NOFAST = JSON.parse(JSON.stringify(MOCK));
-MOCK_NOFAST.fast_level_desc = "No Fast"; MOCK_NOFAST.fast_exception_desc = "";
+// St Vladimir case: record carries a fish allowance that only applies when the
+// day falls on Wed/Fri — on a "No Fast" day the app must suppress it entirely.
+MOCK_NOFAST.fast_level_desc = "No Fast"; MOCK_NOFAST.fast_exception_desc = "Fish, Wine and Oil are Allowed";
 
 function serve(){
   return http.createServer((req,res)=>{
@@ -476,7 +478,9 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   await page.goto(base,{waitUntil:'networkidle'});
   await page.waitForSelector('.reading',{timeout:5000});
   const nfExc = await page.textContent('#fastExc');
+  const nfIco = await page.textContent('#fastIco');
   check('No-Fast day: no strict note', nfExc.trim()==='');
+  check('No-Fast day: spurious allowance suppressed (St Vladimir case)', nfExc.trim()==='' && nfIco.trim()==='');
   await ctx.close();
 
   // ================= 4. NKJV SOURCE DOWN =================

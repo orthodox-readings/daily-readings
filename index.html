@@ -187,6 +187,17 @@
   .quote .qtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.65;color:var(--ink);margin:0 0 10px}
   .quote .qby{color:var(--gold);font-size:13px;font-weight:700;margin:0}
 
+  /* Fast strip inside the date card */
+  .faststrip{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+    margin:14px -18px -16px;padding:11px 16px;border-top:1px solid var(--line);
+    background:color-mix(in srgb, var(--gold) 9%, transparent);
+    border-radius:0 0 16px 16px;font-size:12.5px;color:var(--ink);font-weight:600}
+  .faststrip.strict{background:color-mix(in srgb, #8a2b2b 10%, transparent)}
+  .faststrip .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+  .faststrip .fsep{color:var(--muted);font-weight:400}
+  .faststrip .fsep:not(:empty)::before{content:"· "}
+  .faststrip .fico{font-size:15px}
+
   /* Sleek link rows */
   .linksCard{padding:4px 16px 2px}
   .linksCard .label{margin:12px 0 2px}
@@ -297,6 +308,12 @@
       <p class="altdate" id="altdate"></p>
       <p class="summary" id="summary"></p>
       <button id="today" class="todaybtn hidden">Go to today</button>
+      <div class="faststrip hidden" id="fastWrap">
+        <span class="dot" id="fastDot"></span>
+        <span id="fastText">—</span>
+        <span class="fsep" id="fastExc"></span>
+        <span class="fico" id="fastIco"></span>
+      </div>
     </div>
   </section>
   <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
@@ -327,11 +344,6 @@
   <div id="loading" class="loading"><div class="spin"></div>Loading the day’s readings…</div>
 
   <div id="content" class="hidden">
-    <div class="fast" id="fastWrap">
-      <span class="pill"><span class="dot" id="fastDot"></span><span id="fastText">—</span></span>
-      <span class="exc" id="fastExc"></span>
-    </div>
-
     <div class="tracker" id="tracker"></div>
 
     <section class="card quote hidden" id="quoteCard">
@@ -449,17 +461,21 @@
     var fexc  = (data && (data.fast_exception_desc || (data.fast_exception && String(data.fast_exception)))) || "";
     var isFastDay = /fast/i.test(fdesc) && !/no fast|fast[\s-]?free/i.test(fdesc);
     var hasExc = !!(fexc && fexc !== "0");
+    var fico = hasExc ? (/fish/i.test(fexc) ? "🐟" : (/wine|oil/i.test(fexc) ? "🍇" : "")) : "";
+    el("fastWrap").classList.remove("hidden","strict");
     el("fastText").textContent = fdesc || "—";
     if(hasExc){
       el("fastDot").style.background = fastColour(fdesc + " " + fexc); // colour reflects what is permitted
-      el("fastExc").textContent = "· " + fexc;
+      el("fastExc").textContent = fexc;
     } else if(isFastDay){
       el("fastDot").style.background = "#8a2b2b";
-      el("fastExc").textContent = "· Strict fast — traditionally no meat, dairy, fish, wine or oil";
+      el("fastWrap").classList.add("strict");
+      el("fastExc").textContent = "no meat, dairy, fish, wine or oil";
     } else {
       el("fastDot").style.background = fastColour(fdesc);
       el("fastExc").textContent = "";
     }
+    el("fastIco").textContent = fico;
 
     // Commemorations — show the FULL list: union of titles + feasts + saints (deduped), minus the headline
     var summary = el("summary").textContent;
@@ -937,7 +953,7 @@
       var fastT=el("fastText").textContent||"";
       var exc=el("fastExc").textContent||"";
       if(fastT && fastT!=="—"){
-        var pill=fastT+(exc? " —"+exc.replace(/^\s*·\s*/," ") : "");
+        var pill=fastT+(exc? " — "+exc.replace(/^\s*·\s*/,"") : "");
         x.font="32px -apple-system, 'Segoe UI', Roboto, sans-serif";
         if(x.measureText(pill).width>820){ pill=fastT; }
         var pw=x.measureText(pill).width+80, py=fy+ff.lines.length*flh+50;

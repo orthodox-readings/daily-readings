@@ -165,6 +165,9 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const noteShown = await page.$eval('#nkjvNote', e=>!e.classList.contains('hidden'));
   check('summary rendered', /Cyrus|Sergius/.test(summary));
   check('fast exception shown when provided', /Wine and Oil/.test(fastExc));
+  const stripInCard = !!(await page.$('.datecard #fastWrap'));
+  const fico = await page.textContent('#fastIco');
+  check('fast strip lives in the date card with allowance icon', stripInCard===true && fico==='🍇');
   check('NKJV swapped in (32 verses across 3 readings)', nVerses===32);
   check('all readings badged NKJV', badges.join(',')==='NKJV,NKJV,NKJV');
   check('NKJV default + copyright note', segActive==='nkjv' && noteShown===true);
@@ -459,8 +462,10 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   await page.waitForSelector('.reading',{timeout:5000});
   const strictExc = await page.textContent('#fastExc');
   const strictDot = await page.$eval('#fastDot', e=>getComputedStyle(e).backgroundColor);
-  check('plain Fast day explains the strict norm', /Strict fast — traditionally no meat, dairy, fish, wine or oil/.test(strictExc));
+  const strictTint = await page.$eval('#fastWrap', e=>e.classList.contains('strict'));
+  check('plain Fast day explains the strict norm', /no meat, dairy, fish, wine or oil/.test(strictExc));
   check('strict fast dot red', strictDot==='rgb(138, 43, 43)');
+  check('strict day tints the fast strip red', strictTint===true);
   await ctx.close();
 
   // ================= 3. NO FAST =================

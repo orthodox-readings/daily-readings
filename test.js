@@ -173,13 +173,25 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const srcLabels = await page.$$eval('.reading .src', n=>n.map(x=>x.textContent));
   const livesAttr = await page.$eval('#livesCard .tattr', e=>e.textContent);
   const footerText = await page.$eval('.footer', e=>e.textContent);
-  const troparAttr = await page.$eval('#troparCard .tattr', e=>e.textContent);
+  const troparAttr = await page.$eval('#troparLink small', e=>e.textContent);
   check('reading labels: plain Epistle', srcLabels[0]==='Epistle');
   check('reading labels: feast qualifier shown', srcLabels[1]==='Gospel — Apostles');
   check('reading labels: Matins Gospel shown', srcLabels[2]==='6th Matins Gospel');
   check('Lives attribution: Abbamoses/John Brady', /Abbamoses/.test(livesAttr) && /John Brady/.test(livesAttr));
   check('footer: corrected sources (Slavic tradition + Abbamoses)', /Slavic Old-Calendar tradition/.test(footerText) && /Abbamoses/.test(footerText) && !/Jordanville\./.test(footerText.split('Lives')[0]));
-  check('Troparia attribution: holytrinityorthodox named', /holytrinityorthodox\.com/.test(troparAttr));
+  check('Troparia row names Holy Trinity calendar', /Holy Trinity/.test(troparAttr));
+
+  // --- card order: wisdom -> readings -> commemorations; combined links card last ---
+  const order = await page.evaluate(()=>{
+    const before=(a,b)=>!!(document.querySelector(a).compareDocumentPosition(document.querySelector(b)) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return { qb: before('#quoteCard','#readings'),
+             rb: before('#readings','#commemCard'),
+             cb: before('#commemCard','#linksCard'),
+             rows: document.querySelectorAll('#linksCard .lrow').length };
+  });
+  check('order: Wisdom before readings', order.qb===true);
+  check('order: readings before commemorations', order.rb===true);
+  check('combined links card below with 3 rows', order.cb===true && order.rows===3);
 
   // --- commemorations: collapsed by default, expand on tap ---
   const commClosed = await page.$eval('#commemList', e=>getComputedStyle(e).display==='none');
@@ -242,10 +254,40 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const quoteText = await page.textContent('#quoteText');
   check('Fathers quote of the day', quoteText.indexOf(expQ.q.slice(0,40))>-1);
 
-  // --- share ---
+  // --- share menu: text + tiles ---
   await page.click('#shareBtn');
+  const menuOpen = await page.$eval('#shareMenu', e=>!e.classList.contains('hidden'));
+  await page.click('#shareTextBtn');
   const shared = await page.evaluate(()=>window.__shared);
+  const menuClosed = await page.$eval('#shareMenu', e=>e.classList.contains('hidden'));
+  check('share button opens menu; text option closes it', menuOpen===true && menuClosed===true);
   check('share includes day summary + readings', !!shared && /Cyrus/.test(shared.text) && /Romans 9:1-5/.test(shared.text));
+
+  const tiles = await page.evaluate(()=>{
+    function probe(kind){
+      const c=window.__buildTile(kind), x=c.getContext('2d');
+      const px=x.getImageData(540,540,1,1).data, corner=x.getImageData(4,4,1,1).data;
+      return { w:c.width, h:c.height, drawn:(px[3]===255), corner:[corner[0],corner[1],corner[2]] };
+    }
+    return { w:probe('wisdom'), d:probe('day') };
+  });
+  const parchy = tiles.w.corner[0]>230 && tiles.w.corner[1]>220;
+  const burgy  = tiles.d.corner[0]>70 && tiles.d.corner[0]<120 && tiles.d.corner[2]<45;
+  check('wisdom tile: 1080px, drawn, parchment ground', tiles.w.w===1080 && tiles.w.h===1080 && tiles.w.drawn && parchy);
+  check('feast-day tile: 1080px, drawn, burgundy ground', tiles.d.w===1080 && tiles.d.h===1080 && tiles.d.drawn && burgy);
+
+  const tileShare = await page.evaluate(()=>new Promise(res=>{
+    window.__shared=null;
+    navigator.canShare = ()=>true;
+    document.getElementById('shareBtn').click();
+    document.getElementById('shareWisdomBtn').click();
+    let n=0;
+    (function poll(){ n++;
+      if(window.__shared||n>40) res(window.__shared && window.__shared.files ? {n:window.__shared.files.length, name:window.__shared.files[0].name, size:window.__shared.files[0].size} : null);
+      else setTimeout(poll,50);
+    })();
+  }));
+  check('wisdom tile shares as a PNG file', !!tileShare && tileShare.n===1 && /wisdom\.png$/.test(tileShare.name) && tileShare.size>20000);
 
   // --- support ---
   const supHref = await page.getAttribute('#supportLink','href');

@@ -83,6 +83,11 @@
   .sheet .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
   .sheet .srow:last-child{border-bottom:0}
   .sheet .lbl{font-size:12.5px;color:var(--muted);font-weight:700}
+  .sheet .mrow{display:block;width:100%;text-align:left;border:0;background:transparent;cursor:pointer;
+    padding:11px 0;border-bottom:1px solid var(--line);font:inherit;-webkit-tap-highlight-color:transparent}
+  .sheet .mrow:last-child{border-bottom:0}
+  .mrow .mtit{display:block;color:var(--ink);font-weight:700;font-size:14px}
+  .mrow .msub{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
   .seg,.seg2{display:inline-flex;background:var(--pill);border-radius:11px;padding:2px}
   .seg button,.seg2 button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;
     padding:5px 11px;border-radius:9px;cursor:pointer}
@@ -182,6 +187,17 @@
   .quote .qtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.65;color:var(--ink);margin:0 0 10px}
   .quote .qby{color:var(--gold);font-size:13px;font-weight:700;margin:0}
 
+  /* Sleek link rows */
+  .linksCard{padding:4px 16px 2px}
+  .linksCard .label{margin:12px 0 2px}
+  .lrow{display:flex;align-items:center;gap:12px;padding:13px 0;text-decoration:none;border-bottom:1px solid var(--line);-webkit-tap-highlight-color:transparent}
+  .lrow:last-child{border-bottom:0}
+  #azbykaCard .lrow{border-bottom:1px solid var(--line)}
+  .ltxt{flex:1;color:var(--ink);font-weight:700;font-size:14.5px}
+  .ltxt small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:3px;line-height:1.45}
+  .ltxt small b{color:var(--accent);font-weight:700}
+  .larr{color:var(--accent);font-size:22px;line-height:1;font-weight:400}
+
   /* Month calendar overlay */
   .calov{position:fixed;inset:0;z-index:100;background:rgba(20,10,8,.45);display:flex;align-items:flex-start;justify-content:center;padding:14px}
   .calpanel{background:var(--bg);border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.4);
@@ -260,6 +276,11 @@
           <button data-sz="+" aria-label="Larger text">A+</button>
         </span></div>
     </div>
+    <div class="sheet hidden" id="shareMenu">
+      <button class="mrow" id="shareTextBtn"><span class="mtit">Share as text</span><span class="msub">Saints, fast &amp; readings</span></button>
+      <button class="mrow" id="shareWisdomBtn"><span class="mtit">Wisdom tile</span><span class="msub">The day’s saying as an image</span></button>
+      <button class="mrow" id="shareDayBtn"><span class="mtit">Feast-day tile</span><span class="msub">Date, saints &amp; fast as an image</span></button>
+    </div>
   </div>
 </header>
 
@@ -313,6 +334,14 @@
 
     <div class="tracker" id="tracker"></div>
 
+    <section class="card quote hidden" id="quoteCard">
+      <p class="label">Wisdom of the Fathers</p>
+      <p class="qtext" id="quoteText"></p>
+      <p class="qby" id="quoteBy"></p>
+    </section>
+
+    <div id="readings"></div>
+
     <section class="card commem collapsible hidden" id="commemCard">
       <p class="label" id="commemHead">Commemorations<span class="cchev">▼</span></p>
       <ul id="commemList"></ul>
@@ -330,31 +359,11 @@
       <div id="notesText"></div>
     </section>
 
-    <div id="readings"></div>
-
-    <section class="card theophan" id="troparCard">
-      <p class="label">Troparia &amp; Kontakia</p>
-      <a class="tbtn" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Today’s troparia on the Holy Trinity calendar →</a>
-      <p class="tattr">Opens the Holy Trinity Orthodox Calendar (holytrinityorthodox.com) for this day — the calendar referenced by Holy Trinity Monastery, Jordanville — with the troparia and kontakia and their tones.</p>
-    </section>
-
-    <section class="card theophan hidden" id="azbykaCard">
-      <p class="label">Full Service Texts · Church Slavonic</p>
-      <a class="tbtn" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">This day’s full services on Azbyka →</a>
-      <p class="tattr">Opens azbyka.ru with the complete ordered texts of this day’s services — Vespers, Matins and Divine Liturgy — in Church Slavonic, for readers and choir. Follows the Old Calendar.</p>
-    </section>
-
-    <section class="card theophan" id="theophanCard">
-      <p class="label">A Thought for the Day · St Theophan the Recluse</p>
-      <p class="tsub" id="theophanSub">His reflection follows the daily Gospel.</p>
-      <a class="tbtn" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Read the full reflection on OrthoChristian →</a>
-      <p class="tattr">Opens St Theophan the Recluse, “Thoughts for Each Day of the Year” (official English text) on OrthoChristian.</p>
-    </section>
-
-    <section class="card quote hidden" id="quoteCard">
-      <p class="label">Wisdom of the Fathers</p>
-      <p class="qtext" id="quoteText"></p>
-      <p class="qby" id="quoteBy"></p>
+    <section class="card linksCard" id="linksCard">
+      <p class="label">For Prayer &amp; Study</p>
+      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Troparia &amp; Kontakia<small>The day’s hymns · Holy Trinity (Jordanville-referenced) calendar</small></span><span class="larr">›</span></a>
+      <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Full Service Texts<small>Vespers · Matins · Liturgy — Church Slavonic, azbyka.ru</small></span><span class="larr">›</span></a></span>
+      <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">His reflection follows the daily Gospel. OrthoChristian (official English text).</small></span><span class="larr">›</span></a>
     </section>
   </div>
 
@@ -825,6 +834,141 @@
     }
   }
 
+  // ---------- Share tiles (canvas, 1080×1080, app palette) ----------
+  var TILE=1080;
+  function tRoundRect(x,a,b,w,h,r){
+    x.beginPath();
+    x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r);
+    x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath();
+  }
+  function tWrap(x, text, maxW){
+    var words=String(text).split(/\s+/), lines=[], cur="";
+    words.forEach(function(w){
+      var t=cur? cur+" "+w : w;
+      if(x.measureText(t).width<=maxW || !cur){ cur=t; } else { lines.push(cur); cur=w; }
+    });
+    if(cur) lines.push(cur);
+    return lines;
+  }
+  function tFit(x, text, maxW, maxLines, startPx, minPx, font){
+    var px=startPx, lines;
+    for(;;){
+      x.font="italic 0px serif"; // reset quirk guard
+      x.font=font.replace("{px}", px);
+      lines=tWrap(x, text, maxW);
+      if(lines.length<=maxLines || px<=minPx) break;
+      px-=2;
+    }
+    return {px:px, lines:lines};
+  }
+  function tBase(x, dark){
+    var g=x.createLinearGradient(0,0,TILE*0.35,TILE);
+    if(dark){ g.addColorStop(0,"#5c161c"); g.addColorStop(1,"#3d0f14"); }
+    else { g.addColorStop(0,"#f6efe0"); g.addColorStop(1,"#efe3cc"); }
+    x.fillStyle=g; x.fillRect(0,0,TILE,TILE);
+    x.strokeStyle= dark? "rgba(212,175,110,.5)":"rgba(148,110,44,.55)";
+    x.lineWidth=3; tRoundRect(x,32,32,TILE-64,TILE-64,12); x.stroke();
+    x.textAlign="center"; x.textBaseline="middle";
+  }
+  function tOrnament(x, y, dark){
+    var gold= dark? "#d4af6e":"#946e2c";
+    x.fillStyle=gold; x.font="34px Georgia, serif";
+    x.fillText("☦", TILE/2, y);
+    x.strokeStyle=gold; x.globalAlpha=.55; x.lineWidth=1.5;
+    [[TILE/2-140,TILE/2-60],[TILE/2+60,TILE/2+140]].forEach(function(seg){
+      x.beginPath(); x.moveTo(seg[0],y); x.lineTo(seg[1],y); x.stroke();
+    });
+    x.globalAlpha=1;
+  }
+  function tLabel(x, text, y, dark){
+    x.fillStyle= dark? "#cdb68f":"#8a7a62";
+    try{ x.letterSpacing="6px"; }catch(e){}
+    x.font="700 26px -apple-system, 'Segoe UI', Roboto, sans-serif";
+    x.fillText(String(text).toUpperCase(), TILE/2, y);
+    try{ x.letterSpacing="0px"; }catch(e){}
+  }
+  function tFoot(x, dark){
+    x.fillStyle= dark? "#cdb68f":"#8a7a62";
+    try{ x.letterSpacing="4px"; }catch(e){}
+    x.font="26px -apple-system, 'Segoe UI', Roboto, sans-serif";
+    var lbl="DAILYREADINGS · "+(state.cal==="julian"?"OLD CALENDAR":"NEW CALENDAR");
+    x.fillText(lbl, TILE/2, TILE-84);
+    try{ x.letterSpacing="0px"; }catch(e){}
+  }
+  function tMonthDay(d){
+    var M=["January","February","March","April","May","June","July","August","September","October","November","December"];
+    return d.getDate()+" "+M[d.getMonth()];
+  }
+  function buildTile(kind){
+    var c=document.createElement("canvas"); c.width=TILE; c.height=TILE;
+    var x=c.getContext("2d");
+    var d=(lastRender && lastRender.data)||{};
+    if(kind==="wisdom"){
+      tBase(x,false); tOrnament(x,236,false);
+      tLabel(x,"Wisdom of the Fathers",320,false);
+      var q=el("quoteText").textContent||"";
+      var by=el("quoteBy").textContent||"";
+      var f=tFit(x,q,880,6,60,34,'{px}px Georgia, "Times New Roman", serif');
+      x.font=f.px+'px Georgia, "Times New Roman", serif';
+      x.fillStyle="#2b1b12";
+      var lh=f.px*1.5, block=f.lines.length*lh;
+      var y0=560-block/2+lh/2;
+      f.lines.forEach(function(L,i){ x.fillText(L, TILE/2, y0+i*lh); });
+      x.fillStyle="#946e2c"; x.font="700 34px -apple-system, 'Segoe UI', Roboto, sans-serif";
+      x.fillText(by, TILE/2, y0+f.lines.length*lh+40);
+      tFoot(x,false);
+    } else {
+      tBase(x,true); tOrnament(x,236,true);
+      x.fillStyle="#f3e4c4"; x.font="700 78px Georgia, serif";
+      var dateTxt=el("date").textContent||"";
+      var df=tFit(x,dateTxt,900,2,78,54,'700 {px}px Georgia, serif');
+      x.font='700 '+df.px+'px Georgia, serif';
+      var dy=360;
+      df.lines.forEach(function(L,i){ x.fillText(L, TILE/2, dy+i*df.px*1.25); });
+      dy+= df.lines.length*df.px*1.25 + 8;
+      x.fillStyle="#cdb68f"; x.font="30px -apple-system, 'Segoe UI', Roboto, sans-serif";
+      var osLine = state.cal==="julian" ? (tMonthDay(menaionOf(state.date))+" on the Old Calendar") : "New Calendar (Revised Julian)";
+      x.fillText(osLine, TILE/2, dy);
+      var feast=d.summary_title||"";
+      var ff=tFit(x,feast,880,3,50,32,'700 {px}px Georgia, serif');
+      x.font='700 '+ff.px+'px Georgia, serif'; x.fillStyle="#f3e4c4";
+      var flh=ff.px*1.45, fy=dy+90;
+      ff.lines.forEach(function(L,i){ x.fillText(L, TILE/2, fy+i*flh); });
+      var fastT=el("fastText").textContent||"";
+      var exc=el("fastExc").textContent||"";
+      if(fastT && fastT!=="—"){
+        var pill=fastT+(exc? " —"+exc.replace(/^\s*·\s*/," ") : "");
+        x.font="32px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        if(x.measureText(pill).width>820){ pill=fastT; }
+        var pw=x.measureText(pill).width+80, py=fy+ff.lines.length*flh+50;
+        x.fillStyle="rgba(212,175,110,.14)";
+        tRoundRect(x,TILE/2-pw/2,py-34,pw,68,34); x.fill();
+        x.strokeStyle="rgba(212,175,110,.4)"; x.lineWidth=1.5;
+        tRoundRect(x,TILE/2-pw/2,py-34,pw,68,34); x.stroke();
+        x.fillStyle="#f3e4c4"; x.fillText(pill, TILE/2, py);
+      }
+      tFoot(x,true);
+    }
+    return c;
+  }
+  function shareTile(kind){
+    try{
+      var c=buildTile(kind);
+      c.toBlob(function(blob){
+        if(!blob) return;
+        var f=new File([blob], "dailyreadings-"+kind+".png", {type:"image/png"});
+        if(navigator.share && navigator.canShare && navigator.canShare({files:[f]})){
+          navigator.share({files:[f], title:"Daily Orthodox Readings"}).catch(function(){});
+        } else {
+          var a=document.createElement("a");
+          a.href=URL.createObjectURL(blob); a.download=f.name;
+          document.body.appendChild(a); a.click();
+          setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1500);
+        }
+      },"image/png");
+    }catch(e){}
+  }
+
   // ---------- Text size ----------
   var SCALES=[90,100,110,120,130];
   function applyScale(){ document.body.style.zoom = (state.scale/100); }
@@ -1073,8 +1217,14 @@
   Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
     b.addEventListener("click", function(){ setTxt(b.getAttribute("data-txt")); });
   });
-  el("shareBtn").addEventListener("click", shareDay);
-  el("gearBtn").addEventListener("click", function(){ el("sheet").classList.toggle("hidden"); });
+  el("shareBtn").addEventListener("click", function(){
+    el("sheet").classList.add("hidden");
+    el("shareMenu").classList.toggle("hidden");
+  });
+  el("shareTextBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareDay(); });
+  el("shareWisdomBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareTile("wisdom"); });
+  el("shareDayBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareTile("day"); });
+  el("gearBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); el("sheet").classList.toggle("hidden"); });
   el("commemHead").addEventListener("click", function(){ el("commemCard").classList.toggle("open"); });
   el("date").addEventListener("click", openCal);
   el("calBtn").addEventListener("click", openCal);
@@ -1122,6 +1272,7 @@
   window.__litKey = liturgicalKey;    // exposed for automated tests
   window.__fastRule = fastRule;       // exposed for automated tests
   window.__azbykaURL = azbykaURL;     // exposed for automated tests
+  window.__buildTile = buildTile;     // exposed for automated tests
   setCal(state.cal);   // paints active state + triggers first load
   syncTodayBtn();
 

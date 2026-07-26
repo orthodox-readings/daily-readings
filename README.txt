@@ -54,13 +54,15 @@ USING IT
   - Feast & fast tracker: current fast day count, next Great Feast,
     Pascha countdown.
   - Lives of the Saints: tap a name to read the Jordanville note.
-  - Troparia & Kontakia: opens the day's hymns on the Jordanville calendar.
-  - Full Service Texts: opens the complete ordered services for the day
-    (Vespers, Matins, Liturgy) in Church Slavonic on azbyka.ru — for readers
-    and choir. Shown in Old Calendar mode.
-  - "A Thought for the Day": St Theophan's reflection on OrthoChristian.
-  - Wisdom of the Fathers: a daily rotating saying (bundled, offline).
-  - Share button (top right): send the day to WhatsApp, Signal, etc.
+  - The page reads top-down as a morning rule: the day's saying from the
+    Fathers, then the Epistle & Gospel, then commemorations and lives.
+  - "For Prayer & Study" card: slim tap-rows to the day's Troparia &
+    Kontakia (Jordanville calendar), the Full Service Texts in Church
+    Slavonic on azbyka.ru (Old Calendar mode), and St Theophan's daily
+    reflection on OrthoChristian.
+  - Share button (top right) now offers three things: the day as text, a
+    "Wisdom tile" (the day's saying as a square image for social media),
+    and a "Feast-day tile" (date, saints & fast as a burgundy image card).
   - Days you've already opened are saved, so they still show offline.
   - Design: burgundy & parchment, with liturgical colours that follow the
     feast day; dark mode follows your phone.

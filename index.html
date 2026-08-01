@@ -1010,15 +1010,23 @@
     return "https://orthochristian.com/calendar/" + j.getFullYear() + mm + dd + ".html";
   }
   function findGospelRef(readings){
-    var g = null;
+    // St Theophan's reflections follow the day's LITURGY Gospel. On Sundays the
+    // Matins (resurrectional) Gospel comes first in the list — it must be skipped,
+    // as must feast-specific extra Gospels (e.g. "Gospel — Prophet Elijah").
+    var plain=null, qualified=null, loose=null;
     (readings||[]).forEach(function(r){
-      if(g) return;
       var src = (r.source||"").toLowerCase();
       var disp = r.display || r.short_display || "";
+      if(!disp) return;
+      var isMatins = /matins/.test(src) || /matins/i.test(r.desc||"");
       var bookish = disp.replace(/^\s*(i{1,3}|1|2|3)\s+/i,"");
-      if(/gospel/.test(src) || /^(matthew|mark|luke|john|matt|mk|lk|jn)\b/i.test(bookish)) g = disp;
+      var looksGospel = /gospel/.test(src) || /^(matthew|mark|luke|john|matt|mk|lk|jn)\b/i.test(bookish);
+      if(!looksGospel || isMatins) return;
+      if(src==="gospel" && !r.desc){ if(!plain) plain = disp; }
+      else if(src==="gospel"){ if(!qualified) qualified = disp; }
+      else { if(!loose) loose = disp; }
     });
-    return g;
+    return plain || qualified || loose;
   }
   function renderTheophan(readings){
     var g = findGospelRef(readings);
@@ -1293,6 +1301,7 @@
   window.__fastRule = fastRule;       // exposed for automated tests
   window.__azbykaURL = azbykaURL;     // exposed for automated tests
   window.__buildTile = buildTile;     // exposed for automated tests
+  window.__gospelRef = findGospelRef; // exposed for automated tests
   setCal(state.cal);   // paints active state + triggers first load
   syncTodayBtn();
 

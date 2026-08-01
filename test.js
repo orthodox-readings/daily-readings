@@ -238,6 +238,23 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('Azbyka service-texts card shown on Old Calendar', azShown===true);
   check('Azbyka link -> civil-date worships URL', azHref===expAzbyka);
 
+  // --- St Theophan subtitle must cite the LITURGY Gospel, never the Matins Gospel ---
+  const theoSub = await page.textContent('#theophanSub');
+  check('Theophan sub cites the Liturgy Gospel (mock day)', /Matthew 9:18-26/.test(theoSub) && !/Luke 24/.test(theoSub));
+  const gsel = await page.evaluate(()=>window.__gospelRef([
+    {source:'9th Matins Gospel', display:'John 20:19-31'},
+    {source:'Epistle', display:'1 Corinthians 3:9-17'},
+    {source:'Epistle', desc:'Prophet Elijah', display:'James 5:10-20'},
+    {source:'Gospel', display:'Matthew 14:22-34'},
+    {source:'Gospel', desc:'Prophet Elijah', display:'Luke 4:22-30'}
+  ]));
+  check('Theophan ref: Liturgy Gospel beats Matins + feast Gospels (2 Aug case)', gsel==='Matthew 14:22-34');
+  const gselFeast = await page.evaluate(()=>window.__gospelRef([
+    {source:'Matins Gospel', display:'Luke 1:39-49'},
+    {source:'Gospel', desc:'Theotokos', display:'Luke 10:38-42'}
+  ]));
+  check('Theophan ref: feast Gospel used when no plain Liturgy Gospel', gselFeast==='Luke 10:38-42');
+
   // --- paschalion + tracker ---
   const paschas = await page.evaluate(()=>[2026,2027,2028,2029,2030].map(y=>window.__paschaCivil(y).toDateString()));
   check('Paschalion 2026 = Sun Apr 12', paschas[0]==='Sun Apr 12 2026');

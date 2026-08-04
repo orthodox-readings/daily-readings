@@ -363,7 +363,7 @@
     <section class="card lives hidden" id="livesCard">
       <p class="label">Lives of the Saints</p>
       <div id="livesList"></div>
-      <p class="tattr">From “Lives of the Saints” by John Brady (Abbamoses.com), used with permission via orthocal.info.</p>
+      <p class="tattr">From “Lives of the Saints” by John Brady (Abbamoses.com), used with permission via orthocal.info. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
     </section>
 
     <section class="card hidden" id="notesCard">
@@ -487,6 +487,10 @@
     function addCommem(v){
       if(v==null) return;
       v = String(v).trim(); if(!v) return;
+      // Data hygiene: some feed entries arrive with the same text doubled
+      // ("X X" — e.g. Righteous Anna, 23 Jul OS 2026). Collapse exact self-repeats.
+      var half = Math.floor(v.length/2);
+      if(half>3 && v.slice(0,half).trim() === v.slice(half).trim()) v = v.slice(0,half).trim();
       var k = v.toLowerCase();
       if(seen[k]) return; seen[k] = 1;
       if(v === summary) return;         // already shown as the headline

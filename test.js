@@ -14,7 +14,8 @@ const MOCK = {
     "Translation of the relics of Ss. Cyrus and John the Unmercenaries (412)",
     "Ss. Sergius and Herman, abbots of Valaam (1353)",
     "Icon of the Most Holy Theotokos 'Of the Three Hands'",
-    "Ven. Sennuphius the Standard-Bearer of Egypt (4th c.)"
+    "Ven. Sennuphius the Standard-Bearer of Egypt (4th c.)",
+    "Righteous Anna (Hannah), mother of the prophet Samuel Righteous Anna (Hannah), mother of the prophet Samuel"
   ],
   fast_level_desc: "Apostles Fast",
   fast_exception_desc: "Wine and Oil are Allowed",
@@ -183,6 +184,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('reading labels: feast qualifier shown', srcLabels[1]==='Gospel — Apostles');
   check('reading labels: Matins Gospel shown', srcLabels[2]==='6th Matins Gospel');
   check('Lives attribution: Abbamoses/John Brady', /Abbamoses/.test(livesAttr) && /John Brady/.test(livesAttr));
+  check('Lives attribution: Greek Horologion dating explained', /Greek Horologion/.test(livesAttr));
   check('footer: corrected sources (Slavic tradition + Abbamoses)', /Slavic Old-Calendar tradition/.test(footerText) && /Abbamoses/.test(footerText) && !/Jordanville\./.test(footerText.split('Lives')[0]));
   check('Troparia row names Holy Trinity calendar', /Holy Trinity/.test(troparAttr));
 
@@ -207,6 +209,10 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   await page.click('#commemHead'); // close again for the screenshot
   check('commemorations collapsed by default', commClosed===true);
   check('commemorations expand on tap (>=4 saints)', commOpenList===true && commems>=4);
+  const commTexts = await page.$$eval('#commemList li', n=>n.map(x=>x.textContent));
+  const annaOK = commTexts.some(t=>t==='Righteous Anna (Hannah), mother of the prophet Samuel') &&
+                 !commTexts.some(t=>/Samuel Righteous/.test(t));
+  check('doubled feed entry collapsed (Righteous Anna case)', annaOK);
   check('full-list link -> exact OrthoChristian day page', commemHref===expectedOCUrl);
 
   // --- readings: collapsed by default; open first; illuminated initial ---

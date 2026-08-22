@@ -77,7 +77,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
 (async()=>{
   const server = serve(); await new Promise(r=>server.listen(8099,r));
   const base = 'http://localhost:8099/index.html';
-  const browser = await chromium.launch();
+  const browser = await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 
   const now = new Date();
   const t0 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -214,6 +214,23 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
                  !commTexts.some(t=>/Samuel Righteous/.test(t));
   check('doubled feed entry collapsed (Righteous Anna case)', annaOK);
   check('full-list link -> exact OrthoChristian day page', commemHref===expectedOCUrl);
+
+  // --- open-all readings control ---
+  const ctlShown = await page.$eval('#readingsCtl', e=>!e.classList.contains('hidden'));
+  await page.click('#openAllBtn');
+  const allOpen = await page.$$eval('.reading', ns=>ns.every(n=>n.classList.contains('open')));
+  const lblClose = await page.textContent('#openAllBtn');
+  await page.click('#openAllBtn');
+  const allClosed = await page.$$eval('.reading', ns=>ns.every(n=>!n.classList.contains('open')));
+  check('open-all control shown and opens every reading', ctlShown===true && allOpen===true && /Close all/.test(lblClose));
+  check('open-all toggles back to closed', allClosed===true);
+
+  // --- settings hints + year-picker chevron ---
+  const calHint = await page.$eval('#calSeg', e=>e.closest('.srow').textContent);
+  const txtHint = await page.$eval('#txtSeg', e=>e.closest('.srow').textContent);
+  const chev = await page.evaluate(()=>getComputedStyle(document.querySelector('.caltitle'),'::after').content);
+  check('settings explain Old Calendar (ROCOR) and KJV/NKJV', /ROCOR/.test(calHint) && /traditional/.test(txtHint));
+  check('month title shows year-picker chevron', /▾/.test(chev));
 
   // --- readings: collapsed by default; open first; illuminated initial ---
   const readingsClosed = await page.$$eval('.reading .body', ns=>ns.every(n=>getComputedStyle(n).display==='none'));
@@ -444,6 +461,56 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   await page.waitForSelector('.reading',{timeout:5000});
   const todayHiddenAgain = await page.$eval('#today', e=>e.classList.contains('hidden'));
   check('"Go to today" returns + hides', todayHiddenAgain===true);
+  await ctx.close();
+
+  // ================= 1a. BACK BUTTON + INSTALL BANNER + PREFETCH =================
+  ctx = await browser.newContext({ viewport:{width:390,height:844} });
+  page = await ctx.newPage();
+  let apiCalls = [];
+  await page.route('**orthocal.info/api/**', r=>{ apiCalls.push(r.request().url()); r.fulfill({ status:200, contentType:'application/json', body: JSON.stringify(MOCK) }); });
+  await page.route('**bolls.life/**', mockBolls);
+  await page.goto(base,{waitUntil:'networkidle'});
+  await page.waitForSelector('.reading',{timeout:5000});
+
+  // Android back closes the month calendar instead of leaving the app
+  await page.click('#calBtn');
+  const bOpen = await page.$eval('#calOverlay', e=>!e.classList.contains('hidden'));
+  await page.goBack();
+  await page.waitForTimeout(400);
+  const bClosed = await page.$eval('#calOverlay', e=>e.classList.contains('hidden')).catch(()=>false);
+  const stillHere = /8099/.test(page.url());
+  check('Back closes the calendar and stays in the app', bOpen===true && bClosed===true && stillHere===true);
+
+  // Install banner: appears on browser visit, Install prompts, dismissal sticks
+  const preBanner = await page.$eval('#installBanner', e=>e.classList.contains('hidden'));
+  await page.evaluate(()=>{
+    const e=new Event('beforeinstallprompt');
+    e.prompt=()=>{ window.__prompted=true; return Promise.resolve(); };
+    e.userChoice=Promise.resolve({outcome:'accepted'});
+    window.dispatchEvent(e);
+  });
+  const postBanner = await page.$eval('#installBanner', e=>!e.classList.contains('hidden'));
+  await page.click('#installGo');
+  await page.waitForTimeout(200);
+  const prompted = await page.evaluate(()=>window.__prompted===true);
+  const goneAfter = await page.$eval('#installBanner', e=>e.classList.contains('hidden'));
+  await page.reload({waitUntil:'networkidle'});
+  await page.waitForSelector('.reading',{timeout:5000});
+  const staysGone = await page.$eval('#installBanner', e=>e.classList.contains('hidden'));
+  check('install banner: hidden until prompt event, then shown', preBanner===true && postBanner===true);
+  check('install banner: Install triggers the native prompt and dismisses', prompted===true && goneAfter===true);
+  check('install banner: choice remembered across restarts', staysGone===true);
+
+  // Prefetch: the coming week is fetched quietly and cached
+  apiCalls = [];
+  await page.evaluate(()=>{ for(const k of Object.keys(localStorage)) if(k.startsWith('day:')) localStorage.removeItem(k); });
+  await page.reload({waitUntil:'networkidle'});
+  await page.waitForSelector('.reading',{timeout:5000});
+  await page.waitForTimeout(8500);
+  const tomorrow = new Date(t0.getFullYear(), t0.getMonth(), t0.getDate()+1);
+  const tomKey = 'day:julian:'+tomorrow.getFullYear()+'-'+(tomorrow.getMonth()+1)+'-'+tomorrow.getDate();
+  const tomCached = await page.evaluate(k=>!!localStorage.getItem(k), tomKey);
+  check('coming week prefetched for offline (>=5 extra fetches; tomorrow cached)', apiCalls.length>=6 && tomCached===true);
   await ctx.close();
 
   // ================= 1b. NEW CALENDAR MODE — the engine must follow the reckoning =================

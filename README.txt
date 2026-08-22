@@ -63,7 +63,11 @@ USING IT
   - Share button (top right) now offers three things: the day as text, a
     "Wisdom tile" (the day's saying as a square image for social media),
     and a "Feast-day tile" (date, saints & fast as a burgundy image card).
-  - Days you've already opened are saved, so they still show offline.
+  - The coming week is saved quietly in the background, so the readings
+    work offline — at church, travelling, or with no signal.
+  - Days you've already opened are saved too.
+  - On first visit the app offers to install itself to your home screen
+    (on iPhone: tap Share, then "Add to Home Screen").
   - Design: burgundy & parchment, with liturgical colours that follow the
     feast day; dark mode follows your phone.
 

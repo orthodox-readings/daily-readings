@@ -187,6 +187,26 @@
   .quote .qtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.65;color:var(--ink);margin:0 0 10px}
   .quote .qby{color:var(--gold);font-size:13px;font-weight:700;margin:0}
 
+  /* Install banner */
+  .install{display:flex;align-items:center;gap:10px;margin:12px 16px 0;padding:11px 14px;
+    background:color-mix(in srgb, var(--gold) 10%, var(--card));border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);
+    border-radius:14px;box-shadow:var(--shadow)}
+  .install .itxt{flex:1;color:var(--ink);font-size:12.5px;line-height:1.45}
+  .install .ibtn{border:0;background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#f3e4c4;
+    font:inherit;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;flex:0 0 auto}
+  .install .ix{border:0;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;padding:4px;flex:0 0 auto}
+
+  /* Settings hints */
+  .sheet .lbl small{display:block;font-weight:400;font-size:10.5px;color:var(--muted);margin-top:2px;max-width:120px;line-height:1.35}
+
+  /* Year picker affordance */
+  .caltitle::after{content:" ▾";font-size:12px;opacity:.65}
+
+  /* Open-all readings control */
+  .rctl{text-align:right;margin:8px 20px -8px}
+  .rctl button{border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;font-weight:700;
+    cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent}
+
   /* Fast strip inside the date card */
   .faststrip{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
     margin:14px -18px -16px;padding:11px 16px;border-top:1px solid var(--line);
@@ -271,12 +291,12 @@
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7 0-.2 0-.5-.1-.7L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.9C7.5 9.4 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.4 2-.9l7.2 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 2.9 2.9 1.6 0 2.9-1.3 2.9-2.9 0-1.6-1.3-2.8-2.9-2.8z"/></svg>
     </button>
     <div class="sheet hidden" id="sheet">
-      <div class="srow"><span class="lbl">Calendar</span>
+      <div class="srow"><span class="lbl">Calendar<small>ROCOR uses the Old Calendar</small></span>
         <span class="seg" id="calSeg">
           <button data-cal="julian" class="active">Old Cal.</button>
           <button data-cal="gregorian">New Cal.</button>
         </span></div>
-      <div class="srow"><span class="lbl">Bible text</span>
+      <div class="srow"><span class="lbl">Bible text<small>KJV traditional · NKJV modern</small></span>
         <span class="seg2" id="txtSeg">
           <button data-txt="kjv">KJV</button>
           <button data-txt="nkjv" class="active">NKJV</button>
@@ -296,6 +316,12 @@
 </header>
 
 <div class="headpiece" aria-hidden="true"><span>☦</span></div>
+
+<div class="install hidden" id="installBanner">
+  <span class="itxt" id="installTxt">Keep DailyReadings with you — add it to your home screen.</span>
+  <button class="ibtn" id="installGo">Install</button>
+  <button class="ix" id="installNo" aria-label="Dismiss">✕</button>
+</div>
 
 <main class="wrap" id="app">
   <section class="hero">
@@ -352,6 +378,7 @@
       <p class="qby" id="quoteBy"></p>
     </section>
 
+    <div class="rctl hidden" id="readingsCtl"><button id="openAllBtn">Open all readings ▾</button></div>
     <div id="readings"></div>
 
     <section class="card commem collapsible hidden" id="commemCard">
@@ -550,6 +577,10 @@
       }
     });
 
+    // Open-all control (only useful with several readings)
+    show(el("readingsCtl"), readings.length>1);
+    el("openAllBtn").textContent = "Open all readings ▾";
+
     // Liturgical colour, lives, tracker, troparia, quote, St Theophan
     applyLit(liturgicalKey(state.date, data, fdesc));
     renderLives(data);
@@ -740,8 +771,20 @@
   function openCal(){
     calMonth=new Date(state.date.getFullYear(), state.date.getMonth(), 1);
     renderCal(); show(el("calOverlay"), true);
+    try{ history.pushState({cal:1},""); calPushed=true; }catch(e){}
   }
-  function closeCal(){ show(el("calOverlay"), false); }
+  var calPushed=false;
+  function closeCal(fromPop){
+    show(el("calOverlay"), false);
+    if(calPushed && fromPop!==true){ calPushed=false; try{ history.back(); }catch(e){} }
+    else calPushed=false;
+  }
+  window.addEventListener("popstate", function(){
+    // Android back: close whatever is open instead of leaving the app
+    if(!el("calOverlay").classList.contains("hidden")) closeCal(true);
+    el("sheet").classList.add("hidden");
+    el("shareMenu").classList.add("hidden");
+  });
   function renderCal(){
     var y=calMonth.getFullYear(), mo=calMonth.getMonth();
     el("calTitle").textContent = calMonth.toLocaleDateString("en-AU",{month:"long",year:"numeric"});
@@ -1216,6 +1259,7 @@
     fetchDay(state.cal, state.date).then(function(data){
       writeCache(state.cal, state.date, data);
       render(data, {cached:false});
+      prefetchWeek();
     }).catch(function(err){
       if(cached && cached.data){
         el("offlineBanner").classList.add("show");   // showing saved copy
@@ -1228,6 +1272,62 @@
       }
     });
   }
+
+  // ---------- Quiet prefetch: keep the coming week readable offline ----------
+  var prefetched=false;
+  function prefetchWeek(){
+    if(prefetched) return; prefetched=true;
+    var base=startOfToday(), i=1;
+    function next(){
+      if(i>7) return;
+      var d=new Date(base.getFullYear(), base.getMonth(), base.getDate()+i); i++;
+      var c=readCache(state.cal,d);
+      if(c && c.t && (Date.now()-c.t) < 3*86400000){ next(); return; }   // already fresh
+      fetchDay(state.cal,d).then(function(data){ writeCache(state.cal,d,data); })
+        .catch(function(){})
+        .then(function(){ setTimeout(next, 400); });
+    }
+    setTimeout(next, 3000);
+  }
+
+  // ---------- Install banner ----------
+  var deferredInstall=null;
+  function isStandalone(){
+    return (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone===true;
+  }
+  function maybeInstallBanner(){
+    if(isStandalone() || store.getItem("pref:installDismissed")) return;
+    if(deferredInstall){
+      show(el("installGo"), true); show(el("installBanner"), true);
+    } else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
+      el("installTxt").textContent = "Keep DailyReadings with you: tap Share, then “Add to Home Screen”.";
+      show(el("installGo"), false); show(el("installBanner"), true);
+    }
+  }
+  window.addEventListener("beforeinstallprompt", function(e){
+    e.preventDefault(); deferredInstall=e; maybeInstallBanner();
+  });
+  window.addEventListener("appinstalled", function(){
+    show(el("installBanner"), false); store.setItem("pref:installDismissed","1");
+  });
+  el("installGo").addEventListener("click", function(){
+    if(!deferredInstall) return;
+    deferredInstall.prompt();
+    (deferredInstall.userChoice || Promise.resolve()).then(function(){
+      show(el("installBanner"), false); store.setItem("pref:installDismissed","1");
+    });
+  });
+  el("installNo").addEventListener("click", function(){
+    show(el("installBanner"), false); store.setItem("pref:installDismissed","1");
+  });
+
+  // ---------- Open/close all readings ----------
+  el("openAllBtn").addEventListener("click", function(){
+    var rs=document.querySelectorAll(".reading");
+    var anyClosed=Array.prototype.some.call(rs, function(r){ return !r.classList.contains("open"); });
+    Array.prototype.forEach.call(rs, function(r){ r.classList.toggle("open", anyClosed); });
+    el("openAllBtn").textContent = anyClosed ? "Close all readings ▴" : "Open all readings ▾";
+  });
 
   // ---------- navigation ----------
   function goDays(n){ state.date=new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()+n); syncTodayBtn(); load(); }
@@ -1262,7 +1362,7 @@
   el("calBtn").addEventListener("click", openCal);
   el("calPrev").addEventListener("click", function(){ calNav(-1); });
   el("calNext").addEventListener("click", function(){ calNav(1); });
-  el("calClose").addEventListener("click", closeCal);
+  el("calClose").addEventListener("click", function(){ closeCal(); });
   el("calOverlay").addEventListener("click", function(e){ if(e.target===el("calOverlay")) closeCal(); });
   el("calTitle").addEventListener("click", function(){
     var dp=el("datePick"), d=state.date;
@@ -1306,6 +1406,7 @@
   window.__azbykaURL = azbykaURL;     // exposed for automated tests
   window.__buildTile = buildTile;     // exposed for automated tests
   window.__gospelRef = findGospelRef; // exposed for automated tests
+  maybeInstallBanner();
   setCal(state.cal);   // paints active state + triggers first load
   syncTodayBtn();
 

@@ -54,6 +54,10 @@ USING IT
   - Feast & fast tracker: current fast day count, next Great Feast,
     Pascha countdown.
   - Lives of the Saints: tap a name to read the Jordanville note.
+  - Year at a glance: in the month calendar, tap the year to see the whole
+    church year — the Great Feasts with Pascha, and the fasting seasons —
+    for planning ahead. Tap any feast to open its day, or share the year
+    as a single image.
   - The page reads top-down as a morning rule: the day's saying from the
     Fathers, then the Epistle & Gospel, then commemorations and lives.
   - "For Prayer & Study" card: slim tap-rows to the day's Troparia &

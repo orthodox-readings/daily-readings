@@ -215,6 +215,68 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('doubled feed entry collapsed (Righteous Anna case)', annaOK);
   check('full-list link -> exact OrthoChristian day page', commemHref===expectedOCUrl);
 
+  // --- Year at a Glance: engine ---
+  const yr = await page.evaluate(()=>{
+    const ev=window.__yearEvents(2026);
+    const names=ev.feasts.map(f=>f.name);
+    return {
+      n: ev.feasts.length,
+      first: ev.feasts[0].name+'|'+ev.feasts[0].d.toDateString(),
+      pascha: ev.feasts.find(f=>f.pascha).d.toDateString(),
+      annBeforePascha: names.indexOf('Annunciation') < names.findIndex(n=>/PASCHA/.test(n)),
+      fasts: ev.fasts.map(f=>f.name+'|'+f.s.toDateString()+'|'+f.e.toDateString())
+    };
+  });
+  check('year 2026: thirteen great-feast rows', yr.n===13);
+  check('year 2026 opens with Nativity on 7 Jan (civil)', yr.first==='Nativity of Christ|Wed Jan 07 2026');
+  check('year 2026: Pascha Sun 12 Apr', yr.pascha==='Sun Apr 12 2026');
+  check('year 2026: Annunciation falls inside Holy Week span (7 Apr, before Pascha)', yr.annBeforePascha===true);
+  check('year 2026: five fast ranges incl. Nativity tail + new', yr.fasts.length===5 &&
+    /Nativity Fast\|Fri Nov 28 2025\|Tue Jan 06 2026/.test(yr.fasts[0]) &&
+    /Great Lent & Holy Week\|Mon Feb 23 2026\|Sat Apr 11 2026/.test(yr.fasts[1]) &&
+    /Apostles’ Fast\|Mon Jun 08 2026\|Sat Jul 11 2026/.test(yr.fasts[2]) &&
+    /Dormition Fast\|Fri Aug 14 2026\|Thu Aug 27 2026/.test(yr.fasts[3]) &&
+    /Nativity Fast\|Sat Nov 28 2026\|Wed Jan 06 2027/.test(yr.fasts[4]));
+
+  // --- Year at a Glance: UI flow + Back behaviour + share + jump ---
+  await page.click('#calBtn');
+  await page.click('#calYearBtn');
+  const yrOpen = await page.$eval('#yearOverlay', e=>!e.classList.contains('hidden'));
+  const yrRows = await page.$$eval('#yrBody .yrow', n=>n.length);
+  const yrTitle1 = await page.textContent('#yrTitle');
+  await page.click('#yrPrev');
+  const yrTitle0 = await page.textContent('#yrTitle');
+  await page.click('#yrNext');
+  check('year view opens from the calendar year with 13 feasts', yrOpen===true && yrRows===13 && yrTitle1===String(t0.getFullYear()));
+  check('year arrows navigate', yrTitle0===String(t0.getFullYear()-1));
+
+  await page.goBack(); await page.waitForTimeout(300);
+  const yrGone = await page.$eval('#yearOverlay', e=>e.classList.contains('hidden'));
+  const calStill = await page.$eval('#calOverlay', e=>!e.classList.contains('hidden'));
+  await page.goBack(); await page.waitForTimeout(300);
+  const calGone = await page.$eval('#calOverlay', e=>e.classList.contains('hidden'));
+  check('Back peels overlays one at a time (year, then calendar)', yrGone===true && calStill===true && calGone===true && /8099/.test(page.url()));
+
+  await page.click('#calBtn'); await page.click('#calYearBtn');
+  const yrShared = await page.evaluate(()=>new Promise(res=>{
+    window.__shared=null; navigator.canShare=()=>true;
+    document.getElementById('yrShare').click();
+    let n=0;(function poll(){ n++;
+      if(window.__shared||n>40) res(window.__shared&&window.__shared.files?window.__shared.files[0].name:null);
+      else setTimeout(poll,50); })();
+  }));
+  check('year image shares as church-year PNG', yrShared==='church-year-'+t0.getFullYear()+'.png');
+  const tile2 = await page.evaluate(()=>{ const c=window.__buildYearTile(2026); const px=c.getContext('2d').getImageData(540,960,1,1).data; return {w:c.width,h:c.height,drawn:px[3]===255}; });
+  check('year tile: 1080×1920, drawn', tile2.w===1080 && tile2.h===1920 && tile2.drawn===true);
+
+  await page.evaluate(()=>{ document.querySelectorAll('#yrBody .yrow')[4] && null; });
+  const paschaRowText = await page.$$eval('#yrBody .yrow', ns=>{ const r=ns.find(n=>/PASCHA/.test(n.textContent)); r.click(); return r.textContent; });
+  await page.waitForTimeout(600);
+  const jumpedDate = await page.textContent('#date');
+  const overlaysGone = await page.evaluate(()=>document.getElementById('yearOverlay').classList.contains('hidden') && document.getElementById('calOverlay').classList.contains('hidden'));
+  check('tapping Pascha jumps to 12 April and closes overlays', /12 April 2026/.test(jumpedDate) && overlaysGone===true && /Apr/.test(paschaRowText));
+  await page.click('#today'); await page.waitForTimeout(400);
+
   // --- v22 refinements: tracker caption, quote clamp, crown colour ---
   const trackerAlign = await page.$eval('.tracker', e=>getComputedStyle(e).textAlign);
   check('tracker reads as a centred caption', trackerAlign==='center');
@@ -449,7 +511,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('today ringed in grid', todayMarked===1);
   // navigate to August 2026 and inspect Transfiguration cell
   for(let i=0;i<24;i++){
-    const t = await page.textContent('#calTitle');
+    const t = (await page.textContent('#calTitle')) + ' ' + (await page.textContent('#calYearBtn'));
     if(/August 2026/.test(t)) break;
     await page.click('#calNext');
   }
@@ -569,6 +631,10 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('NS: OrthoChristian link keys to the nominal date', nsCommemHref==='https://orthochristian.com/calendar/'+nsYmd+'.html');
   const nsAzHidden = await page.$eval('#azbykaCard', e=>e.classList.contains('hidden'));
   check('NS: Azbyka card hidden (no correct dual-cycle mapping)', nsAzHidden===true);
+  const nsYr = await page.evaluate(()=>{ const ev=window.__yearEvents(2026);
+    return {f:ev.feasts.length, fasts:ev.fasts.length, ap:ev.fasts.some(x=>/Apostles/.test(x.name)),
+      nat:ev.fasts.some(x=>/Nativity/.test(x.name) && x.s.getFullYear()===2026 && x.e.getFullYear()===2026)}; });
+  check('NS year: 13 feasts, 4 in-year fast ranges, Apostles kept', nsYr.f===13 && nsYr.fasts===4 && nsYr.ap===true && nsYr.nat===true);
   await page.click('#calBtn');
   const nsCells = await page.$$eval('.cd', n=>n.length);
   check('NS: month grid renders under new reckoning', nsCells===42);

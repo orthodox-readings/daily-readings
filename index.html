@@ -246,7 +246,30 @@
   .calpanel{background:var(--bg);border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.4);
     max-width:420px;width:100%;margin-top:calc(env(safe-area-inset-top) + 40px);padding:14px 14px 10px}
   .calhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-  .caltitle{flex:1;border:0;background:none;font:inherit;font-size:17px;font-weight:800;color:var(--ink);cursor:pointer;text-align:center}
+  .caltitle{flex:1;border:0;background:none;font:inherit;font-size:17px;font-weight:800;color:var(--ink);cursor:pointer;text-align:right}
+  .calyear{flex:1;border:0;background:none;font:inherit;font-size:17px;font-weight:800;color:var(--accent);cursor:pointer;text-align:left;padding-left:4px;-webkit-tap-highlight-color:transparent}
+
+  /* Year at a glance */
+  .yearpanel{max-height:86vh;overflow-y:auto}
+  .yrtitle{flex:1;font-size:17px;font-weight:800;color:var(--ink);text-align:center}
+  #yrBody .label{margin:12px 0 4px}
+  .yrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;font:inherit;
+    cursor:pointer;padding:9px 2px;border-bottom:1px solid var(--line);-webkit-tap-highlight-color:transparent}
+  .yrow .ynm{flex:1;color:var(--ink);font-size:13.5px;font-weight:600}
+  .yrow.pascha .ynm{color:#9e1f1f;font-weight:800}
+  .yrow .ydt{color:var(--muted);font-size:12.5px;white-space:nowrap}
+  .ydot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .ydot-blue{background:#1e3a76}.ydot-red{background:#9e1f1f}.ydot-green{background:#1f5c31}
+  .ydot-violet{background:#4d2a78}.ydot-white{background:#efe6cf;border:1px solid #a8842e}
+  .yfast{display:flex;flex-direction:column;gap:2px;padding:8px 2px;border-bottom:1px solid var(--line)}
+  .yfast .ynm{color:var(--ink);font-size:13.5px;font-weight:700}
+  .yfast .ydt2{color:var(--muted);font-size:12px}
+  .yrfoot{margin:14px 0 4px;text-align:center}
+  @media (prefers-color-scheme: dark){
+    .yrow.pascha .ynm{color:#e08a8a}
+    .ydot{box-shadow:0 0 0 1px rgba(255,255,255,.18)}
+    .ydot-white{background:#3a332a;border-color:#e2be6c}
+  }
   .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
   .cwd{text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);padding:2px 0 6px}
   .cd{position:relative;aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:var(--card);
@@ -360,7 +383,8 @@
     <div class="calpanel">
       <div class="calhead">
         <button id="calPrev" class="hbtn" aria-label="Previous month">‹</button>
-        <button id="calTitle" class="caltitle" title="Tap for year picker">Month</button>
+        <button id="calTitle" class="caltitle" title="Tap for date picker">Month</button>
+        <button id="calYearBtn" class="calyear" title="Year at a glance">Year ▸</button>
         <button id="calNext" class="hbtn" aria-label="Next month">›</button>
         <button id="calClose" class="hbtn" aria-label="Close">✕</button>
       </div>
@@ -372,7 +396,21 @@
         <span>🍇 wine &amp; oil</span>
         <span>✚ great feast</span>
       </div>
-      <p class="calnote">The grid shows the general rule of the Church — open any day for its precise fast and feast.</p>
+      <p class="calnote">The grid shows the general rule of the Church — open any day for its precise fast and feast. Tap the year above for the year at a glance.</p>
+    </div>
+  </div>
+
+  <div class="calov hidden" id="yearOverlay">
+    <div class="calpanel yearpanel">
+      <div class="calhead">
+        <button id="yrPrev" class="hbtn" aria-label="Previous year">‹</button>
+        <span class="yrtitle" id="yrTitle">Year</span>
+        <button id="yrNext" class="hbtn" aria-label="Next year">›</button>
+        <button id="yrClose" class="hbtn" aria-label="Close">✕</button>
+      </div>
+      <div id="yrBody"></div>
+      <div class="yrfoot"><button class="tbtn" id="yrShare">Share this year ▤</button></div>
+      <p class="calnote">The Twelve Great Feasts with Pascha, and the fasting seasons — tap a feast to open its day.</p>
     </div>
   </div>
 
@@ -793,14 +831,16 @@
     else calPushed=false;
   }
   window.addEventListener("popstate", function(){
-    // Android back: close whatever is open instead of leaving the app
-    if(!el("calOverlay").classList.contains("hidden")) closeCal(true);
+    // Android back: close whatever is open (topmost first) instead of leaving the app
+    if(!el("yearOverlay").classList.contains("hidden")) closeYear(true);
+    else if(!el("calOverlay").classList.contains("hidden")) closeCal(true);
     el("sheet").classList.add("hidden");
     el("shareMenu").classList.add("hidden");
   });
   function renderCal(){
     var y=calMonth.getFullYear(), mo=calMonth.getMonth();
-    el("calTitle").textContent = calMonth.toLocaleDateString("en-AU",{month:"long",year:"numeric"});
+    el("calTitle").textContent = calMonth.toLocaleDateString("en-AU",{month:"long"});
+    el("calYearBtn").textContent = y+" ▸";
     var first=new Date(y,mo,1);
     var startOffset=(first.getDay()+6)%7;                            // Monday-start grid
     var start=new Date(y,mo,1-startOffset);
@@ -902,6 +942,155 @@
     var on = state.cal==="julian";
     show(el("azbykaCard"), on);
     if(on) el("azbykaLink").setAttribute("href", azbykaURL(state.date));
+  }
+
+  // ---------- Year at a glance ----------
+  var FEASTS_FIXED=[
+    [9,8,"Nativity of the Theotokos","blue"],
+    [9,14,"Exaltation of the Cross","violet"],
+    [11,21,"Entry of the Theotokos","blue"],
+    [12,25,"Nativity of Christ","white"],
+    [1,6,"Theophany of the Lord","white"],
+    [2,2,"Meeting of the Lord","blue"],
+    [3,25,"Annunciation","blue"],
+    [8,6,"Transfiguration","white"],
+    [8,15,"Dormition of the Theotokos","blue"]
+  ];
+  function addD(d,n){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()+n); }
+  function yearEvents(y){
+    var o=calOffsetDays(), feasts=[], fasts=[];
+    for(var yy=y-1; yy<=y; yy++){
+      FEASTS_FIXED.forEach(function(f){
+        var d=new Date(yy, f[0]-1, f[1]+o);
+        if(d.getFullYear()===y) feasts.push({d:d, name:f[2], lit:f[3]});
+      });
+    }
+    var P=paschaCivil(y);
+    feasts.push({d:addD(P,-7), name:"Palm Sunday — Entry into Jerusalem", lit:"green"});
+    feasts.push({d:P, name:"PASCHA — the Resurrection of Christ", lit:"red", pascha:true});
+    feasts.push({d:addD(P,39), name:"Ascension of the Lord", lit:"white"});
+    feasts.push({d:addD(P,49), name:"Pentecost — Day of the Holy Trinity", lit:"green"});
+    feasts.sort(function(a,b){ return a.d-b.d; });
+    for(var y2=y-1; y2<=y; y2++){
+      var Py=paschaCivil(y2);
+      [ {name:"Great Lent & Holy Week", s:addD(Py,-48), e:addD(Py,-1)},
+        {name:"Apostles’ Fast",         s:addD(Py,57),  e:new Date(y2,5,28+o)},
+        {name:"Dormition Fast",         s:new Date(y2,7,1+o),  e:new Date(y2,7,14+o)},
+        {name:"Nativity Fast",          s:new Date(y2,10,15+o), e:new Date(y2,11,24+o)}
+      ].forEach(function(r){
+        if(r.e<r.s) return;                                        // NS years can lose the Apostles' Fast
+        if(r.e.getFullYear()>=y && r.s.getFullYear()<=y) fasts.push(r);
+      });
+    }
+    fasts.sort(function(a,b){ return a.s-b.s; });
+    return {feasts:feasts, fasts:fasts};
+  }
+
+  var yearShown=null, yrPushed=false;
+  function fmtYD(d){ return d.toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"}); }
+  function fmtYR(r){
+    var days=Math.round((r.e-r.s)/86400000)+1, opt={day:"numeric",month:"short"};
+    var s=r.s.toLocaleDateString("en-AU",opt)+(r.s.getFullYear()!==yearShown? " "+r.s.getFullYear() : "");
+    var e=r.e.toLocaleDateString("en-AU",opt)+(r.e.getFullYear()!==yearShown? " "+r.e.getFullYear() : "");
+    return s+" – "+e+" · "+days+" days";
+  }
+  function renderYear(){
+    el("yrTitle").textContent=String(yearShown);
+    var ev=yearEvents(yearShown), b=el("yrBody"); b.innerHTML="";
+    var h1=document.createElement("p"); h1.className="label"; h1.textContent="The Great Feasts"; b.appendChild(h1);
+    ev.feasts.forEach(function(f){
+      var r=document.createElement("button"); r.className="yrow"+(f.pascha?" pascha":"");
+      var dot=document.createElement("span"); dot.className="ydot ydot-"+f.lit; r.appendChild(dot);
+      var nm=document.createElement("span"); nm.className="ynm"; nm.textContent=f.name; r.appendChild(nm);
+      var dt=document.createElement("span"); dt.className="ydt"; dt.textContent=fmtYD(f.d); r.appendChild(dt);
+      r.addEventListener("click", function(){ jumpFromYear(f.d); });
+      b.appendChild(r);
+    });
+    var h2=document.createElement("p"); h2.className="label"; h2.textContent="The Fasting Seasons"; b.appendChild(h2);
+    ev.fasts.forEach(function(f){
+      var r=document.createElement("div"); r.className="yfast";
+      var nm=document.createElement("span"); nm.className="ynm"; nm.textContent=f.name; r.appendChild(nm);
+      var dt=document.createElement("span"); dt.className="ydt2"; dt.textContent=fmtYR(f); r.appendChild(dt);
+      b.appendChild(r);
+    });
+  }
+  function openYear(){
+    yearShown=(calMonth?calMonth.getFullYear():state.date.getFullYear());
+    renderYear(); show(el("yearOverlay"), true);
+    try{ history.pushState({yr:1},""); yrPushed=true; }catch(e){}
+  }
+  function closeYear(fromPop){
+    show(el("yearOverlay"), false);
+    if(yrPushed && fromPop!==true){ yrPushed=false; try{ history.back(); }catch(e){} }
+    else yrPushed=false;
+  }
+  function jumpFromYear(d){
+    var n=(yrPushed?1:0)+(calPushed?1:0);
+    yrPushed=false; calPushed=false;
+    show(el("yearOverlay"), false); show(el("calOverlay"), false);
+    if(n){ try{ history.go(-n); }catch(e){} }
+    state.date=new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    syncTodayBtn(); load();
+  }
+  el("calYearBtn").addEventListener("click", openYear);
+  el("yrClose").addEventListener("click", function(){ closeYear(); });
+  el("yrPrev").addEventListener("click", function(){ if(yearShown>1901){ yearShown--; renderYear(); } });
+  el("yrNext").addEventListener("click", function(){ if(yearShown<2098){ yearShown++; renderYear(); } });
+  el("yearOverlay").addEventListener("click", function(e){ if(e.target===el("yearOverlay")) closeYear(); });
+  el("yrShare").addEventListener("click", function(){ shareCanvas(buildYearTile(), "church-year-"+yearShown+".png"); });
+
+  function buildYearTile(){
+    var W=1080, H=1920;
+    var c=document.createElement("canvas"); c.width=W; c.height=H;
+    var x=c.getContext("2d");
+    var g=x.createLinearGradient(0,0,W*0.35,H);
+    g.addColorStop(0,"#f6efe0"); g.addColorStop(1,"#efe3cc");
+    x.fillStyle=g; x.fillRect(0,0,W,H);
+    x.strokeStyle="rgba(148,110,44,.55)"; x.lineWidth=3;
+    tRoundRect(x,32,32,W-64,H-64,12); x.stroke();
+    x.textAlign="center"; x.textBaseline="middle";
+    x.fillStyle="#946e2c"; x.font="34px Georgia, serif"; x.fillText("☦", W/2, 120);
+    x.fillStyle="#8a7a62";
+    try{ x.letterSpacing="6px"; }catch(e){}
+    x.font="700 28px -apple-system, 'Segoe UI', Roboto, sans-serif";
+    x.fillText("THE CHURCH YEAR", W/2, 180);
+    try{ x.letterSpacing="0px"; }catch(e){}
+    x.fillStyle="#2b1b12"; x.font="700 96px Georgia, serif";
+    x.fillText(String(yearShown), W/2, 268);
+    x.fillStyle="#8a7a62"; x.font="26px -apple-system, 'Segoe UI', Roboto, sans-serif";
+    x.fillText(state.cal==="julian" ? "Old Calendar (Julian)" : "New Calendar (Revised Julian)", W/2, 330);
+    var DOTC={blue:"#1e3a76", red:"#9e1f1f", green:"#1f5c31", violet:"#4d2a78", white:"#a8842e"};
+    var ev=yearEvents(yearShown), y=410;
+    ev.feasts.forEach(function(f){
+      x.beginPath(); x.arc(110, y, 9, 0, 7); x.fillStyle=DOTC[f.lit]||"#946e2c"; x.fill();
+      x.textAlign="left"; x.fillStyle= f.pascha? "#9e1f1f" : "#2b1b12";
+      x.font=(f.pascha? "800 ":"600 ")+"31px -apple-system, 'Segoe UI', Roboto, sans-serif";
+      var nm=f.name; if(x.measureText(nm).width>640){ nm=nm.split(" — ")[0]; }
+      x.fillText(nm, 140, y);
+      x.textAlign="right"; x.fillStyle="#8a7a62"; x.font="29px -apple-system, 'Segoe UI', Roboto, sans-serif";
+      x.fillText(fmtYD(f.d), W-110, y);
+      y+=62;
+    });
+    y+=30;
+    x.textAlign="center"; x.fillStyle="#8a7a62";
+    try{ x.letterSpacing="6px"; }catch(e){}
+    x.font="700 26px -apple-system, 'Segoe UI', Roboto, sans-serif";
+    x.fillText("THE FASTING SEASONS", W/2, y);
+    try{ x.letterSpacing="0px"; }catch(e){}
+    y+=56;
+    ev.fasts.forEach(function(f){
+      x.textAlign="left"; x.fillStyle="#2b1b12"; x.font="700 30px -apple-system, 'Segoe UI', Roboto, sans-serif";
+      x.fillText(f.name, 110, y);
+      x.textAlign="right"; x.fillStyle="#8a7a62"; x.font="28px -apple-system, 'Segoe UI', Roboto, sans-serif";
+      x.fillText(fmtYR(f), W-110, y);
+      y+=58;
+    });
+    x.textAlign="center"; x.fillStyle="#8a7a62";
+    try{ x.letterSpacing="4px"; }catch(e){}
+    x.font="26px -apple-system, 'Segoe UI', Roboto, sans-serif";
+    x.fillText("DAILYREADINGS", W/2, H-84);
+    try{ x.letterSpacing="0px"; }catch(e){}
+    return c;
   }
 
   // ---------- Share ----------
@@ -1039,12 +1228,11 @@
     }
     return c;
   }
-  function shareTile(kind){
+  function shareCanvas(c, name){
     try{
-      var c=buildTile(kind);
       c.toBlob(function(blob){
         if(!blob) return;
-        var f=new File([blob], "dailyreadings-"+kind+".png", {type:"image/png"});
+        var f=new File([blob], name, {type:"image/png"});
         if(navigator.share && navigator.canShare && navigator.canShare({files:[f]})){
           navigator.share({files:[f], title:"Daily Orthodox Readings"}).catch(function(){});
         } else {
@@ -1055,6 +1243,9 @@
         }
       },"image/png");
     }catch(e){}
+  }
+  function shareTile(kind){
+    try{ shareCanvas(buildTile(kind), "dailyreadings-"+kind+".png"); }catch(e){}
   }
 
   // ---------- Text size ----------
@@ -1428,6 +1619,8 @@
   window.__buildTile = buildTile;     // exposed for automated tests
   window.__gospelRef = findGospelRef; // exposed for automated tests
   window.__setFathers = function(f){ var old=FATHERS; FATHERS=f; renderQuote(); return old; }; // exposed for automated tests
+  window.__yearEvents = yearEvents;   // exposed for automated tests
+  window.__buildYearTile = function(y){ yearShown=y||state.date.getFullYear(); return buildYearTile(); }; // exposed for automated tests
   maybeInstallBanner();
   setCal(state.cal);   // paints active state + triggers first load
   syncTodayBtn();

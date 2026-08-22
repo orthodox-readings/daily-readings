@@ -48,6 +48,15 @@
     [data-lit="violet"]{ --accent:#b79ade; --accent-2:#c8b0e8}
     [data-lit="white"]{  --accent:#e2be6c; --accent-2:#ecc96a}
     [data-lit="gold"]{   --accent:#e2be6c; --accent-2:#ecc96a}
+    /* The date-card crown keeps deep liturgical colour in the dark
+       (light text accents above would render it pastel) */
+    :root{               --crown:#7d2b2b}
+    [data-lit="blue"]{   --crown:#2e4a86}
+    [data-lit="red"]{    --crown:#8a2525}
+    [data-lit="green"]{  --crown:#2b6a3e}
+    [data-lit="violet"]{ --crown:#5b3790}
+    [data-lit="white"]{  --crown:#a5822a}
+    [data-lit="gold"]{   --crown:#a5822a}
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -101,7 +110,7 @@
 
   /* Hero — the day card, crowned with the liturgical colour */
   .hero{padding:12px 16px 2px}
-  .datecard{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--accent);
+  .datecard{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--crown, var(--accent));
     border-radius:18px;box-shadow:var(--shadow);padding:12px 12px 13px;text-align:center;
     transition:border-color .6s ease}
   .herobar{display:flex;align-items:center;gap:8px}
@@ -122,8 +131,8 @@
     background:var(--pill);border:1px solid var(--line);font-weight:600;font-size:14px;box-shadow:var(--shadow);color:var(--ink)}
   .dot{width:11px;height:11px;border-radius:50%;background:var(--gold);flex:0 0 auto}
   .fast .exc{color:var(--muted);font-size:13px}
-  .tracker{margin:8px 20px 0;color:var(--muted);font-size:12.5px;line-height:1.85}
-  .tracker .chip{display:inline;color:var(--muted);font-size:12.5px}
+  .tracker{margin:10px 24px 0;color:var(--muted);font-size:11.5px;line-height:1.8;text-align:center}
+  .tracker .chip{display:inline;color:var(--muted);font-size:11.5px}
   .tracker .chip b{color:var(--accent)}
   .tracker .chip+.chip::before{content:"   ·   "}
   .tracker .chip.today{color:var(--accent);font-weight:700}
@@ -185,6 +194,9 @@
 
   /* Wisdom of the Fathers */
   .quote .qtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.65;color:var(--ink);margin:0 0 10px}
+  .quote .qtext.clamped{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .quote .qmore{border:0;background:transparent;color:var(--accent);font:inherit;font-size:12.5px;font-weight:700;
+    padding:0;cursor:pointer;margin:-2px 0 10px;-webkit-tap-highlight-color:transparent}
   .quote .qby{color:var(--gold);font-size:13px;font-weight:700;margin:0}
 
   /* Install banner */
@@ -375,6 +387,7 @@
     <section class="card quote hidden" id="quoteCard">
       <p class="label">Wisdom of the Fathers</p>
       <p class="qtext" id="quoteText"></p>
+      <button class="qmore hidden" id="quoteMore">Read the whole saying ▾</button>
       <p class="qby" id="quoteBy"></p>
     </section>
 
@@ -835,8 +848,16 @@
     var q=FATHERS.quotes[((doy % FATHERS.quotes.length)+FATHERS.quotes.length) % FATHERS.quotes.length];
     el("quoteText").textContent="“"+q.q+"”";
     el("quoteBy").textContent="— "+q.by+(q.src? (" · "+q.src):"");
+    var long = q.q.length > 180;   // long sayings fold to three lines
+    el("quoteText").classList.toggle("clamped", long);
+    show(el("quoteMore"), long);
+    el("quoteMore").textContent = "Read the whole saying ▾";
     card.classList.remove("hidden");
   }
+  el("quoteMore").addEventListener("click", function(){
+    var clamped = el("quoteText").classList.toggle("clamped");
+    el("quoteMore").textContent = clamped ? "Read the whole saying ▾" : "Show less ▴";
+  });
 
   // ---------- Lives of the Saints (Jordanville notes carried by orthocal) ----------
   function renderLives(data){
@@ -1406,6 +1427,7 @@
   window.__azbykaURL = azbykaURL;     // exposed for automated tests
   window.__buildTile = buildTile;     // exposed for automated tests
   window.__gospelRef = findGospelRef; // exposed for automated tests
+  window.__setFathers = function(f){ var old=FATHERS; FATHERS=f; renderQuote(); return old; }; // exposed for automated tests
   maybeInstallBanner();
   setCal(state.cal);   // paints active state + triggers first load
   syncTodayBtn();

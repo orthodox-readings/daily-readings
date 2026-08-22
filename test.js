@@ -215,6 +215,35 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('doubled feed entry collapsed (Righteous Anna case)', annaOK);
   check('full-list link -> exact OrthoChristian day page', commemHref===expectedOCUrl);
 
+  // --- v22 refinements: tracker caption, quote clamp, crown colour ---
+  const trackerAlign = await page.$eval('.tracker', e=>getComputedStyle(e).textAlign);
+  check('tracker reads as a centred caption', trackerAlign==='center');
+
+  const clampProbe = await page.evaluate(()=>{
+    const long = 'A very long saying of the fathers that certainly runs past the one hundred and eighty character clamp threshold, so the wisdom card folds it to three lines with a read-more control for the reader.';
+    const orig = window.__setFathers({quotes:[{q:long, by:'Test Father'}]});
+    const t=document.getElementById('quoteText'), m=document.getElementById('quoteMore');
+    const clamped1 = t.classList.contains('clamped') && !m.classList.contains('hidden');
+    m.click();
+    const expanded = !t.classList.contains('clamped') && /Show less/.test(m.textContent);
+    window.__setFathers({quotes:[{q:'Short saying.', by:'Test Father'}]});
+    const short1 = !t.classList.contains('clamped') && m.classList.contains('hidden');
+    window.__setFathers(orig);   // restore the real quotes for later checks
+    return {clamped1, expanded, short1};
+  });
+  check('long saying folds to three lines with read-more', clampProbe.clamped1===true && clampProbe.expanded===true);
+  check('short saying never clamped', clampProbe.short1===true);
+
+  const prevLit = await page.evaluate(()=>{
+    const p=document.documentElement.getAttribute('data-lit');
+    document.documentElement.setAttribute('data-lit','red');
+    return p;
+  });
+  await page.waitForTimeout(750);   // .datecard border-color transition is .6s
+  const crownLight = await page.$eval('.datecard', e=>getComputedStyle(e).borderTopColor);
+  await page.evaluate(p=>{ if(p) document.documentElement.setAttribute('data-lit', p); }, prevLit);
+  check('light crown keeps full liturgical red', crownLight==='rgb(158, 31, 31)');
+
   // --- open-all readings control ---
   const ctlShown = await page.$eval('#readingsCtl', e=>!e.classList.contains('hidden'));
   await page.click('#openAllBtn');

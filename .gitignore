@@ -1,1 +1,9 @@
 node_modules/
+package.json
+package-lock.json
+qr.txt
+v2*.png
+shot*.js
+shots_*.js
+ux_probe.js
+handout-preview.png

@@ -425,10 +425,26 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   }));
   check('wisdom tile shares as a PNG file', !!tileShare && tileShare.n===1 && /wisdom\.png$/.test(tileShare.name) && tileShare.size>20000);
 
-  // --- support ---
-  const supHref = await page.getAttribute('#supportLink','href');
-  const supVis = await page.$eval('#supportLink', e=>!e.classList.contains('hidden'));
-  check('support button -> Holy Dormition', supVis && supHref==='https://wollongong.cerkov.ru/');
+  // --- support: in-app parish bank-transfer sheet ---
+  await page.evaluate(()=>{ window.__copied=null;
+    Object.defineProperty(navigator,'clipboard',{value:{writeText:v=>{window.__copied=v;return Promise.resolve();}},configurable:true}); });
+  await page.click('#supportLink');
+  const supOpen = await page.$eval('#supportOverlay', e=>!e.classList.contains('hidden'));
+  const supText = await page.$eval('.supPanel', e=>e.textContent);
+  check('support opens the parish sheet with Westpac details', supOpen===true &&
+    /Russian Orthodox Church Abroad/.test(supText) && /Wollongong Parish/.test(supText) &&
+    /032-695/.test(supText) && /458 013/.test(supText) && /Westpac/.test(supText) &&
+    /payment reference/.test(supText));
+  await page.click('.supcopy[data-copy="032695"]');
+  await page.waitForTimeout(150);
+  const copied = await page.evaluate(()=>window.__copied);
+  const tick = await page.$eval('.supcopy[data-copy="032695"]', e=>e.textContent);
+  check('BSB copies digits-only with feedback tick', copied==='032695' && tick==='✓');
+  const supSite = await page.$eval('.supPanel a[href*="cerkov"]', e=>e.getAttribute('href'));
+  check('parish website link kept inside the sheet', supSite==='https://wollongong.cerkov.ru/');
+  await page.goBack(); await page.waitForTimeout(300);
+  const supGone = await page.$eval('#supportOverlay', e=>e.classList.contains('hidden'));
+  check('Back closes the support sheet, stays in app', supGone===true && /8099/.test(page.url()));
 
   // --- text size via sheet + persistence ---
   await page.click('#gearBtn');

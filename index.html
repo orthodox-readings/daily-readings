@@ -265,6 +265,20 @@
   .yfast .ynm{color:var(--ink);font-size:13.5px;font-weight:700}
   .yfast .ydt2{color:var(--muted);font-size:12px}
   .yrfoot{margin:14px 0 4px;text-align:center}
+
+  /* Support sheet */
+  .supPanel{max-width:400px}
+  .supName{font-family:Georgia,serif;font-size:17px;font-weight:700;color:var(--ink);text-align:center;margin:6px 0 2px;line-height:1.4}
+  .supSub{color:var(--muted);font-size:12px;text-align:center;margin:0 0 14px}
+  .suprow{display:flex;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid var(--line)}
+  .suplbl{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;width:76px}
+  .supval{flex:1;color:var(--ink);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
+  .supcopy{border:1px solid var(--line);background:var(--pill);color:var(--accent);font:inherit;font-size:12px;font-weight:700;
+    padding:6px 14px;border-radius:999px;cursor:pointer;min-width:74px;-webkit-tap-highlight-color:transparent}
+  .supcopy:empty{border:0;background:none;min-width:74px}
+  .supcopy.done{background:#2e8b4f;color:#fff;border-color:#2e8b4f}
+  .supnote{color:var(--muted);font-size:11.5px;line-height:1.5;margin:12px 0 0;text-align:center}
+  .supnote a{color:var(--gold);text-decoration:none}
   @media (prefers-color-scheme: dark){
     .yrow.pascha .ynm{color:#e08a8a}
     .ydot{box-shadow:0 0 0 1px rgba(255,255,255,.18)}
@@ -400,6 +414,22 @@
     </div>
   </div>
 
+  <div class="calov hidden" id="supportOverlay">
+    <div class="calpanel supPanel">
+      <div class="calhead">
+        <span class="yrtitle">Support the Parish</span>
+        <button id="supClose" class="hbtn" aria-label="Close">✕</button>
+      </div>
+      <p class="supName">Russian Orthodox Church Abroad<br>Wollongong Parish</p>
+      <p class="supSub">Holy Dormition of the Mother of God, Corrimal</p>
+      <div class="suprow"><span class="suplbl">Bank</span><span class="supval">Westpac</span><span class="supcopy"></span></div>
+      <div class="suprow"><span class="suplbl">BSB</span><span class="supval">032-695</span><button class="supcopy" data-copy="032695">Copy</button></div>
+      <div class="suprow"><span class="suplbl">Account</span><span class="supval">458 013</span><button class="supcopy" data-copy="458013">Copy</button></div>
+      <p class="supnote">A direct bank transfer — every dollar goes to the parish. Please use your name as the payment reference.</p>
+      <p class="supnote"><a href="https://wollongong.cerkov.ru/" target="_blank" rel="noopener noreferrer">Parish website →</a></p>
+    </div>
+  </div>
+
   <div class="calov hidden" id="yearOverlay">
     <div class="calpanel yearpanel">
       <div class="calhead">
@@ -458,7 +488,7 @@
   </div>
 
   <footer class="footer">
-    <a class="support hidden" id="supportLink" href="#" target="_blank" rel="noopener noreferrer">♡ Support Holy Dormition, Corrimal</a>
+    <a class="support" id="supportLink" href="#">♡ Support Holy Dormition, Corrimal</a>
     Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition (KJV text).<br>
     Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal.<br>
     <span id="nkjvNote" class="hidden">New King James Version® © Thomas Nelson (unofficial text; KJV shown if unavailable).<br></span>
@@ -496,7 +526,7 @@
 
   // ── Optional donations: set DONATE_URL to your Ko-fi / PayPal.me / parish donation link to show a
   //    discreet "Support this app" button in the footer. Leave it "" to hide the button entirely.
-  var DONATE_URL = "https://wollongong.cerkov.ru/";  // Holy Dormition, Corrimal (parish site — swap for a giving page when one exists)
+  // Support: the footer button opens the in-app parish bank-transfer sheet (#supportOverlay).
 
   // ---------- helpers ----------
   function startOfToday(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
@@ -832,10 +862,41 @@
   }
   window.addEventListener("popstate", function(){
     // Android back: close whatever is open (topmost first) instead of leaving the app
-    if(!el("yearOverlay").classList.contains("hidden")) closeYear(true);
+    if(!el("supportOverlay").classList.contains("hidden")) closeSupport(true);
+    else if(!el("yearOverlay").classList.contains("hidden")) closeYear(true);
     else if(!el("calOverlay").classList.contains("hidden")) closeCal(true);
     el("sheet").classList.add("hidden");
     el("shareMenu").classList.add("hidden");
+  });
+
+  // ---------- Support the Parish sheet ----------
+  var supPushed=false;
+  function openSupport(){
+    show(el("supportOverlay"), true);
+    try{ history.pushState({sup:1},""); supPushed=true; }catch(e){}
+  }
+  function closeSupport(fromPop){
+    show(el("supportOverlay"), false);
+    if(supPushed && fromPop!==true){ supPushed=false; try{ history.back(); }catch(e){} }
+    else supPushed=false;
+  }
+  el("supportLink").addEventListener("click", function(e){ e.preventDefault(); openSupport(); });
+  el("supClose").addEventListener("click", function(){ closeSupport(); });
+  el("supportOverlay").addEventListener("click", function(e){ if(e.target===el("supportOverlay")) closeSupport(); });
+  Array.prototype.forEach.call(document.querySelectorAll(".supcopy[data-copy]"), function(b){
+    b.addEventListener("click", function(){
+      var v=b.getAttribute("data-copy");
+      function done(){ b.classList.add("done"); b.textContent="✓"; setTimeout(function(){ b.classList.remove("done"); b.textContent="Copy"; },1400); }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(v).then(done).catch(function(){ fallback(); });
+      } else fallback();
+      function fallback(){
+        var t=document.createElement("textarea"); t.value=v; t.style.position="fixed"; t.style.opacity="0";
+        document.body.appendChild(t); t.select();
+        try{ document.execCommand("copy"); done(); }catch(e){}
+        t.remove();
+      }
+    });
   });
   function renderCal(){
     var y=calMonth.getFullYear(), mo=calMonth.getMonth();
@@ -1603,7 +1664,6 @@
   }, {passive:true});
 
   // ---------- boot ----------
-  if(DONATE_URL){ var _sl=el("supportLink"); _sl.setAttribute("href", DONATE_URL); _sl.classList.remove("hidden"); }
   Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
     b.classList.toggle("active", b.getAttribute("data-txt")===state.txt);
   });

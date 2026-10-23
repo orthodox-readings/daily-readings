@@ -482,6 +482,7 @@
     <section class="card linksCard" id="linksCard">
       <p class="label">For Prayer &amp; Study</p>
       <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Troparia &amp; Kontakia<small>The day’s hymns · Holy Trinity (Jordanville-referenced) calendar</small></span><span class="larr">›</span></a>
+      <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Prologue of Ohrid<small>St Nikolai of Žiča — the day’s lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
       <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Full Service Texts<small>Vespers · Matins · Liturgy — Church Slavonic, azbyka.ru</small></span><span class="larr">›</span></a></span>
       <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">His reflection follows the daily Gospel. OrthoChristian (official English text).</small></span><span class="larr">›</span></a>
     </section>
@@ -667,6 +668,7 @@
     renderLives(data);
     renderTracker(fdesc);
     el("troparLink").setAttribute("href", htmURL(state.date));
+    el("prologueLink").setAttribute("href", prologueURL(state.date));
     renderAzbyka();
     renderQuote();
     renderTheophan(readings);
@@ -989,6 +991,14 @@
   }
 
   // ---------- Troparia link (Holy Trinity Jordanville calendar, civil-date params) ----------
+  // ---------- Prologue of Ohrid (Lazarica Press translation, hosted by Holy Myrrh-bearers;
+  //            pages are keyed by the OS/menaion date, so the link follows the nominal day in either mode) ----------
+  var PRO_MONTHS=["january","february","march","april","may","june","july","august","september","october","november","december"];
+  function prologueURL(d){
+    var m=menaionOf(d);
+    return "https://www.myrrh-bearers.org/prologue/"+PRO_MONTHS[m.getMonth()]+"/"+m.getDate()+".htm";
+  }
+
   function htmURL(d){
     // HTM's calendar is OS-keyed by civil date: on New Calendar, shift so its OS content matches the viewed menaion day
     var h = new Date(d.getFullYear(), d.getMonth(), d.getDate() + (13 - calOffsetDays()));
@@ -1682,6 +1692,7 @@
   window.__litKey = liturgicalKey;    // exposed for automated tests
   window.__fastRule = fastRule;       // exposed for automated tests
   window.__azbykaURL = azbykaURL;     // exposed for automated tests
+  window.__prologueURL = prologueURL; // exposed for automated tests
   window.__buildTile = buildTile;     // exposed for automated tests
   window.__gospelRef = findGospelRef; // exposed for automated tests
   window.__setFathers = function(f){ var old=FATHERS; FATHERS=f; renderQuote(); return old; }; // exposed for automated tests

@@ -61,7 +61,9 @@ USING IT
   - The page reads top-down as a morning rule: the day's saying from the
     Fathers, then the Epistle & Gospel, then commemorations and lives.
   - "For Prayer & Study" card: slim tap-rows to the day's Troparia &
-    Kontakia (Jordanville calendar), the Full Service Texts in Church
+    Kontakia (Jordanville calendar), the day's Prologue of Ohrid entry
+    (St Nikolai of Zica — lives, reflection & homily, Lazarica translation
+    hosted by Holy Myrrh-bearers), the Full Service Texts in Church
     Slavonic on azbyka.ru (Old Calendar mode), and St Theophan's daily
     reflection on OrthoChristian.
   - Share button (top right) now offers three things: the day as text, a

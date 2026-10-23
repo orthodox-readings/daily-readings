@@ -198,7 +198,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   });
   check('order: Wisdom before readings', order.qb===true);
   check('order: readings before commemorations', order.rb===true);
-  check('combined links card below with 3 rows', order.cb===true && order.rows===3);
+  check('combined links card below with 4 rows (incl. Prologue)', order.cb===true && order.rows===4);
 
   // --- commemorations: collapsed by default, expand on tap ---
   const commClosed = await page.$eval('#commemList', e=>getComputedStyle(e).display==='none');
@@ -351,6 +351,14 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const azHref = await page.getAttribute('#azbykaLink','href');
   check('Azbyka service-texts card shown on Old Calendar', azShown===true);
   check('Azbyka link -> civil-date worships URL', azHref===expAzbyka);
+
+  // --- Prologue of Ohrid link (OS/menaion-date keyed) ---
+  const MONL=['january','february','march','april','may','june','july','august','september','october','november','december'];
+  const proHref = await page.getAttribute('#prologueLink','href');
+  const expPro = 'https://www.myrrh-bearers.org/prologue/'+MONL[jd.getMonth()]+'/'+jd.getDate()+'.htm';
+  check('Prologue link -> OS day page (Lazarica/Myrrh-bearers)', proHref===expPro);
+  const proLeap = await page.evaluate(()=>window.__prologueURL(new Date(2028,2,13))); // 13 Mar 2028 civil = 29 Feb OS (leap year)
+  check('Prologue link handles 29 February (OS leap day)', proLeap==='https://www.myrrh-bearers.org/prologue/february/29.htm');
 
   // --- St Theophan subtitle must cite the LITURGY Gospel, never the Matins Gospel ---
   const theoSub = await page.textContent('#theophanSub');
@@ -655,6 +663,9 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('NS: 15 August wears Theotokos blue', ns.aug15Lit==='blue');
   check('NS: 7 January is no longer Nativity', !ns.janSeven.feast && ns.janSeven.f===0);
   check('NS: OrthoChristian link keys to the nominal date', nsCommemHref==='https://orthochristian.com/calendar/'+nsYmd+'.html');
+  const nsProHref = await page.getAttribute('#prologueLink','href');
+  const NSMONL=['january','february','march','april','may','june','july','august','september','october','november','december'];
+  check('NS: Prologue link keys to the nominal date', nsProHref==='https://www.myrrh-bearers.org/prologue/'+NSMONL[t0.getMonth()]+'/'+t0.getDate()+'.htm');
   const nsAzHidden = await page.$eval('#azbykaCard', e=>e.classList.contains('hidden'));
   check('NS: Azbyka card hidden (no correct dual-cycle mapping)', nsAzHidden===true);
   const nsYr = await page.evaluate(()=>{ const ev=window.__yearEvents(2026);

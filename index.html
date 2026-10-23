@@ -582,7 +582,7 @@
     } else if(isFastDay){
       el("fastDot").style.background = "#8a2b2b";
       el("fastWrap").classList.add("strict");
-      el("fastExc").textContent = "no meat, dairy, fish, wine or oil";
+      el("fastExc").textContent = "traditionally strict — many saints’ days allow wine & oil";
     } else {
       el("fastDot").style.background = fastColour(fdesc);
       el("fastExc").textContent = (hasExc && /fast[\s-]?free/i.test(fexc)) ? "fast-free week" : "";
@@ -830,13 +830,19 @@
       return {f:2,fish:fishD,wineOil:weekend&&!fishD,feast:feast};
     }
     // Apostles' Fast: Monday after All Saints (P+57) to 28 June nominal
-    // (common Slavic rule: fish Tue/Thu/Sat/Sun; wine & oil Monday; Wed/Fri stricter)
+    // (common Slavic rule: fish Tue/Thu/Sat/Sun; wine & oil Monday; Wed/Fri stricter;
+    //  fish on the Nativity of the Forerunner, 24 June, whatever the weekday)
     var ap=new Date(P.getFullYear(),P.getMonth(),P.getDate()+57);
     if(d>=ap && x<=628 && mm>=5){
-      return {f:1,fish:(dow===0||dow===2||dow===4||dow===6),wineOil:(dow===1),feast:feast};
+      var fishA=(dow===0||dow===2||dow===4||dow===6)||(mm===6&&mday===24);
+      return {f:1,fish:fishA,wineOil:(dow===1)&&!fishA,feast:feast};
     }
-    // Nativity Fast: 15 Nov – 24 Dec nominal (same weekday rule until 19 Dec; strict final days)
-    if(mbtw(11,15,12,19)) return {f:1,fish:(dow===0||dow===2||dow===4||dow===6),wineOil:(dow===1),feast:feast};
+    // Nativity Fast: 15 Nov – 24 Dec nominal (same weekday rule until 19 Dec; strict final days;
+    //  fish on the Entry of the Theotokos, 21 November, whatever the weekday)
+    if(mbtw(11,15,12,19)){
+      var fishN=(dow===0||dow===2||dow===4||dow===6)||(mm===11&&mday===21);
+      return {f:1,fish:fishN,wineOil:(dow===1)&&!fishN,feast:feast};
+    }
     if(mbtw(12,20,12,24)) return {f:2,fish:false,wineOil:weekend,feast:feast};
     // One-day strict fasts
     if(mm===1&&mday===5)  return {f:2,fish:false,feast:feast};       // Eve of Theophany

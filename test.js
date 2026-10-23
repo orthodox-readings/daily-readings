@@ -493,6 +493,14 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('fastRule: Exaltation strict one-day fast', fr.exalt.f===2);
   check('fastRule: Trinity-week Friday fast-free', fr.trinityFri.f===0);
   check('fastRule: Apostles-fast Saturday fish', fr.apSat.f===1 && fr.apSat.fish===true);
+  const frFeast = await page.evaluate(()=>({
+    entryFri:  window.__fastRule(new Date(2026,11,4)),   // Entry of the Theotokos, a FRIDAY in the Nativity Fast
+    forerunWed:window.__fastRule(new Date(2027,6,7)),    // Nativity of the Forerunner (24 Jun OS), a WEDNESDAY in the Apostles' Fast
+    natMon:    window.__fastRule(new Date(2026,11,7))    // ordinary Nativity-fast Monday: wine & oil, no fish
+  }));
+  check('fastRule: fish on the Entry even on Friday (4 Dec 2026)', frFeast.entryFri.f===1 && frFeast.entryFri.fish===true && /Entry/.test(frFeast.entryFri.feast||''));
+  check('fastRule: fish on the Forerunner even on Wednesday (7 Jul 2027)', frFeast.forerunWed.f===1 && frFeast.forerunWed.fish===true);
+  check('fastRule: Nativity-fast Monday keeps wine & oil, no fish', frFeast.natMon.f===1 && frFeast.natMon.fish===false && frFeast.natMon.wineOil===true);
   check('fastRule: Nativity fast final days strict', fr.natStrict.f===2);
   check('fastRule: Svyatki Friday fast-free', fr.svyatki.f===0);
   const frWo = await page.evaluate(()=>({
@@ -525,11 +533,13 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('calendar opens on date tap', calVisible===true);
   check('calendar grid: 42 day cells + 7 weekday headers', cellCount===42 && wdCount===7);
   check('today ringed in grid', todayMarked===1);
-  // navigate to August 2026 and inspect Transfiguration cell
-  for(let i=0;i<24;i++){
-    const t = (await page.textContent('#calTitle')) + ' ' + (await page.textContent('#calYearBtn'));
-    if(/August 2026/.test(t)) break;
-    await page.click('#calNext');
+  // navigate to August 2026 (either direction — the suite must pass on any date) and inspect Transfiguration cell
+  for(let i=0;i<40;i++){
+    const mTxt = await page.textContent('#calTitle');
+    const yTxt = (await page.textContent('#calYearBtn')).replace(/[^0-9]/g,'');
+    if(/August/.test(mTxt) && yTxt==='2026') break;
+    const cur = parseInt(yTxt,10)*12 + ['January','February','March','April','May','June','July','August','September','October','November','December'].indexOf(mTxt.trim());
+    await page.click(cur > 2026*12+7 ? '#calPrev' : '#calNext');
   }
   const aug19 = await page.evaluate(()=>{
     const c=[...document.querySelectorAll('.cd:not(.om)')].find(x=>x.querySelector('.n').textContent==='19');
@@ -666,7 +676,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const strictExc = await page.textContent('#fastExc');
   const strictDot = await page.$eval('#fastDot', e=>getComputedStyle(e).backgroundColor);
   const strictTint = await page.$eval('#fastWrap', e=>e.classList.contains('strict'));
-  check('plain Fast day explains the strict norm', /no meat, dairy, fish, wine or oil/.test(strictExc));
+  check('plain Fast day explains the strict norm honestly', /traditionally strict/.test(strictExc) && /wine & oil/.test(strictExc));
   check('strict fast dot red', strictDot==='rgb(138, 43, 43)');
   check('strict day tints the fast strip red', strictTint===true);
   await ctx.close();

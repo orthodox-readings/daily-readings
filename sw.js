@@ -1,5 +1,5 @@
 /* Minimal offline shell. Data caching is handled in-page via localStorage. */
-var CACHE = "orthodox-readings-v29";
+var CACHE = "orthodox-readings-v30";
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./fathers.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-32.png"
@@ -19,13 +19,29 @@ self.addEventListener("activate", function(e){
 
 self.addEventListener("fetch", function(e){
   var url = new URL(e.request.url);
-  // Only manage our own app-shell files. Let API/network calls pass straight through.
-  if(url.origin === self.location.origin){
+  if(url.origin !== self.location.origin) return;   // API/network calls pass straight through
+
+  var isShellPage = e.request.mode === "navigate" ||
+    url.pathname.endsWith("/index.html") || url.pathname.endsWith("/");
+
+  if(isShellPage){
+    // NETWORK-FIRST for the page itself: every online open gets the newest
+    // version immediately; the cached copy serves offline. (Cache-first here
+    // once left phones stuck on an old version — v28.)
+    e.respondWith(
+      fetch(e.request).then(function(res){
+        var copy = res.clone();
+        caches.open(CACHE).then(function(c){ c.put("./index.html", copy); });
+        return res;
+      }).catch(function(){
+        return caches.match("./index.html");
+      })
+    );
+  } else {
+    // Cache-first for static assets (icons, quotes), refreshed by version bump.
     e.respondWith(
       caches.match(e.request).then(function(hit){
-        return hit || fetch(e.request).then(function(res){
-          return res;
-        }).catch(function(){ return caches.match("./index.html"); });
+        return hit || fetch(e.request).catch(function(){ return caches.match("./index.html"); });
       })
     );
   }

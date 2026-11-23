@@ -317,10 +317,9 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('open-all toggles back to closed', allClosed===true);
 
   // --- settings hints + year-picker chevron ---
-  const calHint = await page.$eval('#calSeg', e=>e.closest('.srow').textContent);
   const txtHint = await page.$eval('#txtSeg', e=>e.closest('.srow').textContent);
   const chev = await page.evaluate(()=>getComputedStyle(document.querySelector('.caltitle'),'::after').content);
-  check('settings explain Old Calendar (ROCOR) and KJV/NKJV', /ROCOR/.test(calHint) && /traditional/.test(txtHint));
+  check('settings explain KJV/NKJV', /traditional/.test(txtHint) && /modern/.test(txtHint));
   check('month title shows year-picker chevron', /▾/.test(chev));
 
   // --- readings: collapsed by default; open first; illuminated initial ---
@@ -667,43 +666,25 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('coming week prefetched for offline (>=5 extra fetches; tomorrow cached)', apiCalls.length>=6 && tomCached===true);
   await ctx.close();
 
-  // ================= 1b. NEW CALENDAR MODE — the engine must follow the reckoning =================
+  // ================= 1b. OLD CALENDAR ONLY — a stored New-Calendar pref must be ignored =================
   ctx = await browser.newContext({ viewport:{width:390,height:844} });
   page = await ctx.newPage();
-  await page.addInitScript(()=>{ localStorage.setItem('pref:cal','gregorian'); });
+  await page.addInitScript(()=>{ localStorage.setItem('pref:cal','gregorian'); });  // legacy pref from pre-v28 installs
   await page.route('**orthocal.info/api/**', r=> r.fulfill({ status:200, contentType:'application/json', body: JSON.stringify(MOCK) }));
   await page.route('**bolls.life/**', mockBolls);
   await page.goto(base,{waitUntil:'networkidle'});
   await page.waitForSelector('.reading',{timeout:5000});
-  const ns = await page.evaluate(()=>({
-    dormNS:    window.__fastRule(new Date(2026,7,5)),    // 5 Aug civil = Dormition fast on NEW calendar
-    aug19NS:   window.__fastRule(new Date(2026,7,19)),   // 19 Aug civil = ordinary Wednesday on NEW calendar
-    natNS:     window.__fastRule(new Date(2026,11,25)),  // 25 Dec civil = Nativity of Christ on NEW calendar
-    dec25Lit:  window.__litKey(new Date(2026,11,25), null, ''),
-    aug15Lit:  window.__litKey(new Date(2026,7,15), null, ''),  // Dormition NS -> blue
-    janSeven:  window.__fastRule(new Date(2027,0,7))     // 7 Jan civil = ordinary day on NEW calendar (Thursday)
-  }));
-  const nsCommemHref = await page.getAttribute('#commemLink','href');
-  const nsYmd = '' + t0.getFullYear() + String(t0.getMonth()+1).padStart(2,'0') + String(t0.getDate()).padStart(2,'0');
-  check('NS: Dormition fast shades 1–14 August', ns.dormNS.f===2);
-  check('NS: 19 August is an ordinary Wednesday', ns.aug19NS.f===1 && !ns.aug19NS.feast);
-  check('NS: Nativity feast on 25 December', /Nativity of Christ/.test(ns.natNS.feast||''));
-  check('NS: 25 December wears white', ns.dec25Lit==='white');
-  check('NS: 15 August wears Theotokos blue', ns.aug15Lit==='blue');
-  check('NS: 7 January is no longer Nativity', !ns.janSeven.feast && ns.janSeven.f===0);
-  check('NS: OrthoChristian link keys to the nominal date', nsCommemHref==='https://orthochristian.com/calendar/'+nsYmd+'.html');
-  const nsProHref = await page.getAttribute('#prologueLink','href');
-  const NSMONL=['january','february','march','april','may','june','july','august','september','october','november','december'];
-  check('NS: Prologue link keys to the nominal date', nsProHref==='https://www.myrrh-bearers.org/prologue/'+NSMONL[t0.getMonth()]+'/'+t0.getDate()+'.htm');
-  const nsAzHidden = await page.$eval('#azbykaCard', e=>e.classList.contains('hidden'));
-  check('NS: Azbyka card hidden (no correct dual-cycle mapping)', nsAzHidden===true);
-  const nsYr = await page.evaluate(()=>{ const ev=window.__yearEvents(2026);
-    return {f:ev.feasts.length, fasts:ev.fasts.length, ap:ev.fasts.some(x=>/Apostles/.test(x.name)),
-      nat:ev.fasts.some(x=>/Nativity/.test(x.name) && x.s.getFullYear()===2026 && x.e.getFullYear()===2026)}; });
-  check('NS year: 13 feasts, 4 in-year fast ranges, Apostles kept', nsYr.f===13 && nsYr.fasts===4 && nsYr.ap===true && nsYr.nat===true);
-  await page.click('#calBtn');
-  const nsCells = await page.$$eval('.cd', n=>n.length);
-  check('NS: month grid renders under new reckoning', nsCells===42);
+  const ocAlt = await page.textContent('#altdate');
+  const ocApi = await page.evaluate(()=>window.__prologueURL ? true : true);
+  const ocAz = await page.$eval('#azbykaCard', e=>!e.classList.contains('hidden'));
+  const ocSeg = await page.$('#calSeg');
+  const ocOffset = await page.evaluate(()=>{
+    const d=new Date(2026,11,25);           // 25 Dec civil must NOT be Nativity (that is 7 Jan civil on the OC)
+    return { dec25: window.__fastRule(d).feast||null, jan7: window.__fastRule(new Date(2027,0,7)).feast||null };
+  });
+  check('legacy New-Calendar pref ignored: app stays on Old Calendar', /Old Calendar/.test(ocAlt) && ocAz===true);
+  check('no calendar toggle remains in settings', ocSeg===null);
+  check('reckoning fixed: Nativity on 7 Jan civil, not 25 Dec', !/Nativity/.test(ocOffset.dec25||'') && /Nativity of Christ/.test(ocOffset.jan7||''));
   await ctx.close();
 
   // ================= 2. STRICT FAST =================

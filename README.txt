@@ -44,7 +44,7 @@ USING IT
     feasts marked with a cross, liturgical-colour dots; tap any day to open
     it. (Tap the month title for a quick year picker.) "Go to today" appears
     when you're away from today.
-  - Settings live behind the GEAR (top right): Old/New Calendar,
+  - Settings live behind the GEAR (top right):
     Bible text (KJV / NKJV), and A−/A+ text size — all remembered.
   - NKJV loads per reading (unofficial source; © Thomas Nelson) and falls
     back to KJV automatically; the badge beside each reference tells you

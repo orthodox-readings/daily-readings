@@ -105,7 +105,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const brandGold = await page.$eval('.brand b', e=>e.textContent);
   const headpiece = await page.$('.headpiece span');
   const todayHidden = await page.$eval('#today', e=>e.classList.contains('hidden'));
-  const sheetHidden = await page.$eval('#sheet', e=>e.classList.contains('hidden'));
+  const sheetHidden = (await page.$('#sheet'))===null && (await page.$('#gearBtn'))===null; // gear retired in v29
   check('parchment ground restored (rgb(244,237,223))', bodyBg==='rgb(244, 237, 223)');
   check('two-tone gold wordmark', brandGold==='Readings');
   const dateCard = await page.evaluate(()=>{
@@ -152,12 +152,15 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('"Go to today" hidden when on today', todayHidden===true);
   check('settings sheet closed by default', sheetHidden===true);
 
-  // --- sheet open/close ---
-  await page.click('#gearBtn');
-  const sheetOpen = await page.$eval('#sheet', e=>!e.classList.contains('hidden'));
-  await page.click('#gearBtn');
-  const sheetClosed = await page.$eval('#sheet', e=>e.classList.contains('hidden'));
-  check('gear opens and closes the settings sheet', sheetOpen===true && sheetClosed===true);
+  // --- reading tools row (v29: toggles live with the readings; gear retired) ---
+  const toolsVis = await page.$eval('#readingsCtl', e=>!e.classList.contains('hidden'));
+  const toolsOrder = await page.evaluate(()=>{
+    const r=document.getElementById('readingsCtl');
+    return r.querySelector('#txtSeg') && r.querySelector('#sizeSeg') && r.querySelector('#openAllBtn') ? true : false;
+  });
+  check('reading tools row holds KJV/NKJV + size + open-all', toolsVis===true && toolsOrder===true);
+  const rowIcons = await page.$$eval('#linksCard .licon svg', n=>n.length);
+  check('Prayer & Study rows carry four line-icons', rowIcons===4);
 
   // --- content ---
   const summary = await page.textContent('#summary');
@@ -317,9 +320,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('open-all toggles back to closed', allClosed===true);
 
   // --- settings hints + year-picker chevron ---
-  const txtHint = await page.$eval('#txtSeg', e=>e.closest('.srow').textContent);
   const chev = await page.evaluate(()=>getComputedStyle(document.querySelector('.caltitle'),'::after').content);
-  check('settings explain KJV/NKJV', /traditional/.test(txtHint) && /modern/.test(txtHint));
   check('month title shows year-picker chevron', /▾/.test(chev));
 
   // --- readings: collapsed by default; open first; illuminated initial ---
@@ -483,13 +484,12 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('Back closes the support sheet, stays in app', supGone===true && /8099/.test(page.url()));
 
   // --- text size via sheet + persistence ---
-  await page.click('#gearBtn');
   await page.click('#sizeSeg button[data-sz="+"]');
   const zoom1 = await page.evaluate(()=>document.body.style.zoom);
   await page.reload({waitUntil:'networkidle'});
   await page.waitForSelector('.reading',{timeout:5000});
   const zoom2 = await page.evaluate(()=>document.body.style.zoom);
-  await page.click('#gearBtn'); await page.click('#sizeSeg button[data-sz="-"]'); await page.click('#gearBtn');
+  await page.click('#sizeSeg button[data-sz="-"]');
   check('A+ bumps zoom to 1.1', String(zoom1)==='1.1');
   check('text size persists across restart', String(zoom2)==='1.1');
 
@@ -499,9 +499,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   await page.screenshot({ path: path.join(DIR,'shot-light.png'), fullPage:true });
 
   // --- KJV toggle via sheet ---
-  await page.click('#gearBtn');
   await page.click('#txtSeg button[data-txt="kjv"]');
-  await page.click('#gearBtn'); // close the sheet again
   await page.waitForFunction(()=>document.querySelectorAll('.reading .body .v').length===7,{timeout:5000}).catch(()=>{});
   const kjvVerses = await page.$$eval('.reading .body .v', n=>n.length);
   const kjvBadges = await page.$$eval('.reading .ver', n=>n.map(x=>x.textContent));

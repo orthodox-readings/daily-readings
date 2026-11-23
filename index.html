@@ -217,8 +217,8 @@
   .caltitle::after{content:" ▾";font-size:12px;opacity:.65}
 
   /* Open-all readings control */
-  .rctl{text-align:right;margin:8px 20px -8px}
-  .rctl button{border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;font-weight:700;
+  .rctl{display:flex;align-items:center;gap:8px;margin:10px 16px -6px}
+  .rctl #openAllBtn{margin-left:auto;border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;font-weight:700;
     cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent}
 
   /* Fast strip inside the date card */
@@ -238,6 +238,7 @@
   .lrow{display:flex;align-items:center;gap:12px;padding:13px 0;text-decoration:none;border-bottom:1px solid var(--line);-webkit-tap-highlight-color:transparent}
   .lrow:last-child{border-bottom:0}
   #azbykaCard .lrow{border-bottom:1px solid var(--line)}
+  .licon{color:var(--accent);flex:0 0 auto;display:inline-flex;opacity:.85}
   .ltxt{flex:1;color:var(--ink);font-weight:700;font-size:14.5px}
   .ltxt small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:3px;line-height:1.45}
   .ltxt small b{color:var(--accent);font-weight:700}
@@ -335,24 +336,9 @@
     <button class="gearbtn" id="calBtn" aria-label="Open the month calendar">
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm4 6h2v2H9v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM9 17h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg>
     </button>
-    <button class="gearbtn" id="gearBtn" aria-label="Settings">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19.4 13c0-.3.1-.6.1-1s0-.7-.1-1l2.1-1.6c.2-.2.2-.4.1-.6l-2-3.5c-.1-.2-.4-.3-.6-.2l-2.5 1c-.5-.4-1.1-.7-1.7-1l-.4-2.6c0-.2-.2-.4-.5-.4h-4c-.2 0-.4.2-.5.4l-.4 2.6c-.6.2-1.1.6-1.7 1l-2.5-1c-.2-.1-.5 0-.6.2l-2 3.5c-.1.2-.1.5.1.6L4.5 11c0 .3-.1.6-.1 1s0 .7.1 1l-2.1 1.6c-.2.2-.2.4-.1.6l2 3.5c.1.2.4.3.6.2l2.5-1c.5.4 1.1.7 1.7 1l.4 2.6c0 .2.2.4.5.4h4c.2 0 .4-.2.5-.4l.4-2.6c.6-.2 1.2-.6 1.7-1l2.5 1c.2.1.5 0 .6-.2l2-3.5c.1-.2.1-.5-.1-.6L19.4 13zM12 15.5c-1.9 0-3.5-1.6-3.5-3.5s1.6-3.5 3.5-3.5 3.5 1.6 3.5 3.5-1.6 3.5-3.5 3.5z"/></svg>
-    </button>
     <button class="iconbtn" id="shareBtn" aria-label="Share this day">
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7 0-.2 0-.5-.1-.7L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.9C7.5 9.4 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.4 2-.9l7.2 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 2.9 2.9 1.6 0 2.9-1.3 2.9-2.9 0-1.6-1.3-2.8-2.9-2.8z"/></svg>
     </button>
-    <div class="sheet hidden" id="sheet">
-      <div class="srow"><span class="lbl">Bible text<small>KJV traditional · NKJV modern</small></span>
-        <span class="seg2" id="txtSeg">
-          <button data-txt="kjv">KJV</button>
-          <button data-txt="nkjv" class="active">NKJV</button>
-        </span></div>
-      <div class="srow"><span class="lbl">Text size</span>
-        <span class="seg2" id="sizeSeg">
-          <button data-sz="-" aria-label="Smaller text">A−</button>
-          <button data-sz="+" aria-label="Larger text">A+</button>
-        </span></div>
-    </div>
     <div class="sheet hidden" id="shareMenu">
       <button class="mrow" id="shareTextBtn"><span class="mtit">Share as text</span><span class="msub">Saints, fast &amp; readings</span></button>
       <button class="mrow" id="shareWisdomBtn"><span class="mtit">Wisdom tile</span><span class="msub">The day’s saying as an image</span></button>
@@ -456,7 +442,17 @@
       <p class="qby" id="quoteBy"></p>
     </section>
 
-    <div class="rctl hidden" id="readingsCtl"><button id="openAllBtn">Open all readings ▾</button></div>
+    <div class="rctl hidden" id="readingsCtl">
+      <span class="seg2" id="txtSeg">
+        <button data-txt="kjv">KJV</button>
+        <button data-txt="nkjv" class="active">NKJV</button>
+      </span>
+      <span class="seg2" id="sizeSeg">
+        <button data-sz="-" aria-label="Smaller text">A−</button>
+        <button data-sz="+" aria-label="Larger text">A+</button>
+      </span>
+      <button id="openAllBtn" class="hidden">Open all readings ▾</button>
+    </div>
     <div id="readings"></div>
 
     <section class="card commem collapsible hidden" id="commemCard">
@@ -479,10 +475,10 @@
 
     <section class="card linksCard" id="linksCard">
       <p class="label">For Prayer &amp; Study</p>
-      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s full ROCOR listing, troparia &amp; kontakia · Holy Trinity Monastery</small></span><span class="larr">›</span></a>
-      <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Prologue of Ohrid<small>St Nikolai of Žiča — the day’s lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
-      <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Full Service Texts<small>Vespers · Matins · Liturgy — Church Slavonic, azbyka.ru</small></span><span class="larr">›</span></a></span>
-      <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">His reflection follows the daily Gospel. OrthoChristian (official English text).</small></span><span class="larr">›</span></a>
+      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm6 4h2v2h2v2h-2v2h-2v-2H9v-2h2v-2z"/></svg></span><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s full ROCOR listing, troparia &amp; kontakia · Holy Trinity Monastery</small></span><span class="larr">›</span></a>
+      <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></span><span class="ltxt">Prologue of Ohrid<small>St Nikolai of Žiča — the day’s lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
+      <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></span><span class="ltxt">Full Service Texts<small>Vespers · Matins · Liturgy — Church Slavonic, azbyka.ru</small></span><span class="larr">›</span></a></span>
+      <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">His reflection follows the daily Gospel. OrthoChristian (official English text).</small></span><span class="larr">›</span></a>
     </section>
   </div>
 
@@ -663,8 +659,9 @@
       }
     });
 
-    // Open-all control (only useful with several readings)
-    show(el("readingsCtl"), readings.length>1);
+    // Reading tools: version + size always with the readings; open-all only when several
+    show(el("readingsCtl"), readings.length>0);
+    show(el("openAllBtn"), readings.length>1);
     el("openAllBtn").textContent = "Open all readings ▾";
 
     // Liturgical colour, lives, tracker, troparia, quote, St Theophan
@@ -877,7 +874,6 @@
     if(!el("supportOverlay").classList.contains("hidden")) closeSupport(true);
     else if(!el("yearOverlay").classList.contains("hidden")) closeYear(true);
     else if(!el("calOverlay").classList.contains("hidden")) closeCal(true);
-    el("sheet").classList.add("hidden");
     el("shareMenu").classList.add("hidden");
   });
 
@@ -1656,13 +1652,11 @@
     b.addEventListener("click", function(){ setTxt(b.getAttribute("data-txt")); });
   });
   el("shareBtn").addEventListener("click", function(){
-    el("sheet").classList.add("hidden");
     el("shareMenu").classList.toggle("hidden");
   });
   el("shareTextBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareDay(); });
   el("shareWisdomBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareTile("wisdom"); });
   el("shareDayBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareTile("day"); });
-  el("gearBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); el("sheet").classList.toggle("hidden"); });
   el("commemHead").addEventListener("click", function(){ el("commemCard").classList.toggle("open"); });
   el("date").addEventListener("click", openCal);
   el("calBtn").addEventListener("click", openCal);

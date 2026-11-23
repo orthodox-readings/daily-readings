@@ -360,6 +360,35 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const proLeap = await page.evaluate(()=>window.__prologueURL(new Date(2028,2,13))); // 13 Mar 2028 civil = 29 Feb OS (leap year)
   check('Prologue link handles 29 February (OS leap day)', proLeap==='https://www.myrrh-bearers.org/prologue/february/29.htm');
 
+  // --- Parish supplement: ROCOR commemorations missing upstream ---
+  const suppUnit = await page.evaluate(()=>({
+    iveron: window.__supplementFor(new Date(2026,10,24), ['Martyrs Menas, Victor and Vincent','Our Righteous Father Theodore the Studite (826)']),
+    dedup:  window.__supplementFor(new Date(2026,10,24), ['Iveron Icon of the Mother of God']),
+    gabriel:window.__supplementFor(new Date(2026,10,2), []),
+    plain:  window.__supplementFor(new Date(2026,10,25), [])
+  }));
+  check('supplement: Montreal Iveron on 24 Nov (11 Nov OS)', suppUnit.iveron.length===1 && /Montreal.*Iveron/.test(suppUnit.iveron[0]));
+  check('supplement: skipped when upstream already carries it', suppUnit.dedup.length===0);
+  check('supplement: St Gabriel of Georgia on 2 Nov (20 Oct OS)', suppUnit.gabriel.length===1 && /Urgebadze/.test(suppUnit.gabriel[0]));
+  check('supplement: silent on ordinary days', suppUnit.plain.length===0);
+
+  // UI: jump to 24 Nov 2026 — ✦ entry and attribution note render
+  await page.evaluate(()=>{
+    const dp=document.getElementById('datePick');
+    dp.value='2026-11-24'; dp.dispatchEvent(new Event('change'));
+  });
+  await page.waitForTimeout(600);
+  await page.click('#commemHead');
+  const suppLi = await page.$$eval('#commemList li.supp', n=>n.map(x=>x.textContent));
+  const suppNoteVis = await page.$eval('#commemSuppNote', e=>!e.classList.contains('hidden'));
+  const suppGlyph = await page.evaluate(()=>getComputedStyle(document.querySelector('#commemList li.supp'),'::before').content);
+  await page.click('#commemHead');
+  check('24 Nov: Montreal Iveron rendered with ✦ and attribution', suppLi.length===1 && /Montreal/.test(suppLi[0]) && suppNoteVis===true && /✦/.test(suppGlyph));
+  const relabel = await page.textContent('#commemLink');
+  const jvLabel = await page.$eval('#troparLink .ltxt', e=>e.textContent);
+  check('honest labels: complete-list link + Jordanville (ROCOR) row', /complete list/.test(relabel) && /Jordanville Calendar \(ROCOR\)/.test(jvLabel));
+  await page.click('#today'); await page.waitForTimeout(500);
+
   // --- St Theophan subtitle must cite the LITURGY Gospel, never the Matins Gospel ---
   const theoSub = await page.textContent('#theophanSub');
   check('Theophan sub cites the Liturgy Gospel (mock day)', /Matthew 9:18-26/.test(theoSub) && !/Luke 24/.test(theoSub));

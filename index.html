@@ -145,14 +145,16 @@
   /* Collapsible commemorations */
   .commem .label{cursor:pointer;position:relative;margin-bottom:0;padding-right:30px;-webkit-tap-highlight-color:transparent}
   .cchev{position:absolute;right:2px;top:-1px;color:var(--gold);font-size:12px;transition:transform .15s}
-  .commem.collapsible #commemList,.commem.collapsible .clink{display:none}
+  .commem.collapsible #commemList,.commem.collapsible .clink,.commem.collapsible #commemSuppNote{display:none}
   .commem.collapsible.open #commemList{display:block;margin-top:10px}
   .commem.collapsible.open .clink{display:inline-block}
+  .commem.collapsible.open #commemSuppNote:not(.hidden){display:block}
   .commem.collapsible.open .cchev{transform:rotate(180deg)}
   .commem ul{margin:0;padding:0;list-style:none}
   .commem li{padding:7px 0;border-bottom:1px solid var(--line);font-size:15.5px}
   .commem li:last-child{border-bottom:0}
   .commem li::before{content:"☦";color:var(--gold);margin-right:9px;font-size:13px;vertical-align:1px}
+  .commem li.supp::before{content:"✦";color:var(--accent)}
   .commem .clink{margin-top:11px;color:var(--gold);font-size:12.5px;font-weight:700;text-decoration:none}
 
   /* Lives */
@@ -465,7 +467,8 @@
     <section class="card commem collapsible hidden" id="commemCard">
       <p class="label" id="commemHead">Commemorations<span class="cchev">▼</span></p>
       <ul id="commemList"></ul>
-      <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Full list for this day on OrthoChristian →</a>
+      <p class="tattr hidden" id="commemSuppNote">✦ From the ROCOR calendar — parish supplement, cross-checked with OrthoChristian.</p>
+      <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">The complete list of the day’s saints — OrthoChristian →</a>
     </section>
 
     <section class="card lives hidden" id="livesCard">
@@ -481,7 +484,7 @@
 
     <section class="card linksCard" id="linksCard">
       <p class="label">For Prayer &amp; Study</p>
-      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Troparia &amp; Kontakia<small>The day’s hymns · Holy Trinity (Jordanville-referenced) calendar</small></span><span class="larr">›</span></a>
+      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s full ROCOR listing, troparia &amp; kontakia · Holy Trinity Monastery</small></span><span class="larr">›</span></a>
       <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Prologue of Ohrid<small>St Nikolai of Žiča — the day’s lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
       <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">Full Service Texts<small>Vespers · Matins · Liturgy — Church Slavonic, azbyka.ru</small></span><span class="larr">›</span></a></span>
       <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">His reflection follows the daily Gospel. OrthoChristian (official English text).</small></span><span class="larr">›</span></a>
@@ -613,8 +616,14 @@
     });
     var ul = el("commemList"); ul.innerHTML="";
     list.forEach(function(t){ var li=document.createElement("li"); li.textContent=t; ul.appendChild(li); });
+    // Parish supplement: ROCOR commemorations the upstream data lacks (see SUPPLEMENT)
+    var supp = supplementFor(state.date, [summary].concat(list));
+    supp.forEach(function(t){
+      var li=document.createElement("li"); li.className="supp"; li.textContent=t; ul.appendChild(li);
+    });
+    show(el("commemSuppNote"), supp.length>0);
     el("commemLink").setAttribute("href", orthoChristianURL(state.date));
-    show(el("commemCard"), list.length>0);
+    show(el("commemCard"), (list.length+supp.length)>0);
 
     // Service notes
     var notes = data && data.service_notes;
@@ -991,6 +1000,28 @@
   }
 
   // ---------- Troparia link (Holy Trinity Jordanville calendar, civil-date params) ----------
+  // ---------- Parish supplement: ROCOR commemorations the upstream data lacks ----------
+  // Every entry is verified against OrthoChristian (the Russian-calendar reference) before
+  // inclusion, keyed by the OS/menaion date, and marked ✦ in the list. If the upstream
+  // source later gains the commemoration, the keyword match skips ours automatically.
+  var SUPPLEMENT=[
+    {m:11,d:11,t:"Myrrh-streaming “Montreal” Iveron Icon of the Theotokos (1982)",k:"iveron"},
+    {m:10,d:20,t:"St Gabriel (Urgebadze), archimandrite, of Mtskheta, Georgia (1995)",k:"urgebadze"},
+    {m:5,d:29,t:"New Hiero-confessor Luke (Voino-Yasenetsky), archbishop of Simferopol (1961)",k:"simferopol"},
+    {m:6,d:29,t:"St Paisios the Athonite (1994)",k:"paisios"},
+    {m:11,d:19,t:"St Porphyrios of Kavsokalyvia (1991)",k:"porphyri"},
+    {m:2,d:13,t:"St Seraphim (Sobolev), archbishop of Bogucharsk (1950)",k:"sobolev"}
+  ];
+  function supplementFor(civilDate, existing){
+    var md=menaionOf(civilDate), mm=md.getMonth()+1, dd=md.getDate();
+    var hay=(existing||[]).join(" ").toLowerCase();
+    var out=[];
+    SUPPLEMENT.forEach(function(s){
+      if(s.m===mm && s.d===dd && hay.indexOf(s.k)<0) out.push(s.t);
+    });
+    return out;
+  }
+
   // ---------- Prologue of Ohrid (Lazarica Press translation, hosted by Holy Myrrh-bearers;
   //            pages are keyed by the OS/menaion date, so the link follows the nominal day in either mode) ----------
   var PRO_MONTHS=["january","february","march","april","may","june","july","august","september","october","november","december"];
@@ -1693,6 +1724,7 @@
   window.__fastRule = fastRule;       // exposed for automated tests
   window.__azbykaURL = azbykaURL;     // exposed for automated tests
   window.__prologueURL = prologueURL; // exposed for automated tests
+  window.__supplementFor = supplementFor; // exposed for automated tests
   window.__buildTile = buildTile;     // exposed for automated tests
   window.__gospelRef = findGospelRef; // exposed for automated tests
   window.__setFathers = function(f){ var old=FATHERS; FATHERS=f; renderQuote(); return old; }; // exposed for automated tests

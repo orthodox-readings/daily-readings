@@ -482,6 +482,7 @@
 
     <section class="card linksCard" id="linksCard">
       <p class="label">For Prayer &amp; Study</p>
+      <a class="lrow" id="prayersLink" href="https://www.myrrh-bearers.org/morning.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 2c1.6 2 2.6 3.4 2.6 4.8A2.6 2.6 0 0 1 12 9.4a2.6 2.6 0 0 1-2.6-2.6C9.4 5.4 10.4 4 12 2zM9.5 11h5a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z"/></svg></span><span class="ltxt"><span id="prayersTitle">Morning Prayers</span><small>Daily Orthodox prayers · Holy Myrrh-bearers</small></span><span class="larr">›</span></a>
       <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm6 4h2v2h2v2h-2v2h-2v-2H9v-2h2v-2z"/></svg></span><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s ROCOR listing &amp; troparia · Holy Trinity</small></span><span class="larr">›</span></a>
       <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></span><span class="ltxt">Prologue of Ohrid<small>St Nikolai — lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
       <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></span><span class="ltxt">Full Service Texts<small>Church Slavonic · azbyka.ru</small></span><span class="larr">›</span></a></span>
@@ -564,7 +565,8 @@
 
     // Optional alternate (Julian civil) date if the API supplies it
     var alt = data && (data.julian_calendar_date || data.date_julian || data.jdate);
-    el("altdate").textContent = tMonthDay(menaionOf(state.date)) + ", Old Style";
+    var tone = toneOfWeek(state.date);
+    el("altdate").textContent = tMonthDay(menaionOf(state.date)) + ", Old Style" + (tone ? " · Tone " + tone : "");
 
     el("summary").textContent = (data && (data.summary_title || (data.titles && data.titles[0]))) || "";
 
@@ -680,6 +682,7 @@
     applyLit(liturgicalKey(state.date, data, fdesc));
     renderLives(data);
     renderTracker(fdesc);
+    renderPrayersLink();
     el("troparLink").setAttribute("href", htmURL(state.date));
     el("prologueLink").setAttribute("href", prologueURL(state.date));
     renderAzbyka();
@@ -1002,6 +1005,27 @@
   }
 
   // ---------- Troparia link (Holy Trinity Jordanville calendar, civil-date params) ----------
+  // ---------- Tone of the week (Octoechos) ----------
+  // Thomas Sunday (Pascha + 7) begins Tone 1; the tone advances each Sunday and cycles 1–8
+  // until the next Palm Sunday. Weekdays take the tone of the preceding Sunday.
+  // No tone of the week from Palm Sunday through Bright Saturday.
+  // Verified against OrthoChristian: 1 Mar 2026 = 5, 19 Apr = 1, 26 Apr = 2, 2 Aug = 8, 22 Nov = 8, 3 Jan 2027 = 6.
+  function toneOfWeek(d){
+    var t=new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    var P=paschaCivil(t.getFullYear());
+    var diff=Math.round((t-P)/86400000);
+    if(diff<-7){ P=paschaCivil(t.getFullYear()-1); diff=Math.round((t-P)/86400000); }
+    else if(diff<7) return null;
+    return ((Math.floor(diff/7)-1)%8)+1;
+  }
+
+  // ---------- Daily prayers (Holy Myrrh-bearers): morning prayers by day, prayers before sleep by evening ----------
+  function renderPrayersLink(){
+    var evening = new Date().getHours() >= 16;
+    el("prayersTitle").textContent = evening ? "Prayers Before Sleep" : "Morning Prayers";
+    el("prayersLink").setAttribute("href", "https://www.myrrh-bearers.org/" + (evening ? "evening.htm" : "morning.htm"));
+  }
+
   // ---------- Parish supplement: ROCOR commemorations the upstream data lacks ----------
   // Every entry is verified against OrthoChristian (the Russian-calendar reference) before
   // inclusion, keyed by the OS/menaion date, and marked ✦ in the list. If the upstream
@@ -1712,6 +1736,7 @@
   window.__azbykaURL = azbykaURL;     // exposed for automated tests
   window.__prologueURL = prologueURL; // exposed for automated tests
   window.__supplementFor = supplementFor; // exposed for automated tests
+  window.__toneOfWeek = toneOfWeek;       // exposed for automated tests
   window.__buildTile = buildTile;     // exposed for automated tests
   window.__gospelRef = findGospelRef; // exposed for automated tests
   window.__setFathers = function(f){ var old=FATHERS; FATHERS=f; renderQuote(); return old; }; // exposed for automated tests

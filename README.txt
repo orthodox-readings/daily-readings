@@ -60,6 +60,9 @@ USING IT
     as a single image.
   - The page reads top-down as a morning rule: the day's saying from the
     Fathers, then the Epistle & Gospel, then commemorations and lives.
+  - The tone of the week (Octoechos) is shown beside the Old Style date.
+  - Daily prayers: the first Prayer & Study row opens Morning Prayers by
+    day and Prayers Before Sleep from 4 pm (Holy Myrrh-bearers).
   - "For Prayer & Study" card: slim tap-rows to the day's Troparia &
     Kontakia (Jordanville calendar), the day's Prologue of Ohrid entry
     (St Nikolai of Zica — lives, reflection & homily, Lazarica translation

@@ -160,7 +160,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   });
   check('reading tools row holds KJV/NKJV + size + open-all', toolsVis===true && toolsOrder===true);
   const rowIcons = await page.$$eval('#linksCard .licon svg', n=>n.length);
-  check('Prayer & Study rows carry four line-icons', rowIcons===4);
+  check('Prayer & Study rows carry five line-icons', rowIcons===5);
 
   // --- content ---
   const summary = await page.textContent('#summary');
@@ -192,7 +192,25 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('About & sources folded by default', aboutClosed===true);
   const osExp = jd.getDate()+' '+['January','February','March','April','May','June','July','August','September','October','November','December'][jd.getMonth()]+', Old Style';
   const osShown = await page.textContent('#altdate');
-  check('Old Style date shown under the civil date', osShown===osExp);
+  const toneToday = await page.evaluate(()=>window.__toneOfWeek(new Date()));
+  check('Old Style date (and tone of the week) shown under the civil date', osShown===osExp+(toneToday? ' · Tone '+toneToday : ''));
+  const tones = await page.evaluate(()=>[
+    window.__toneOfWeek(new Date(2026,2,1)),   // First Sunday of Lent 2026
+    window.__toneOfWeek(new Date(2026,3,19)),  // Thomas Sunday
+    window.__toneOfWeek(new Date(2026,3,26)),  // Myrrh-bearers
+    window.__toneOfWeek(new Date(2026,7,2)),   // 9th Sunday after Pentecost
+    window.__toneOfWeek(new Date(2026,10,24)), // Tuesday of the 26th week
+    window.__toneOfWeek(new Date(2027,0,3)),   // 31st Sunday after Pentecost
+    window.__toneOfWeek(new Date(2026,3,5)),   // Palm Sunday: none
+    window.__toneOfWeek(new Date(2026,3,12)),  // Pascha: none
+    window.__toneOfWeek(new Date(2026,3,18))   // Bright Saturday: none
+  ]);
+  check('tone of the week matches OrthoChristian on six dates', tones.slice(0,6).join(',')==='5,1,2,8,8,6');
+  check('no tone from Palm Sunday through Bright Saturday', tones[6]===null && tones[7]===null && tones[8]===null);
+  const prayers = await page.evaluate(()=>({ t:document.getElementById('prayersTitle').textContent, h:document.getElementById('prayersLink').getAttribute('href'), hr:new Date().getHours() }));
+  check('daily prayers row follows the time of day', prayers.hr>=16
+    ? (prayers.t==='Prayers Before Sleep' && /evening\.htm$/.test(prayers.h))
+    : (prayers.t==='Morning Prayers' && /morning\.htm$/.test(prayers.h)));
   check('footer: corrected sources (Slavic tradition + Abbamoses)', /Slavic Old-Calendar tradition/.test(footerText) && /Abbamoses/.test(footerText) && !/Jordanville\./.test(footerText.split('Lives')[0]));
   check('Troparia row names Holy Trinity calendar', /Holy Trinity/.test(troparAttr));
 
@@ -206,7 +224,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   });
   check('order: Wisdom before readings', order.qb===true);
   check('order: readings before commemorations', order.rb===true);
-  check('combined links card below with 4 rows (incl. Prologue)', order.cb===true && order.rows===4);
+  check('combined links card below with 5 rows (prayers first)', order.cb===true && order.rows===5);
 
   // --- commemorations: collapsed by default, expand on tap ---
   const commClosed = await page.$eval('#commemList', e=>getComputedStyle(e).display==='none');

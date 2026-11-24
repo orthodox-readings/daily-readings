@@ -187,7 +187,12 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('reading labels: feast qualifier shown', srcLabels[1]==='Gospel — Apostles');
   check('reading labels: Matins Gospel shown', srcLabels[2]==='6th Matins Gospel');
   check('Lives attribution: Abbamoses/John Brady', /Abbamoses/.test(livesAttr) && /John Brady/.test(livesAttr));
-  check('Lives attribution: Greek Horologion dating explained', /Greek Horologion/.test(livesAttr));
+  check('Greek Horologion dating explained (now under About & sources)', /Greek Horologion/.test(footerText));
+  const aboutClosed = await page.$eval('#about', e=>!e.open);
+  check('About & sources folded by default', aboutClosed===true);
+  const osExp = jd.getDate()+' '+['January','February','March','April','May','June','July','August','September','October','November','December'][jd.getMonth()]+', Old Style';
+  const osShown = await page.textContent('#altdate');
+  check('Old Style date shown under the civil date', osShown===osExp);
   check('footer: corrected sources (Slavic tradition + Abbamoses)', /Slavic Old-Calendar tradition/.test(footerText) && /Abbamoses/.test(footerText) && !/Jordanville\./.test(footerText.split('Lives')[0]));
   check('Troparia row names Holy Trinity calendar', /Holy Trinity/.test(troparAttr));
 
@@ -278,7 +283,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const jumpedDate = await page.textContent('#date');
   const overlaysGone = await page.evaluate(()=>document.getElementById('yearOverlay').classList.contains('hidden') && document.getElementById('calOverlay').classList.contains('hidden'));
   check('tapping Pascha jumps to 12 April and closes overlays', /12 April 2026/.test(jumpedDate) && overlaysGone===true && /Apr/.test(paschaRowText));
-  await page.click('#today'); await page.waitForTimeout(400);
+  await page.evaluate(()=>{ const b=document.getElementById('today'); if(!b.classList.contains('hidden')) b.click(); }); await page.waitForTimeout(400);
 
   // --- v22 refinements: tracker caption, quote clamp, crown colour ---
   const trackerAlign = await page.$eval('.tracker', e=>getComputedStyle(e).textAlign);
@@ -387,7 +392,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const relabel = await page.textContent('#commemLink');
   const jvLabel = await page.$eval('#troparLink .ltxt', e=>e.textContent);
   check('honest labels: complete-list link + Jordanville (ROCOR) row', /complete list/.test(relabel) && /Jordanville Calendar \(ROCOR\)/.test(jvLabel));
-  await page.click('#today'); await page.waitForTimeout(500);
+  await page.evaluate(()=>{ const b=document.getElementById('today'); if(!b.classList.contains('hidden')) b.click(); }); await page.waitForTimeout(500);
 
   // --- St Theophan subtitle must cite the LITURGY Gospel, never the Matins Gospel ---
   const theoSub = await page.textContent('#theophanSub');
@@ -417,7 +422,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   const p26=new Date(2026,3,12), p27=new Date(2027,4,2);
   const nextP = (p26>t0)? p26 : p27;
   const expPd = Math.round((nextP-t0)/86400000);
-  check('tracker: fast day count', chips.some(c=>/day \d+/.test(c)));
+  check('tracker no longer repeats the fast name', !chips.some(c=>/Fast|Lent/.test(c)));
   check('tracker: Pascha countdown ('+expPd+'d)', chips.some(c=>c==='Pascha in '+expPd+' days'));
 
   // --- Fathers quote ---
@@ -588,7 +593,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   await page.waitForFunction(()=>/19 August 2026/.test(document.getElementById('date').textContent),{timeout:5000});
   const calClosed = await page.$eval('#calOverlay', e=>e.classList.contains('hidden'));
   check('tapping a day jumps to it and closes the calendar', calClosed===true);
-  await page.click('#today');
+  await page.evaluate(()=>{ const b=document.getElementById('today'); if(!b.classList.contains('hidden')) b.click(); });
   await page.waitForSelector('.reading',{timeout:5000});
 
   // --- jump to a day (19 Aug 2026 = Transfiguration = Julian 6 Aug) ---
@@ -608,7 +613,7 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('date jump: page turns WHITE for Transfiguration', jumpLit==='white');
   check('date jump: Android bar colour follows (#9a8a5c)', jumpMeta==='#9a8a5c');
   check('"Go to today" appears when off today', todayVisible===true);
-  await page.click('#today');
+  await page.evaluate(()=>{ const b=document.getElementById('today'); if(!b.classList.contains('hidden')) b.click(); });
   await page.waitForSelector('.reading',{timeout:5000});
   const todayHiddenAgain = await page.$eval('#today', e=>e.classList.contains('hidden'));
   check('"Go to today" returns + hides', todayHiddenAgain===true);
@@ -680,9 +685,31 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
     const d=new Date(2026,11,25);           // 25 Dec civil must NOT be Nativity (that is 7 Jan civil on the OC)
     return { dec25: window.__fastRule(d).feast||null, jan7: window.__fastRule(new Date(2027,0,7)).feast||null };
   });
-  check('legacy New-Calendar pref ignored: app stays on Old Calendar', /Old Calendar/.test(ocAlt) && ocAz===true);
+  check('legacy New-Calendar pref ignored: app stays on Old Calendar', /Old Style/.test(ocAlt) && ocAz===true);
   check('no calendar toggle remains in settings', ocSeg===null);
   check('reckoning fixed: Nativity on 7 Jan civil, not 25 Dec', !/Nativity/.test(ocOffset.dec25||'') && /Nativity of Christ/.test(ocOffset.jan7||''));
+  await ctx.close();
+
+  // ================= 1c. FAST DAY COUNT lives in the fast strip =================
+  ctx = await browser.newContext({ viewport:{width:390,height:844} });
+  page = await ctx.newPage();
+  const MOCK_NAT = JSON.parse(JSON.stringify(MOCK));
+  MOCK_NAT.fast_level_desc = "Nativity Fast"; MOCK_NAT.fast_exception_desc = "Fish, Wine and Oil are Allowed";
+  await page.route('**orthocal.info/api/**', r=> r.fulfill({ status:200, contentType:'application/json', body: JSON.stringify(MOCK_NAT) }));
+  await page.route('**bolls.life/**', mockBolls);
+  await page.goto(base,{waitUntil:'networkidle'});
+  await page.waitForSelector('.reading',{timeout:5000});
+  await page.evaluate(()=>{ const dp=document.getElementById('datePick'); dp.value='2026-12-04'; dp.dispatchEvent(new Event('change')); });
+  await page.waitForFunction(()=>/4 December 2026/.test(document.getElementById('date').textContent),{timeout:5000});
+  await page.waitForTimeout(300);
+  const fday = await page.textContent('#fastDay');
+  const ftxt = await page.textContent('#fastText');
+  check('fast strip shows the day of the season (Nativity Fast, 4 Dec = day 7)', /day 7$/.test(fday.trim()) && ftxt==='Nativity Fast');
+  await page.evaluate(()=>{ const dp=document.getElementById('datePick'); dp.value='2026-10-28'; dp.dispatchEvent(new Event('change')); });
+  await page.waitForFunction(()=>/28 October 2026/.test(document.getElementById('date').textContent),{timeout:5000});
+  await page.waitForTimeout(300);
+  const fdayOut = await page.textContent('#fastDay');
+  check('no day count when the date is outside the season', fdayOut.trim()==='');
   await ctx.close();
 
   // ================= 2. STRICT FAST =================

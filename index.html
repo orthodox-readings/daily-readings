@@ -222,15 +222,19 @@
     cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent}
 
   /* Fast strip inside the date card */
-  .faststrip{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  .faststrip{display:flex;align-items:center;justify-content:center;gap:4px 12px;flex-wrap:wrap;
     margin:14px -18px -16px;padding:11px 16px;border-top:1px solid var(--line);
     background:color-mix(in srgb, var(--gold) 9%, transparent);
     border-radius:0 0 16px 16px;font-size:12.5px;color:var(--ink);font-weight:600}
   .faststrip.strict{background:color-mix(in srgb, #8a2b2b 10%, transparent)}
   .faststrip .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);flex:0 0 auto}
-  .faststrip .fsep{color:var(--muted);font-weight:400}
-  .faststrip .fsep:not(:empty)::before{content:"· "}
+  /* Two groups — [dot · name · day] and [allowance + icon] — each stays together; the second
+     drops to its own centred line when the strip is too narrow for both. */
+  .faststrip .fgrp{display:inline-flex;align-items:center;gap:7px;max-width:100%}
+  .faststrip .fsep{color:var(--muted);font-weight:400;text-align:center}
+  .faststrip .fday{color:var(--muted);font-weight:400;margin-left:-3px}
   .faststrip .fico{font-size:15px}
+  .faststrip .fico:empty{display:none}
 
   /* Sleek link rows */
   .linksCard{padding:4px 16px 2px}
@@ -320,6 +324,11 @@
 
   /* Footer + support */
   .footer{padding:18px 20px 30px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
+  .about summary{cursor:pointer;color:var(--muted);font-weight:700;list-style:none;display:inline-block;letter-spacing:.04em;-webkit-tap-highlight-color:transparent}
+  .about summary::-webkit-details-marker{display:none}
+  .about summary::after{content:" ▾";opacity:.7}
+  .about[open] summary::after{content:" ▴"}
+  .about p{margin:8px 0 0}
   .footer a{color:var(--gold);text-decoration:none}
   .support{display:block;width:-moz-fit-content;width:fit-content;margin:0 auto 16px;padding:9px 16px;
     border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--gold);
@@ -367,10 +376,8 @@
       <p class="summary" id="summary"></p>
       <button id="today" class="todaybtn hidden">Go to today</button>
       <div class="faststrip hidden" id="fastWrap">
-        <span class="dot" id="fastDot"></span>
-        <span id="fastText">—</span>
-        <span class="fsep" id="fastExc"></span>
-        <span class="fico" id="fastIco"></span>
+        <span class="fgrp"><span class="dot" id="fastDot"></span><span id="fastText">—</span><span class="fday" id="fastDay"></span></span>
+        <span class="fgrp"><span class="fsep" id="fastExc"></span><span class="fico" id="fastIco"></span></span>
       </div>
     </div>
   </section>
@@ -465,7 +472,7 @@
     <section class="card lives hidden" id="livesCard">
       <p class="label">Lives of the Saints</p>
       <div id="livesList"></div>
-      <p class="tattr">From “Lives of the Saints” by John Brady (Abbamoses.com), used with permission via orthocal.info. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
+      <p class="tattr">Lives by John Brady (Abbamoses.com), with permission.</p>
     </section>
 
     <section class="card hidden" id="notesCard">
@@ -475,19 +482,21 @@
 
     <section class="card linksCard" id="linksCard">
       <p class="label">For Prayer &amp; Study</p>
-      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm6 4h2v2h2v2h-2v2h-2v-2H9v-2h2v-2z"/></svg></span><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s full ROCOR listing, troparia &amp; kontakia · Holy Trinity Monastery</small></span><span class="larr">›</span></a>
-      <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></span><span class="ltxt">Prologue of Ohrid<small>St Nikolai of Žiča — the day’s lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
-      <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></span><span class="ltxt">Full Service Texts<small>Vespers · Matins · Liturgy — Church Slavonic, azbyka.ru</small></span><span class="larr">›</span></a></span>
+      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm6 4h2v2h2v2h-2v2h-2v-2H9v-2h2v-2z"/></svg></span><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s ROCOR listing &amp; troparia · Holy Trinity</small></span><span class="larr">›</span></a>
+      <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></span><span class="ltxt">Prologue of Ohrid<small>St Nikolai — lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
+      <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></span><span class="ltxt">Full Service Texts<small>Church Slavonic · azbyka.ru</small></span><span class="larr">›</span></a></span>
       <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">His reflection follows the daily Gospel. OrthoChristian (official English text).</small></span><span class="larr">›</span></a>
     </section>
   </div>
 
   <footer class="footer">
     <a class="support" id="supportLink" href="#">♡ Support Holy Dormition, Corrimal</a>
-    Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition (KJV text).<br>
-    Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal.<br>
-    <span id="nkjvNote" class="hidden">New King James Version® © Thomas Nelson (unofficial text; KJV shown if unavailable).<br></span>
-    <span id="stamp"></span>
+    <details class="about" id="about"><summary>About &amp; sources</summary>
+      <p>Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition (KJV text).</p>
+      <p>Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
+      <p id="nkjvNote" class="hidden">New King James Version® © Thomas Nelson (unofficial text; KJV shown if unavailable).</p>
+      <p><span id="stamp"></span></p>
+    </details>
   </footer>
 </main>
 
@@ -555,7 +564,7 @@
 
     // Optional alternate (Julian civil) date if the API supplies it
     var alt = data && (data.julian_calendar_date || data.date_julian || data.jdate);
-    el("altdate").textContent = alt ? ("Old-Calendar date: "+alt) : "Old Calendar (Julian)";
+    el("altdate").textContent = tMonthDay(menaionOf(state.date)) + ", Old Style";
 
     el("summary").textContent = (data && (data.summary_title || (data.titles && data.titles[0]))) || "";
 
@@ -583,6 +592,9 @@
       el("fastExc").textContent = (hasExc && /fast[\s-]?free/i.test(fexc)) ? "fast-free week" : "";
     }
     el("fastIco").textContent = fico;
+    // Day of the fasting season (only inside a real season: 1–49 covers the longest, Great Lent)
+    var fseason = isFastDay ? seasonInfo(new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()), fdesc) : null;
+    el("fastDay").textContent = (fseason && fseason.day>=1 && fseason.day<=49) ? (" · day "+fseason.day) : "";
 
     // Commemorations — show the FULL list: union of titles + feasts + saints (deduped), minus the headline
     var summary = el("summary").textContent;
@@ -746,7 +758,6 @@
       c.innerHTML=html; wrap.appendChild(c);
     }
     var season=seasonInfo(t,fdesc);
-    if(season) chip("<b>"+season.name+"</b> · day "+season.day);
     var all=feastsFor(t.getFullYear()-1).concat(feastsFor(t.getFullYear()), feastsFor(t.getFullYear()+1));
     var today=null, next=null;
     all.forEach(function(fx){
@@ -1391,11 +1402,10 @@
     var sub = el("theophanSub");
     sub.textContent = "";
     if(g){
-      sub.appendChild(document.createTextNode("His reflection follows the day’s Gospel, "));
+      sub.appendChild(document.createTextNode("On the day’s Gospel, "));
       var b = document.createElement("b"); b.textContent = g; sub.appendChild(b);
-      sub.appendChild(document.createTextNode("."));
     } else {
-      sub.textContent = "His reflection follows the day’s Gospel and Epistle.";
+      sub.textContent = "On the day’s Gospel and Epistle";
     }
     el("theophanLink").setAttribute("href", orthoChristianURL(state.date));
   }

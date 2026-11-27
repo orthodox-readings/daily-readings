@@ -60,6 +60,10 @@ USING IT
     as a single image.
   - The page reads top-down as a morning rule: the day's saying from the
     Fathers, then the Epistle & Gospel, then commemorations and lives.
+  - Greek: the "Greek" switch above the readings shows the Greek New
+    Testament under each verse (Byzantine Textform, Robinson-Pierpont 2018,
+    public domain; bundled in the greek/ folder, one file per chapter).
+    Off by default; New Testament readings only.
   - The tone of the week (Octoechos) is shown beside the Old Style date.
   - Daily prayers: the first Prayer & Study row opens Morning Prayers by
     day and Prayers Before Sleep from 4 pm (Holy Myrrh-bearers).

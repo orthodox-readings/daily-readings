@@ -1,5 +1,6 @@
 /* Minimal offline shell. Data caching is handled in-page via localStorage. */
-var CACHE = "orthodox-readings-v32";
+var CACHE = "orthodox-readings-v33";
+var GREEK_CACHE = "orthodox-readings-greek-1";   // Greek NT chapters, kept across app updates
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./fathers.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-32.png"
@@ -12,7 +13,7 @@ self.addEventListener("install", function(e){
 self.addEventListener("activate", function(e){
   e.waitUntil(
     caches.keys().then(function(keys){
-      return Promise.all(keys.map(function(k){ if(k!==CACHE) return caches.delete(k); }));
+      return Promise.all(keys.map(function(k){ if(k!==CACHE && k!==GREEK_CACHE) return caches.delete(k); }));
     }).then(function(){ return self.clients.claim(); })
   );
 });
@@ -35,6 +36,18 @@ self.addEventListener("fetch", function(e){
         return res;
       }).catch(function(){
         return caches.match("./index.html");
+      })
+    );
+  } else if(url.pathname.indexOf("/greek/") > -1){
+    // Greek New Testament chapters: cache-first, saved as they are read so they work offline afterwards.
+    e.respondWith(
+      caches.open(GREEK_CACHE).then(function(c){
+        return c.match(e.request).then(function(hit){
+          return hit || fetch(e.request).then(function(res){
+            if(res && res.ok) c.put(e.request, res.clone());
+            return res;
+          });
+        });
       })
     );
   } else {

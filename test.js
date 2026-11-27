@@ -730,6 +730,76 @@ function check(name, cond){ results.push((cond?'PASS':'FAIL')+' — '+name); }
   check('no day count when the date is outside the season', fdayOut.trim()==='');
   await ctx.close();
 
+  // ================= 1d. GREEK NEW TESTAMENT toggle =================
+  ctx = await browser.newContext({ viewport:{width:390,height:844} });
+  page = await ctx.newPage();
+  await page.route('**orthocal.info/api/**', r=> r.fulfill({ status:200, contentType:'application/json', body: JSON.stringify(MOCK) }));
+  await page.route('**bolls.life/**', mockBolls);
+  await page.goto(base,{waitUntil:'networkidle'});
+  await page.waitForSelector('.reading',{timeout:5000});
+  await page.waitForFunction(()=>document.querySelectorAll('.reading .body .v').length===32,{timeout:5000}).catch(()=>{});
+  const gkOff = await page.$$eval('.reading .body .gk', n=>n.length);
+  const gkBtnOff = await page.$eval('#greekBtn', e=>e.classList.contains('active'));
+  check('Greek is off by default', gkOff===0 && gkBtnOff===false);
+  const rowFits = await page.evaluate(()=>{ const r=document.getElementById('readingsCtl'); return r.scrollWidth<=r.clientWidth+1 && r.getBoundingClientRect().height<60; });
+  check('reading tools row still fits on one line with the Greek switch', rowFits===true);
+
+  await page.click('#greekBtn');
+  await page.waitForFunction(()=>document.querySelectorAll('.reading .body .gk').length===32,{timeout:5000}).catch(()=>{});
+  const gk = await page.evaluate(()=>{
+    const bodies=[...document.querySelectorAll('.reading .body')];
+    const first=bodies[0].querySelector('.gk');
+    return { n:document.querySelectorAll('.reading .body .gk').length,
+      per:bodies.map(b=>b.querySelectorAll('.gk').length).join(','),
+      rom91:first?first.textContent:'', afterVerse:first? first.previousElementSibling.classList.contains('v') : false,
+      lang:first?first.getAttribute('lang'):'',
+      luke2436:bodies[2].querySelector('.gk')?bodies[2].querySelector('.gk').textContent:'',
+      btn:document.getElementById('greekBtn').classList.contains('active') };
+  });
+  check('Greek on: one Greek line under each of the 32 verses (5 + 9 + 18)', gk.n===32 && gk.per==='5,9,18' && gk.btn===true);
+  check('Greek sits directly under its verse and is the right text (Romans 9:1)', gk.afterVerse===true && gk.lang==='grc' && /^Ἀλήθειαν λέγω ἐν χριστῷ/.test(gk.rom91));
+  check('Greek follows the reference, not position (Luke 24:36)', /^Ταῦτα δὲ αὐτῶν λαλούντων/.test(gk.luke2436));
+
+  await page.reload({waitUntil:'networkidle'});
+  await page.waitForSelector('.reading',{timeout:5000});
+  await page.waitForFunction(()=>document.querySelectorAll('.reading .body .gk').length===32,{timeout:6000}).catch(()=>{});
+  const gkPersist = await page.$$eval('.reading .body .gk', n=>n.length);
+  check('Greek choice remembered across restarts', gkPersist===32);
+
+  await page.click('#txtSeg button[data-txt="kjv"]');
+  await page.waitForFunction(()=>document.querySelectorAll('.reading .body .gk').length===7,{timeout:5000}).catch(()=>{});
+  const gkKjv = await page.evaluate(()=>({ v:document.querySelectorAll('.reading .body .v').length, g:document.querySelectorAll('.reading .body .gk').length }));
+  check('Greek also pairs with the KJV text', gkKjv.v===7 && gkKjv.g===7);
+
+  await page.click('#greekBtn');
+  await page.waitForTimeout(300);
+  const gkOff2 = await page.$$eval('.reading .body .gk,.reading .body .gknote', n=>n.length);
+  check('Greek switches off cleanly', gkOff2===0);
+
+  const gkData = await page.evaluate(async ()=>{
+    const r16=await (await fetch('greek/45/16.json')).json(), r14=await (await fetch('greek/45/14.json')).json();
+    const a837=await (await fetch('greek/44/8.json')).json();
+    return { dox: r16['25']===r14['24'] && !!r16['27'], acts837: ('37' in a837) };
+  });
+  check('Romans doxology answers to 16:25-27 as in English Bibles', gkData.dox===true);
+  check('verses absent from the Byzantine text are simply omitted (Acts 8:37)', gkData.acts837===false);
+  await ctx.close();
+
+  // Old Testament reading: no Greek, with a plain note
+  ctx = await browser.newContext({ viewport:{width:390,height:844} });
+  page = await ctx.newPage();
+  await page.addInitScript(()=>{ localStorage.setItem('pref:greek','1'); localStorage.setItem('pref:txt','kjv'); });
+  const MOCK_OT = JSON.parse(JSON.stringify(MOCK));
+  MOCK_OT.readings = [{ source:"Vespers", display:"Isaiah 1:1-3", passage:[{verse:1,content:"The vision of Isaiah."},{verse:2,content:"Hear, O heavens."},{verse:3,content:"The ox knoweth his owner."}] }];
+  await page.route('**orthocal.info/api/**', r=> r.fulfill({ status:200, contentType:'application/json', body: JSON.stringify(MOCK_OT) }));
+  await page.route('**bolls.life/**', mockBolls);
+  await page.goto(base,{waitUntil:'networkidle'});
+  await page.waitForSelector('.reading',{timeout:5000});
+  await page.waitForTimeout(400);
+  const ot = await page.evaluate(()=>({ g:document.querySelectorAll('.reading .body .gk').length, note:(document.querySelector('.reading .body .gknote')||{}).textContent||'' }));
+  check('Old Testament reading: no Greek, and a note says why', ot.g===0 && /New Testament readings/.test(ot.note));
+  await ctx.close();
+
   // ================= 2. STRICT FAST =================
   ctx = await browser.newContext({ viewport:{width:390,height:844} });
   page = await ctx.newPage();

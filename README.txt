@@ -46,10 +46,11 @@ FILES
   tools/                  build scripts for the Greek and KJV files; make_preview.py
 
 PUBLISHING (GitHub Pages: github.com/orthodox-readings/daily-readings)
-  The live site is served from the gh-pages branch; main is kept identical.
+  GitHub Pages publishes the site from this repository. main and gh-pages are kept identical:
+  always push the same commit to both.
   1. Change the version in sw.js (CACHE = PREFIX + "v35") and APP_VERSION in index.html.
   2. Run the checks:            node test.js        (all must pass)
-  3. Commit to main, then push main and push the same commit to gh-pages.
+  3. Commit to main, push main, then push the same commit to gh-pages.
   4. Wait for Pages to rebuild (4–10 minutes). Check the ROOT address with a cache-buster,
      e.g. https://orthodox-readings.github.io/daily-readings/?fresh=1
   Installed phones get the new version the next time the app is opened online (the page
@@ -59,9 +60,10 @@ PUBLISHING (GitHub Pages: github.com/orthodox-readings/daily-readings)
 
 REVIEW COPY (preview)
   python3 tools/make_preview.py ../preview-build
-  Publish the output as the folder "preview/" on gh-pages. It is served at
-  https://orthodox-readings.github.io/daily-readings/preview/ with its own service worker
-  and cache names, so it never replaces or clears the live app. Remove the folder when done.
+  Publish the output as a folder called "preview/" on the branch GitHub Pages serves (see the
+  repository's Settings -> Pages). It then appears at
+  https://orthodox-readings.github.io/daily-readings/preview/ with its own service worker and
+  cache names, so it never replaces or clears the live app. Remove the folder when done.
 
 SOURCES AND LICENCES (see also Settings → About & sources)
   Readings & calendar: orthocal.info (Slavic Old-Calendar tradition), KJV text.

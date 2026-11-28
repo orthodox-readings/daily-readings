@@ -1,0 +1,25 @@
+{
+  "name": "Daily Readings Preview",
+  "short_name": "Preview",
+  "description": "Daily Orthodox readings on the Old Calendar: Epistle and Gospel, saints, fasting, the New Testament in Greek and English, and a word from the Fathers.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FAF7EF",
+  "theme_color": "#FAF7EF",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

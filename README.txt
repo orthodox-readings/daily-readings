@@ -1,12 +1,15 @@
-DAILY READINGS  —  v35  (Old Calendar Orthodox daily readings, a home-screen web app)
+DAILY READINGS  —  v36  (ROCOR, Old Calendar: daily readings, a home-screen web app)
 =====================================================================================
 
 WHAT THIS IS
-Each day's Orthodox calendar on the OLD CALENDAR (Julian): the season and the fast, the
-Epistle and Gospel in full, the saints and Lives of the Saints, a saying from the Fathers,
-and links for prayer and study. A New Testament reader (English and Greek) and a fasting
-calendar sit alongside. Day data comes live from orthocal.info (Slavic Old-Calendar
-tradition); everything else is in this folder and works offline.
+Each day's Orthodox calendar as kept by the Russian Orthodox Church Outside of Russia (ROCOR),
+on the OLD CALENDAR (Julian): the season and the fast, the Epistle and Gospel in full, the
+saints and Lives of the Saints, a saying from the Fathers, and links for prayer and study. A
+New Testament reader (English and Greek) and a fasting calendar sit alongside.
+The fasting rule (Typikon, as kept in ROCOR), the liturgical colours (ROCOR Liturgical
+Handbook), the season and the ROCOR feasts are worked out on the device. The day's readings
+and saints come live from orthocal.info, whose Slavic data follows the OCA's calendar; the
+ROCOR differences confirmed so far are corrected in the app and marked on the day.
 
 THE FIVE TABS
   Today      A. The day card: civil date, Old Style date, tone, feast, the liturgical
@@ -25,12 +28,14 @@ THE FIVE TABS
   Scripture  The New Testament by book and chapter: English (KJV), Greek, or both.
              Tap a verse to copy, share, bookmark or highlight it.
   Prayer     Morning prayers / prayers before sleep, St Theophan, the Prologue of Ohrid,
-             the Jordanville (ROCOR) calendar, service texts (azbyka.ru), saved sayings,
-             and the parish support details.
+             the Holy Trinity calendar (the one Jordanville's website shows), the ROCOR
+             diocesan calendar (Australia and New Zealand), service texts (azbyka.ru), saved
+             sayings, and the parish support details.
   Settings   Theme, reading size, Customise Today, language, Greek edition, sayings
              awaiting review, OFFLINE READING (the coming 30 days; the New Testament in
-             English and in either Greek edition), BACKUP AND RESTORE, the calendar,
-             About & sources (with the full source and licence registry).
+             English and in either Greek edition), BACKUP AND RESTORE, TRADITION AND
+             CALENDAR (ROCOR; Traditional Julian), About & sources (with the full source
+             and licence registry).
 
 HOW THE APP IS MADE
   The app is published as one page (index.html) but edited as modules:
@@ -77,6 +82,8 @@ PUBLISHING (GitHub Pages: github.com/orthodox-readings/daily-readings)
   fetched network-first; the new service worker installs completely, then replaces the old
   copy). Preferences, bookmarks, notes and saved texts are never touched by an update.
   Rollback: push the previous commit (for example the backup-v34 branch) to main and gh-pages.
+  ROCOR rules: src/js/20-engines.js (fasting and colours); src/js/40-day-links.js (ROCOR feasts and
+  corrections to the day's data). Change them only with the ROCOR discrepancy report to hand.
 
 REVIEW COPY (preview)
   python3 tools/build.py && python3 tools/make_preview.py ../preview-build
@@ -88,7 +95,8 @@ REVIEW COPY (preview)
   Remove the folder when done.
 
 SOURCES AND LICENCES (full registry: data/sources.json, shown in Settings → About & sources)
-  Readings & calendar: orthocal.info (Slavic Old-Calendar tradition), KJV text.
+  Readings & saints: orthocal.info (Slavic tradition, maintained against the OCA's calendar), KJV text.
+  Fasting: the Typikon as kept in ROCOR (computed). Colours: ROCOR Liturgical Handbook (computed).
   Lives of the Saints: Abbamoses.com (John Brady), used with permission via orthocal.
   KJV: public domain (eBible.org; Crown patent in the UK). Byzantine Textform: public domain.
   Patriarchal Text transcription: public domain. Literata: SIL Open Font License (fonts/OFL-Literata.txt).

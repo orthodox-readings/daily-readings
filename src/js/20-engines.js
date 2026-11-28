@@ -31,29 +31,6 @@
     });
     return hit;
   }
-  function seasonInfo(t, fdesc){
-    var s=(fdesc||"").toLowerCase(), y=t.getFullYear();
-    function dayN(start){ return Math.round((t-start)/86400000)+1; }
-    if(s.indexOf("lent")>-1){
-      var P=paschaCivil(y); if(P<t) P=paschaCivil(y+1);
-      var st=new Date(P.getFullYear(),P.getMonth(),P.getDate()-48);
-      return (t>=st) ? {name:"Great Lent", day:dayN(st)} : null;
-    }
-    if(s.indexOf("apostles")>-1){
-      var Pp=paschaCivil(y); if(Pp>t) Pp=paschaCivil(y-1);
-      var st2=new Date(Pp.getFullYear(),Pp.getMonth(),Pp.getDate()+57); // Monday after All Saints
-      return (t>=st2) ? {name:"Apostles’ Fast", day:dayN(st2)} : null;
-    }
-    if(s.indexOf("dormition")>-1){
-      var st3=new Date(y,7,1+calOffsetDays()); if(t<st3) st3=new Date(y-1,7,1+calOffsetDays());
-      return {name:"Dormition Fast", day:dayN(st3)};
-    }
-    if(s.indexOf("nativity")>-1){
-      var st4=new Date(y,10,15+calOffsetDays()); if(t<st4) st4=new Date(y-1,10,15+calOffsetDays());
-      return {name:"Nativity Fast", day:dayN(st4)};
-    }
-    return null;
-  }
   function renderTracker(fdesc){
     var t=dayOnly(state.date);
     var wrap=el("tracker"); wrap.innerHTML="";
@@ -77,110 +54,257 @@
     if(pd>0) chip("Pascha in <b>"+pd+"</b> "+(pd===1?"day":"days"));
   }
 
-  // ---------- Liturgical colour of the day (Russian/ROCOR practice; adjust the table freely) ----------
-  // Colours: burgundy (no specific colour determined) · blue Theotokos · red martyrs & Paschaltide
-  //          green prophets/venerables/Pentecost · violet Cross & Lent · white Lord's great feasts · gold apostles & hierarchs
-  var LIT_BARS = { burgundy:"#5c161c", blue:"#1e3357", red:"#7d1518", green:"#1e4d2b",
-                   violet:"#46246b", white:"#9a8a5c", gold:"#8a6a14" };
-  // Fixed-feast colours by NOMINAL (menaion) date — correct on either calendar reckoning
-  var LIT_FIXED = {
-    blue:   [[9,8],[11,21],[3,25],[8,15],[2,2],[10,1]],          // Nat. Theotokos, Entry, Annunc., Dormition, Meeting, Protection
-    white:  [[12,25],[1,6],[8,6]],                                // Nativity, Theophany, Transfiguration
-    violet: [[9,14],[8,1]],                                       // Exaltation, Procession of the Cross
-    red:    [[8,29]],                                             // Beheading of St John the Baptist
-    gold:   [[6,29]]                                              // Ss Peter & Paul
-  };
-  function liturgicalKey(d, data, fdesc){
-    var t=new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    var P=paschaCivil(t.getFullYear());
-    var diff=Math.round((t-P)/86400000);
-    if(diff===-7) return "green";                                  // Palm Sunday
-    if(diff>=0 && diff<39) return "red";                           // Pascha to Ascension eve (Russian: red)
-    if(diff===39) return "white";                                  // Ascension
-    if(diff>=49 && diff<=55) return "green";                       // Pentecost + week
-    var md=menaionOf(t), mm=md.getMonth()+1, mday=md.getDate();
-    for(var k in LIT_FIXED){ for(var i=0;i<LIT_FIXED[k].length;i++){
-      if(mm===LIT_FIXED[k][i][0] && mday===LIT_FIXED[k][i][1]) return k; } }
-    if(/lent/i.test(fdesc||"")) return "violet";                   // Lenten weekdays keep the dark colour, whoever is commemorated
-    var head=String((data && (data.summary_title || (data.titles&&data.titles[0]))) || "");
-    if(/theotokos|mother of god|most holy lady/i.test(head)) return "blue";
-    if(/\bcross\b/i.test(head)) return "violet";
-    if(/martyr/i.test(head)) return "red";
-    if(/prophet/i.test(head)) return "green";
-    if(/\bven\.|venerable|abbots? of|ascetic|recluse/i.test(head)) return "green";
-    if(/apostle|equal-to-the-apostles/i.test(head)) return "gold";
-    if(/hierarch|archbishop|metropolitan of|bishop of|wonderworker/i.test(head)) return "gold";
-    return "burgundy";
+  // ---------- Liturgical colour of the day — ROCOR practice ----------
+  // Follows the "Liturgical Handbook of the Russian Orthodox Church Abroad" (Diocese of Great Britain and Western Europe,
+  // ROCOR) — the only ROCOR colour guide found. The handbook itself notes "certain limited variations on these colours
+  // even within the Church Abroad", so a parish may differ. Gold is the colour of ordinary days outside a fast.
+  // Returns {key, basis}: basis "feast" (a feast or holy day), "season" (Lent, Pascha, a fasting season),
+  // "saint" (from the day's headline commemoration) or "ordinary" (gold).
+  // Fixed-date colours by Old Style date, [from MMDD, to MMDD, colour] — the first match wins.
+  var LIT_FIXED = [
+    [1226,1226,"blue"],                       // Synaxis of the Theotokos (handbook: Synaxis — blue)
+    [1224,1231,"white"],                      // Nativity of Christ, from the Eve to the leavetaking
+    [101,101,"white"],                        // Circumcision
+    [105,114,"white"],                        // Theophany, from the Eve to the leavetaking
+    [201,209,"blue"],                         // Meeting of the Lord, forefeast to leavetaking
+    [324,326,"blue"],                         // Annunciation, forefeast to afterfeast
+    [801,801,"red"],                          // Procession of the Cross
+    [805,813,"white"],                        // Transfiguration, from the Eve to the leavetaking
+    [814,823,"blue"],                         // Dormition, forefeast to leavetaking
+    [907,912,"blue"],                         // Nativity of the Theotokos, forefeast to leavetaking
+    [913,921,"red"],                          // Exaltation of the Cross, forefeast to leavetaking
+    [1001,1001,"blue"],                       // Protection of the Theotokos
+    [1022,1022,"blue"],                       // Kazan Icon of the Mother of God
+    [1120,1125,"blue"],                       // Entry of the Theotokos, forefeast to leavetaking
+    [1127,1127,"blue"],                       // Kursk Root Icon of the Mother of God
+    [624,624,"red"], [829,829,"red"], [923,923,"red"], [224,224,"red"], [525,525,"red"],   // the Forerunner
+    [1108,1108,"red"], [906,906,"red"], [713,713,"red"],                                   // the Archangels
+    [629,630,"gold"]                                                                         // the Apostles
+  ];
+  // Colour from the day's headline commemoration (when the day's data names a saint or feast)
+  function saintColour(head){
+    head=String(head||"");
+    if(!head) return null;
+    var named=/\b(st|sts|saint|ven|venerable|martyr|hieromartyr|greatmartyr|apostle|prophet|icon|theotokos|mother of god|righteous|blessed|archangel|forerunner|baptist|cross|confessor|hierarch|wonderworker|equal)/i.test(head);
+    if(!named) return null;                                   // "Tuesday of the 27th week after Pentecost" and the like
+    if(/theotokos|mother of god|most holy lady|\bicon\b/i.test(head)) return "blue";
+    if(/\bcross\b|forerunner|baptist|archangel|bodiless|martyr|passion-?bearer/i.test(head)) return "red";
+    if(/\bven\b|\bven\.|venerable|abbot|abbess|hermit|ascetic|recluse|stylite|fool[- ]for[- ]christ/i.test(head)) return "green";
+    return "gold";                                            // apostles, prophets, hierarchs, the righteous
   }
-  function applyLit(key){
+  function litInfo(d, data){
+    var t=dayOnly(d), y=t.getFullYear(), P=paschaCivil(y), diff=Math.round((t-P)/86400000), dow=t.getDay();
+    var md=menaionOf(t), x=(md.getMonth()+1)*100+md.getDate();
+    var head=(data && (data.summary_title || (data.titles&&data.titles[0]))) || "";
+    function r(k,b){ return {key:k, basis:b}; }
+    // Holy Week, Lazarus Saturday and Palm Sunday
+    if(diff===-8 || diff===-7) return r("green","feast");
+    if(diff>=-6 && diff<=-1){
+      if(x===325) return r("blue","feast");                  // the Annunciation in Holy Week: the feast day itself
+      if(diff===-3) return r("red","feast");                 // Great Thursday: red at the Liturgy
+      return r("black","season");                            // Great Saturday: black until the Apostle, then white
+    }
+    // Pascha to the leavetaking; Ascension to the leavetaking; Pentecost to the leavetaking
+    if(diff>=0 && diff<=38) return r("white","season");
+    if(diff>=39 && diff<=47) return r("white","feast");
+    if(diff>=49 && diff<=55) return r("green","feast");
+    // Great Lent: black on weekdays, purple at weekends and on polyeleos feasts
+    if(diff>=-48 && diff<=-9){
+      if(x>=324 && x<=326) return r("blue","feast");
+      if(diff===-42 || diff===-28) return r("red","feast");  // Triumph of Orthodoxy; Sunday of the Cross
+      if(diff===-15) return r("blue","feast");               // Saturday of the Akathist
+      if(dow===0 || dow===6) return r("purple","season");
+      if(LENT_CLAIM[mmdd(md)]) return r("purple","feast");               // the named polyeleos feasts of Lent
+      return r("black","season");
+    }
+    for(var i=0;i<LIT_FIXED.length;i++){ if(x>=LIT_FIXED[i][0] && x<=LIT_FIXED[i][1]) return r(LIT_FIXED[i][2],"feast"); }
+    var sc=saintColour(head);
+    // The fasting seasons: red (the Apostles' Fast keeps gold at weekends; the Dormition Fast until the Eve of the Transfiguration)
+    if(x>=1115 && x<=1223) return sc ? r(sc,"saint") : r("red","season");
+    if(x>=801 && x<=804) return sc ? r(sc,"saint") : r("red","season");
+    if(inApostlesFast(t)) return sc ? r(sc,"saint") : ((dow===0||dow===6) ? r("gold","season") : r("red","season"));
+    if(sc) return r(sc,"saint");
+    return r("gold","ordinary");
+  }
+  function liturgicalKey(d, data){ return litInfo(d, data).key; }
+  function applyLit(info){
+    var key=info.key;
     document.documentElement.setAttribute("data-lit", key);
-    // The colour is named only when the day's feast or saint determines it; otherwise the row is left out.
-    var named = !!LIT_NAME[key];
-    show(el("litRow"), named);
-    if(named){ el("litText").textContent = LIT_NAME[key]; el("litDot").style.background = LIT_DOT[key]; }
+    show(el("litRow"), !!LIT_NAME[key]);
+    if(!LIT_NAME[key]) return;
+    var t0=dayOnly(state.date), diff=Math.round((t0-paschaCivil(t0.getFullYear()))/86400000);
+    el("litText").textContent = LIT_NAME[key] + (diff===-1 ? " — white from the Liturgy" : (diff===-3 ? " at the Liturgy" : ""));
+    var dot=el("litDot"); dot.style.background = LIT_DOT[key]; dot.classList.toggle("blk", key==="black");
   }
 
-  // ---------- Fasting rule of the day (offline; the general rule — open a day for the precise fast) ----------
-  // Returns {f:0|1|2, fish:bool, feast:string|null} — 0 no fast, 1 fast, 2 strict fast season/day.
-  function fastRule(d){
-    var y=d.getFullYear(), P=paschaCivil(y), diff=Math.round((d-P)/86400000);
-    var dow=d.getDay(); // 0=Sun — weekdays are the same on either reckoning
-    var md=menaionOf(d), mm=md.getMonth()+1, mday=md.getDate(); // nominal (menaion) date
-    var feast=feastOn(d);
-    var x=mm*100+mday;
-    function mbtw(m1,d1,m2,d2){ var a=m1*100+d1, b=m2*100+d2; return (a<=b) ? (x>=a&&x<=b) : (x>=a||x<=b); }
-    var weekend=(dow===0||dow===6);
-    // Fast-free weeks (movable + Svyatki)
-    if(diff>=0&&diff<=6)     return {f:0,fish:false,feast:feast};    // Bright Week
-    if(diff>=50&&diff<=55)   return {f:0,fish:false,feast:feast};    // Trinity week
-    if(diff>=-69&&diff<=-63) return {f:0,fish:false,feast:feast};    // week after Publican & Pharisee
-    if(mbtw(12,25,1,4))      return {f:0,fish:false,feast:feast};    // Nativity to Theophany eve (Svyatki)
-    // Cheesefare week (no meat; dairy, eggs and fish allowed)
-    if(diff>=-55&&diff<=-49) return {f:1,fish:true,feast:feast};
-    // Great Lent + Holy Week (strict; fish on Annunciation & Palm Sunday; wine & oil weekends & Lazarus Saturday)
-    if(diff>=-48&&diff<=-1){
-      var fishL=(mm===3&&mday===25)||(diff===-7);
-      return {f:2,fish:fishL,wineOil:(weekend||diff===-8)&&!fishL,feast:feast};
-    }
-    // Dormition Fast: 1–14 August nominal (fish on Transfiguration; wine & oil weekends)
-    if(mbtw(8,1,8,14)){
-      var fishD=(mm===8&&mday===6);
-      return {f:2,fish:fishD,wineOil:weekend&&!fishD,feast:feast};
-    }
-    // Apostles' Fast: Monday after All Saints (P+57) to 28 June nominal
-    // (common Slavic rule: fish Tue/Thu/Sat/Sun; wine & oil Monday; Wed/Fri stricter;
-    //  fish on the Nativity of the Forerunner, 24 June, whatever the weekday)
-    var ap=new Date(P.getFullYear(),P.getMonth(),P.getDate()+57);
-    if(d>=ap && x<=628 && mm>=5){
-      var fishA=(dow===0||dow===2||dow===4||dow===6)||(mm===6&&mday===24);
-      return {f:1,fish:fishA,wineOil:(dow===1)&&!fishA,feast:feast};
-    }
-    // Nativity Fast: 15 Nov – 24 Dec nominal (same weekday rule until 19 Dec; strict final days;
-    //  fish on the Entry of the Theotokos, 21 November, whatever the weekday)
-    if(mbtw(11,15,12,19)){
-      var fishN=(dow===0||dow===2||dow===4||dow===6)||(mm===11&&mday===21);
-      return {f:1,fish:fishN,wineOil:(dow===1)&&!fishN,feast:feast};
-    }
-    if(mbtw(12,20,12,24)) return {f:2,fish:false,wineOil:weekend,feast:feast};
-    // One-day strict fasts
-    if(mm===1&&mday===5)  return {f:2,fish:false,feast:feast};       // Eve of Theophany
-    if(mm===8&&mday===29) return {f:2,fish:false,feast:"Beheading of St John the Baptist"};
-    if(mm===9&&mday===14) return {f:2,fish:false,feast:feast};       // Exaltation of the Cross
-    // Ordinary Wednesdays and Fridays
-    if(dow===3||dow===5) return {f:1,fish:false,feast:feast};
-    return {f:0,fish:false,feast:feast};
+  // ---------- Fasting: the rule of the day — ROCOR ----------
+  // The Typikon (chapters 32–33) as kept in the Russian Orthodox Church Outside of Russia. Where the sources this was
+  // checked against differ, the choice made here and the reason are recorded in the ROCOR discrepancy report.
+  //   Levels, strictest first: strict (no wine or oil — xerophagy or food without oil, as the day requires) · wine (wine,
+  //   no oil: Great Saturday) · oil (wine and oil) · caviar (wine, oil and caviar: Lazarus Saturday) · fish (fish, wine and
+  //   oil) · meat (meat excluded: Cheesefare week) · free (no fast).
+  // It is the Church's general norm. It does not apply in the same way to everyone, and a parish or monastery may keep a
+  // feast with greater solemnity; personal fasting should be guided by one's spiritual father.
+  var FAST_LV = {strict:0, wine:1, oil:2, caviar:3, fish:4, meat:5, free:6};
+  function mmdd(md){ return ("0"+(md.getMonth()+1)).slice(-2)+("0"+md.getDate()).slice(-2); }
+  // Feasts that lift an ordinary Wednesday or Friday (and the fasts' own named days), by Old Style date.
+  // "f" fish, wine and oil · "o" wine and oil. Great feasts and vigil-rank saints take fish; polyeleos-rank saints wine
+  // and oil (Holy Trinity calendar shown by Jordanville, as sampled; see the report). Checked against orthocal.info's
+  // Slavic data, whose OCA-only allowances (27 Feb, 31 Mar, 7 Apr, 7 May, 26 Jul, 9 Aug, 24 Sep, 9 Oct) are not used.
+  var CLAIM = {
+    "0107":"f Synaxis of St John the Baptist", "0114":"f Leavetaking of Theophany · St Sava of Serbia",
+    "0117":"f St Anthony the Great", "0120":"f St Euthymius the Great", "0130":"f the Three Holy Hierarchs",
+    "0202":"f the Meeting of the Lord", "0224":"o the Finding of the Head of St John the Baptist",
+    "0309":"o the Forty Martyrs of Sebaste", "0324":"o the Forefeast of the Annunciation", "0325":"f the Annunciation",
+    "0326":"o the Synaxis of the Archangel Gabriel", "0423":"o the Great Martyr George", "0425":"o the Apostle Mark",
+    "0508":"f the Apostle John the Theologian", "0511":"f Sts Cyril and Methodius", "0624":"f the Nativity of St John the Baptist",
+    "0629":"f the Apostles Peter and Paul", "0705":"f the Finding of the Relics of St Sergius of Radonezh",
+    "0715":"f St Vladimir, Equal-to-the-Apostles", "0720":"f the Prophet Elijah", "0806":"f the Transfiguration",
+    "0815":"f the Dormition of the Theotokos", "0816":"o the Image of Christ Not Made by Hands", "0828":"o St Job of Pochaev",
+    "0901":"o the Church New Year", "0908":"f the Nativity of the Theotokos", "0912":"o the Leavetaking of the Nativity of the Theotokos",
+    "0913":"o the Forefeast of the Exaltation", "0923":"o the Conception of St John the Baptist", "0925":"f St Sergius of Radonezh",
+    "0926":"f the Apostle John the Theologian", "0928":"o St Chariton the Confessor", "1001":"f the Protection of the Theotokos",
+    "1006":"f the Apostle Thomas", "1022":"f the Kazan Icon of the Mother of God (ROCOR: kept with a vigil)",
+    "1026":"f the Great Martyr Demetrius", "1108":"f the Synaxis of the Archangel Michael", "1113":"f St John Chrysostom",
+    "1114":"o the Apostle Philip"
+  };
+  // Polyeleos-rank commemorations (Old Style): wine and oil when they fall on an ordinary Wednesday or Friday, or on
+  // a Wednesday or Friday of the Apostles' Fast (Typikon ch. 33).
+  var POLY = {};
+  ("0109 0110 0111 0124 0125 0127 0209 0212 0214 0217 0304 0406 0430 0502 0503 0509 0510 0519 0521 0525 0610 0611 " +
+   "0615 0616 0619 0626 0630 0703 0710 0717 0719 0724 0826 0830 0911 0921 1018 1205 1220").split(" ").forEach(function(k){ POLY[k]=1; });
+  // Great Lent: the named weekday allowances (wine and oil; the Annunciation fish). Holy Week and the first week keep
+  // no allowance but the Annunciation's on Great Thursday.
+  var LENT_CLAIM = { "0224":"o", "0309":"o", "0324":"o", "0326":"o", "0423":"o", "0425":"o" };
+  // The Nativity Fast's ranked days (Typikon ch. 33 and its instruction under 14 November, as applied in a ROCOR parish's
+  // published day-by-day table): "v" fish on any day · "d" fish on Tuesday, Thursday and at the weekend, wine and oil on
+  // Monday, Wednesday and Friday. From 20 December (Old Style) no fish, even at the weekend.
+  var NAT_RANK = {
+    "1116":"d the Apostle Matthew", "1121":"v the Entry of the Theotokos into the Temple", "1124":"d the Great Martyr Catherine",
+    "1125":"d the Leavetaking of the Entry", "1127":"v the Kursk Root Icon of the Mother of God (ROCOR)",
+    "1130":"d the Apostle Andrew the First-called", "1204":"d the Great Martyr Barbara", "1205":"d St Sabbas the Sanctified",
+    "1206":"v St Nicholas the Wonderworker", "1209":"d the Conception of the Theotokos by St Anna", "1212":"d St Spyridon",
+    "1213":"v St Herman of Alaska", "1217":"d the Prophet Daniel and the Three Holy Youths",
+    "1220":"d St Ignatius the God-bearer · St John of Kronstadt"
+  };
+  function inApostlesFast(t){
+    var P=paschaCivil(t.getFullYear()), ap=new Date(P.getFullYear(),P.getMonth(),P.getDate()+57);
+    var md=menaionOf(t), x=(md.getMonth()+1)*100+md.getDate();
+    return t>=ap && x>=500 && x<=628;
   }
-  // The general rule as a colour category and a plain sentence (wraps fastRule; the rule itself is unchanged).
+  var WEEKDAY_OF = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  function fastRule(d){
+    var t=dayOnly(d), y=t.getFullYear(), P=paschaCivil(y), diff=Math.round((t-P)/86400000), dow=t.getDay();
+    var md=menaionOf(t), x=(md.getMonth()+1)*100+md.getDate(), k=mmdd(md);
+    var weekend=(dow===0||dow===6), wedfri=(dow===3||dow===5);
+    var feast=feastOn(t);
+    function res(lv, season, name, why, f){
+      return {lv:lv, f:f, fish:(lv==="fish"||lv==="meat"), wineOil:(lv==="oil"||lv==="caviar"), season:season, name:name,
+              why:why||"", feast:feast};
+    }
+    function claimOf(table){ var c=table[k]; return c ? {lv:(c.charAt(0)==="f"?"fish":"oil"), why:c.slice(2)} : null; }
+    // 1. The fast-free periods
+    if(diff>=0 && diff<=6)     return res("free","free","Bright Week","",0);
+    if(diff>=50 && diff<=55)   return res("free","free","Trinity Week","",0);
+    if(diff>=-69 && diff<=-64) return res("free","free","Week of the Publican and the Pharisee","",0);
+    if(x>=1225 || x<=104)      return res("free","free","Christmastide","",0);
+    if(x===106)                return res("free","free","Theophany","",0);
+    // 2. Cheesefare week: meat only is given up, every day
+    if(diff>=-55 && diff<=-49) return res("meat","cheesefare","Cheesefare Week","",1);
+    // 3. Great Lent and Holy Week
+    if(diff>=-48 && diff<=-1){
+      var nm = diff>=-6 ? "Holy Week" : (diff===-8 ? "Lazarus Saturday" : (diff===-7 ? "Palm Sunday" : "Great Lent"));
+      var lv = weekend ? "oil" : "strict", why = weekend ? (dow===6 ? "Saturday" : "Sunday") : "";
+      if(diff===-17){ lv="oil"; why="Thursday of the Great Canon"; }
+      if(diff===-8){ lv="caviar"; why="Lazarus Saturday"; }
+      if(diff===-7){ lv="fish"; why="Palm Sunday"; }
+      if(diff===-3){ lv="oil"; why="Great Thursday"; }
+      var noOverrides = (diff>=-48 && diff<=-44) || (diff>=-6 && diff<=-4) || diff===-2;
+      if(!noOverrides && diff!==-1){
+        if(x===325 && FAST_LV.fish>FAST_LV[lv]){ lv="fish"; why="the Annunciation"; }
+        else if(LENT_CLAIM[k] && FAST_LV.oil>FAST_LV[lv]){ lv="oil"; why=CLAIM[k].slice(2); }
+      }
+      if(noOverrides) lv="strict";
+      if(diff===-1){ lv="wine"; why="Great Saturday — wine, but not oil"; }
+      return res(lv, "lent", nm, why, 2);
+    }
+    // 4. The Apostles' Fast: from the Monday after All Saints to 28 June (Old Style)
+    if(inApostlesFast(t)){
+      var lvA = weekend ? "fish" : ((dow===2||dow===4) ? "oil" : "strict"), whyA = weekend ? (dow===6?"Saturday":"Sunday") : "";
+      if(k==="0624"){ lvA="fish"; whyA=CLAIM[k].slice(2); }
+      else if(wedfri && POLY[k]){ lvA="oil"; whyA="a saint with a polyeleos"; }
+      return res(lvA, "apostles", "Apostles’ Fast", whyA, 1);
+    }
+    // 5. The Dormition Fast: 1–14 August (Old Style); only the Transfiguration lifts it
+    if(x>=801 && x<=814){
+      var lvD = weekend ? "oil" : "strict", whyD = weekend ? (dow===6?"Saturday":"Sunday") : "";
+      if(x===806){ lvD="fish"; whyD="the Transfiguration"; }
+      return res(lvD, "dormition", "Dormition Fast", whyD, 2);
+    }
+    // 6. The Nativity Fast: 15 November – 24 December (Old Style)
+    if(x>=1115 && x<=1224){
+      if(x===1224) return res(weekend ? "oil" : "strict", "nativity", "Eve of the Nativity of Christ", weekend ? "the Eve falls on a "+WEEKDAY_OF[dow] : "", 2);
+      var late = x>=1220;                                     // from 20 December: no fish, even at the weekend
+      var lvN = weekend ? (late ? "oil" : "fish") : ((dow===2||dow===4) ? "oil" : "strict");
+      var whyN = weekend ? (late ? "no fish from 20 December (Old Style)" : (dow===6?"Saturday":"Sunday")) : "";
+      var rk = NAT_RANK[k];
+      if(rk){
+        var kind=rk.charAt(0), who=rk.slice(2);
+        if(kind==="v" || weekend || dow===2 || dow===4){ lvN = late ? "oil" : "fish"; }
+        else lvN = "oil";
+        whyN = who;
+      }
+      return res(lvN, "nativity", "Nativity Fast", whyN, late ? 2 : 1);
+    }
+    // 7. Single fast days
+    if(x===105) return res(weekend ? "oil" : "strict", "eve", "Eve of Theophany", weekend ? "the Eve falls on a "+WEEKDAY_OF[dow] : "", 2);
+    if(x===829) return res("oil", "fastday", "Beheading of St John the Baptist", "a fast day, with wine and oil", 2);
+    if(x===914) return res("oil", "fastday", "Exaltation of the Cross", "a fast day, with wine and oil", 2);
+    // 8. Wednesdays and Fridays
+    if(wedfri){
+      if(diff>=7 && diff<=48) return res("fish", "paschal", "Fast day", "Paschal season", 1);
+      var c=claimOf(CLAIM);
+      if(c) return res(c.lv, "wedfri", "Fast day", c.why, 1);
+      if(POLY[k]) return res("oil", "wedfri", "Fast day", "a saint with a polyeleos", 1);
+      return res("strict", "wedfri", "Fast day", "", 1);
+    }
+    return res("free", "none", "No fast", "", 0);
+  }
+  // What each level allows, in words
+  var LV_WORDS = { strict:"no wine or oil", wine:"wine allowed, no oil", oil:"wine and oil allowed",
+                   caviar:"wine, oil and caviar allowed", fish:"fish, wine and oil allowed",
+                   meat:"meat excluded — dairy, eggs and fish allowed", free:"" };
+  // The rule as a colour category (the Calendar's key) and a plain sentence.
   function dayRule(d){
-    var t=dayOnly(d), r=fastRule(t), P=paschaCivil(t.getFullYear()), diff=Math.round((t-P)/86400000), dow=t.getDay();
-    var cat, label;
-    if(r.f===0){ cat="free"; label=(dow===3||dow===5) ? "Fast-free" : "No fast"; }
-    else if(diff>=-55 && diff<=-49){ cat="fish"; label="Cheesefare week — no meat; dairy, eggs and fish"; }
-    else if(r.fish){ cat="fish"; label="Fast — fish, wine and oil allowed"; }
-    else if(r.wineOil){ cat="wine"; label="Fast — wine and oil allowed"; }
-    else if(r.f===2){ cat="strict"; label="Strict fast"; }
-    else { cat="fast"; label="Fast day"; }
-    return {r:r, cat:cat, label:label, feast:r.feast};
+    var t=dayOnly(d), r=fastRule(t), dow=t.getDay(), cat, label;
+    switch(r.lv){
+      case "free":   cat="free";  label = (r.season==="free" && (dow===3||dow===5)) ? "Fast-free" : "No fast"; break;
+      case "meat":   cat="fish";  label="Cheesefare week — meat excluded; dairy, eggs and fish allowed"; break;
+      case "fish":   cat="fish";  label="Fast — fish, wine and oil allowed"; break;
+      case "caviar": cat="wine";  label="Fast — wine, oil and caviar allowed"; break;
+      case "oil":    cat="wine";  label="Fast — wine and oil allowed"; break;
+      case "wine":   cat="strict"; label="Strict fast — wine allowed, no oil"; break;
+      default:
+        if(r.season==="wedfri"){ cat="fast"; label="Fast day — no wine or oil"; }
+        else { cat="strict"; label="Strict fast — no wine or oil"; }
+    }
+    return {r:r, cat:cat, label:label, feast:r.feast, lv:r.lv, why:r.why, name:r.name};
+  }
+  // The day's fast as orthocal.info gives it (Slavic tradition, maintained against the OCA's calendar), as a level
+  function sourceFast(data){
+    if(!data) return null;
+    var fd=String(data.fast_level_desc||data.fast_level_description||""), fx=String(data.fast_exception_desc||"");
+    if(!fd && !fx) return null;
+    var lv;
+    if(/no fast/i.test(fd) || /fast[\s-]?free/i.test(fx)) lv="free";
+    else if(/meat fast/i.test(fx)) lv="meat";
+    else if(/fish/i.test(fx)) lv="fish";
+    else if(/caviar/i.test(fx)) lv="caviar";
+    else if(/wine and oil/i.test(fx)) lv="oil";
+    else if(/wine is allowed/i.test(fx)) lv="wine";
+    else lv="strict";
+    var words = lv==="free" ? "no fast" : LV_WORDS[lv];
+    return {lv:lv, text:(fd||"Fast")+(lv==="free" ? "" : " — "+words)};
   }
   // The fasting season containing a civil date: {name, day, len, s, e} or null.
   function seasonOf(d){
@@ -205,6 +329,15 @@
     35:"6th Sunday of Pascha — the Blind Man", 42:"7th Sunday of Pascha — the Holy Fathers of the First Council"};
   // The Sundays of Great Lent and whom they commemorate
   var LENT_SUNDAYS = {1:"the Triumph of Orthodoxy", 2:"St Gregory Palamas", 3:"the Veneration of the Cross", 4:"St John of the Ladder", 5:"St Mary of Egypt"};
+  // The Saturdays of Great Lent: the 2nd, 3rd and 4th are Saturdays of the Departed (memorial Saturdays)
+  var LENT_SATURDAYS = {1:"St Theodore the Recruit", 2:"Saturday of the Departed", 3:"Saturday of the Departed", 4:"Saturday of the Departed", 5:"the Saturday of the Akathist"};
+  // Demetrius Saturday: the Saturday before the feast of St Demetrius (26 October, Old Style)
+  function isDemetriusSaturday(t){
+    var d26=new Date(t.getFullYear(), 9, 26+calOffsetDays());           // 26 October OS as a civil date
+    var back=(d26.getDay()+1)%7; if(back===0) back=7;                      // days back to the Saturday before
+    var sat=new Date(d26.getFullYear(), d26.getMonth(), d26.getDate()-back);
+    return sameDay(sat, t);
+  }
   function movableWeek(t){
     var y=t.getFullYear(), P=paschaCivil(y), diff=Math.round((t-P)/86400000), dow=t.getDay();
     if(diff < -70){ P=paschaCivil(y-1); diff=Math.round((t-P)/86400000); }   // still in last year's weeks after Pentecost
@@ -222,7 +355,9 @@
     } else if(diff>=-48 && diff<=-9){
       var wk=Math.floor((diff+48)/7)+1;
       r.season="Great Lent"; r.fast=true; r.day=diff+49; r.len=40;
-      r.label = dow===0 ? ordinal(wk)+" Sunday of Great Lent"+(LENT_SUNDAYS[wk] ? " — "+LENT_SUNDAYS[wk] : "") : ordinal(wk)+" week of Great Lent";
+      r.label = dow===0 ? ordinal(wk)+" Sunday of Great Lent"+(LENT_SUNDAYS[wk] ? " — "+LENT_SUNDAYS[wk] : "")
+              : (dow===6 && LENT_SATURDAYS[wk]) ? ordinal(wk)+" Saturday of Great Lent — "+LENT_SATURDAYS[wk]
+              : ordinal(wk)+" week of Great Lent";
     } else if(diff===-8){ r.season="Lazarus Saturday"; r.fast=true; r.label="The eve of Palm Sunday";
     } else if(diff===-7){ r.season="Palm Sunday"; r.fast=true; r.label="The Entry of the Lord into Jerusalem";
     } else if(diff>=-6 && diff<=-1){ r.season="Holy Week"; r.fast=true; r.label="Great and Holy "+WEEKDAYS[dow];
@@ -231,6 +366,7 @@
     } else if(diff>=7 && diff<=48){
       r.season="Paschal season";
       if(PASCHA_SUNDAYS[diff]) r.label=PASCHA_SUNDAYS[diff];
+      else if(diff===9) r.label="Radonitsa — the Paschal commemoration of the departed";
       else if(diff===24) r.label="Mid-Pentecost";
       else if(diff===39) r.label="The Ascension of the Lord";
       else if(diff===48) r.label="Saturday of the Departed (Trinity Saturday)";
@@ -243,6 +379,7 @@
       else if(dow===0) r.label=ordinal((diff-49)/7)+" Sunday after Pentecost";
       else r.label=ordinal(Math.floor((diff-50)/7)+1)+" week after Pentecost";
       if(diff>=50 && diff<=55) r.label += " — fast-free week";
+      if(dow===6 && isDemetriusSaturday(t)) r.label += " — Demetrius Saturday, the Saturday of the Departed";
     }
     return r;
   }

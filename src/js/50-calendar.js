@@ -1,7 +1,7 @@
   // ---------- Year at a glance ----------
   var FEASTS_FIXED=[
     [9,8,"Nativity of the Theotokos","blue"],
-    [9,14,"Exaltation of the Cross","violet"],
+    [9,14,"Exaltation of the Cross","red"],
     [11,21,"Entry of the Theotokos","blue"],
     [12,25,"Nativity of Christ","white"],
     [1,6,"Theophany of the Lord","white"],
@@ -21,7 +21,7 @@
     }
     var P=paschaCivil(y);
     feasts.push({d:addD(P,-7), name:"Palm Sunday — Entry into Jerusalem", lit:"green"});
-    feasts.push({d:P, name:"PASCHA — the Resurrection of Christ", lit:"red", pascha:true});
+    feasts.push({d:P, name:"PASCHA — the Resurrection of Christ", lit:"white", pascha:true});
     feasts.push({d:addD(P,39), name:"Ascension of the Lord", lit:"white"});
     feasts.push({d:addD(P,49), name:"Pentecost — Day of the Holy Trinity", lit:"green"});
     feasts.sort(function(a,b){ return a.d-b.d; });
@@ -110,11 +110,13 @@
       var dr=dayRule(d), r=dr.r;
       var cell=mk("button","cd"+(r.f===1?" f1":"")+(r.f===2?" f2":"")+(dr.cat!=="free"?" cat-"+dr.cat:"")+
         (d.getMonth()!==mo?" om":"")+(sameDay(d,today)?" tod":"")+(sameDay(d,calSel)?" sel":""));
-      var lit=liturgicalKey(d, null, r.f===2?"Lenten Fast":"");
+      var li=litInfo(d, null);
       cell.appendChild(mk("span","n",String(d.getDate())));
       if(r.feast) cell.appendChild(mk("span","mk","✚"));
-      if(lit!=="burgundy"&&LIT_DOT[lit]){
-        var dot=mk("span","ld"); dot.style.background=LIT_DOT[lit]; cell.appendChild(dot);
+      // A dot for the colour of a feast, of Great Lent and of the Paschal season (ordinary gold days and the red of the
+      // other fasts are left plain, so that the fasting colours stay readable)
+      if(LIT_DOT[li.key] && (li.basis==="feast" || (li.basis==="season" && li.key!=="red" && li.key!=="gold"))){
+        var dot=mk("span","ld"+(li.key==="black"?" blk":"")); dot.style.background=LIT_DOT[li.key]; cell.appendChild(dot);
       }
       var note=log[isoKey(d)];
       if(note) cell.appendChild(mk("span","kept", note==="k" ? "✓" : "½"));
@@ -175,7 +177,9 @@
     el("dpDate").textContent = fmtDate(calSel);
     el("dpSub").textContent = tMonthDay(menaionOf(calSel)) + ", Old Style" + (tone ? " · Tone " + tone : "");
     var pill=el("dpPill"); pill.className="pill cat-"+dr.cat; pill.textContent=dr.label;
-    el("dpFeast").textContent = dr.feast || ""; show(el("dpFeast"), !!dr.feast);
+    var why = (dr.why && !/^(saturday|sunday)$/i.test(dr.why)) ? dr.why.charAt(0).toUpperCase()+dr.why.slice(1) : "";
+    var dpf = [dr.feast||"", (why && (!dr.feast || why.toLowerCase().indexOf(String(dr.feast).toLowerCase())<0)) ? why : ""].filter(Boolean).join(" · ");
+    el("dpFeast").textContent = dpf; show(el("dpFeast"), !!dpf);
     show(el("dpJournal"), dr.r.f>0 && calSel<=startOfToday());   // a note can be made on the day or afterwards
     var cur=fastLog()[isoKey(calSel)] || "";
     each("#logSeg button", function(b){ b.classList.toggle("active", b.getAttribute("data-log")===cur); });

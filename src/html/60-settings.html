@@ -66,11 +66,19 @@
         </div>
       </section>
 
-      <section class="card set">
-        <p class="eyebrow">Calendar</p>
+      <section class="card set" id="traditionCard">
+        <p class="eyebrow">Tradition and calendar</p>
+        <div class="srow">
+          <span class="sl">Liturgical tradition<small>Russian Orthodox Church Outside of Russia — Diocese of Australia and New Zealand. Fasting, colours and ROCOR feasts follow ROCOR sources; the day’s readings and saints come from orthocal.info (OCA practice), with the ROCOR differences confirmed so far corrected and marked.</small></span>
+          <span class="sval" id="tradVal">ROCOR</span>
+        </div>
+        <div class="srow">
+          <span class="sl">Church calendar<small>Fixed feasts on the Julian calendar, 13 days behind the civil calendar; Pascha by the Julian Paschalion. Days follow your phone’s own date.</small></span>
+          <span class="sval" id="calVal">Traditional Julian (Old Calendar)</span>
+        </div>
         <div class="srow col">
           <div>
-            <button class="opt active" data-cal="julian"><span class="rd"></span><span><b>Old Calendar (Julian)</b><small>The Church calendar this app follows: feasts, fasts and readings in the Slavic tradition.</small></span></button>
+            <button class="opt active" data-cal="julian"><span class="rd"></span><span><b>Traditional Julian (Old Calendar)</b><small>The Church calendar this app follows, as ROCOR keeps it.</small></span></button>
             <button class="opt" data-cal="revised" disabled aria-disabled="true"><span class="rd"></span><span><b>Revised Julian (New) Calendar</b><small>Not available. It needs its own verified tables of fixed feasts, fasts and readings — it cannot be made by shifting dates — so it is held for a later version.</small></span></button>
           </div>
         </div>
@@ -88,12 +96,13 @@
         <div class="srow hidden" id="logosRow"><a class="lrow first" id="logosLink" href="#" target="_blank" rel="noopener" style="padding:0"><span class="ltxt">Learn Biblical Greek — ΛΟΓΟΣ<small>A separate app for learning the Greek of the New Testament</small></span><span class="larr">›</span></a></div>
         <div class="srow"><button class="lrow first" id="supportLink2" style="padding:0"><span class="ltxt">Support Holy Dormition, Corrimal<small>Bank details for a direct gift to the parish</small></span><span class="larr">›</span></button></div>
         <details class="about" id="about" style="border-top:1px solid var(--line)"><summary>About &amp; sources</summary>
-          <p>Daily Readings is a companion for the daily readings, prayers, saints and fasts of the Orthodox Church on the Old Calendar. It does not replace the guidance of your priest or spiritual father, nor the services of the Church.</p>
-          <p>Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition. English Scripture: King James Version.</p>
+          <p>Daily Readings is a companion for the daily readings, prayers, saints and fasts of the Orthodox Church as kept by the Russian Orthodox Church Outside of Russia (ROCOR), on the Old Calendar. It does not replace the guidance of your priest or spiritual father, nor the services of the Church.</p>
+          <p>Fasting follows the Typikon as kept in ROCOR and is the Church’s general norm: it does not apply in the same way to everyone, and individual fasting should be discussed with your spiritual father. Liturgical colours follow the ROCOR Liturgical Handbook (Diocese of Great Britain and Western Europe); a parish may differ.</p>
+          <p>Readings &amp; saints via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — its Slavic tradition is maintained against the OCA’s calendar. Where ROCOR differs and the difference has been confirmed, the app corrects it and says so on the day. English Scripture: King James Version.</p>
           <p>Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
           <p id="nkjvNote" class="hidden">New King James Version® © 1982 Thomas Nelson.</p>
           <p>Greek New Testament: Byzantine Textform, ed. Robinson &amp; Pierpont (2018) — public domain. Patriarchal Text of 1904/1912 (Antoniades), transcribed by M. A. Robinson &amp; J. Ala-Konni — public domain.</p>
-          <p>Sayings of the Fathers are a parish selection. Each shows its source where it has been confirmed; adapted wording is marked. Liturgical colours follow common Russian practice and are a guide only.</p>
+          <p>Sayings of the Fathers are a parish selection. Each shows its source where it has been confirmed; adapted wording is marked.</p>
           <p class="eyebrow" style="margin-top:14px">Sources &amp; licences</p>
           <div id="sourcesList"><p>Loading…</p></div>
           <p><span id="stamp"></span><span id="verLbl"></span></p>

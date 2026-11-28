@@ -32,3 +32,5 @@
   .gknote,.none{font-size:.82rem;color:var(--muted2);font-style:italic;margin:.8em 0 0}
   .reading .more{display:inline-block;margin-top:10px}
 
+  .reading .rsrc{font:500 .7rem/1.3 var(--sans);color:var(--muted2);margin-bottom:3px}
+  .rocornote{margin:2px 4px 12px}

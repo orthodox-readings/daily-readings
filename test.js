@@ -1,7 +1,8 @@
-// Daily Readings v35 — automated checks. Run: node test.js   (needs: npm install playwright)
+// Daily Readings — automated checks (version from tools/build.py). Run: node test.js   (needs: npm install playwright)
 // Every check is date-proof: expectations are computed from the day the suite runs, or use fixed past dates.
 // Sections 1–11 test the app as a reader uses it; 12 tests offline packages, backup and restore; 13 tests the
-// service worker, the update from version 34 and the review copy, laid out as on GitHub Pages.
+// service worker, the update from version 34 and the review copy, laid out as on GitHub Pages; 14 tests the ROCOR
+// alignment (fasting, colours, feasts, readings and the local date) against the reference dates in the ROCOR report.
 const http = require('http');
 const fs = require('fs');
 const os = require('os');
@@ -10,6 +11,7 @@ const { execSync } = require('child_process');
 const { chromium } = require('playwright');
 
 const DIR = __dirname;
+const VER = fs.readFileSync(path.join(__dirname,'tools','build.py'),'utf8').match(/VERSION\s*=\s*"(\d+)"/)[1];
 const EXE = fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined;
 const TYPES = { '.html':'text/html', '.js':'text/javascript', '.json':'application/json',
   '.webmanifest':'application/manifest+json', '.png':'image/png', '.woff2':'font/woff2', '.txt':'text/plain' };
@@ -165,25 +167,25 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   check('five-tab bar: Today, Calendar, Scripture, Prayer, Settings with icons (no extra tabs)', nav.labels==='Today,Calendar,Scripture,Prayer,Settings' && nav.icons===5);
   check('tab bar fixed to the bottom, Today active, page padded so nothing hides behind it', nav.fixed && nav.bottom && nav.active==='today' && nav.pad);
 
-  // --- liturgical colour engine (unchanged from v33) ---
+  // --- liturgical colour engine (ROCOR Liturgical Handbook; the full set is checked in section 14) ---
   const lit = await page.evaluate((mock)=>({
-    natTheot: window.__litKey(new Date(2026,8,21), mock, ''), exalt: window.__litKey(new Date(2026,8,27), mock, ''),
-    transfig: window.__litKey(new Date(2026,7,19), mock, ''), pascha: window.__litKey(new Date(2026,3,12), mock, ''),
-    pentecost:window.__litKey(new Date(2026,4,31), mock, ''),
-    martyr:   window.__litKey(new Date(2026,9,20), {summary_title:'Great-martyr Artemius'}, 'Fast'),
-    prophet:  window.__litKey(new Date(2026,6,16), {summary_title:'Holy Prophet Elias'}, ''),
-    theotIcon:window.__litKey(new Date(2026,9,22), {summary_title:'Icon of the Most Holy Theotokos of Kazan'}, ''),
-    lentWk:   window.__litKey(new Date(2027,2,10), {summary_title:'Ven. Somebody'}, 'Lenten Fast'),
-    plain:    window.__litKey(new Date(2026,6,16), {summary_title:'Ss. Cyrus and John'}, 'Fast'),
-    beheading:window.__litKey(new Date(2026,8,11), {summary_title:'Beheading of St John the Baptist'}, 'Fast')
+    natTheot: window.__litKey(new Date(2026,8,21), mock), exalt: window.__litKey(new Date(2026,8,27), mock),
+    transfig: window.__litKey(new Date(2026,7,19), mock), pascha: window.__litKey(new Date(2026,3,12), mock),
+    pentecost:window.__litKey(new Date(2026,4,31), mock),
+    martyr:   window.__litKey(new Date(2026,9,20), {summary_title:'Great-martyr Artemius'}),
+    prophet:  window.__litKey(new Date(2026,6,16), {summary_title:'Holy Prophet Elias'}),
+    theotIcon:window.__litKey(new Date(2026,9,22), {summary_title:'Icon of the Most Holy Theotokos'}),
+    lentWk:   window.__litKey(new Date(2027,2,17), {summary_title:'Ven. Somebody'}),
+    plain:    window.__litKey(new Date(2026,6,14), {summary_title:'Tuesday of the 6th week after Pentecost'}),
+    beheading:window.__litKey(new Date(2026,8,11), {summary_title:'Beheading of St John the Baptist'})
   }), MOCK);
-  check('lit: Theotokos feast blue · Cross violet · Transfiguration white', lit.natTheot==='blue' && lit.exalt==='violet' && lit.transfig==='white');
-  check('lit: Pascha red · Pentecost green · martyr red · prophet green', lit.pascha==='red' && lit.pentecost==='green' && lit.martyr==='red' && lit.prophet==='green');
-  check('lit: Theotokos icon blue · Lent weekday violet · Beheading red', lit.theotIcon==='blue' && lit.lentWk==='violet' && lit.beheading==='red');
-  check('lit: undetermined day has no named colour', lit.plain==='burgundy');
+  check('lit: Theotokos feast blue · Cross red · Transfiguration white', lit.natTheot==='blue' && lit.exalt==='red' && lit.transfig==='white');
+  check('lit: Pascha white · Pentecost green · martyr red · prophet gold', lit.pascha==='white' && lit.pentecost==='green' && lit.martyr==='red' && lit.prophet==='gold');
+  check('lit: Theotokos icon blue · Lent weekday black · Beheading red', lit.theotIcon==='blue' && lit.lentWk==='black' && lit.beheading==='red');
+  check('lit: an ordinary day outside a fast is gold', lit.plain==='gold');
   const domLit = await page.evaluate((mock)=>({ applied: document.documentElement.getAttribute('data-lit'),
-    expected: window.__litKey(new Date(), mock, mock.fast_level_desc), row: !document.getElementById('litRow').classList.contains('hidden') }), MOCK);
-  check('liturgical colour applied; indicator row only when the colour is determined', domLit.applied===domLit.expected && domLit.row===(domLit.expected!=='burgundy'));
+    expected: window.__litKey(new Date(), mock), row: !document.getElementById('litRow').classList.contains('hidden') }), MOCK);
+  check('liturgical colour applied and named every day (the handbook gives every day a colour)', domLit.applied===domLit.expected && domLit.row===true);
   await page.evaluate(()=>{ window.__selectDay(new Date(2026,7,19)); document.getElementById('dpOpen').click(); });
   await page.waitForFunction(()=>/19 August 2026/.test(document.getElementById('date').textContent),{timeout:5000});
   const litRow = await page.evaluate(()=>({ shown:!document.getElementById('litRow').classList.contains('hidden'), text:document.getElementById('litText').textContent }));
@@ -201,9 +203,13 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   check('Julian (Old Style) date with the tone of the week', day.alt.replace(/ /g,' ')===osExp+(day.tone? ' · Tone '+day.tone : ''));
   check('previous, next and return-to-today live in the day card; return hidden on today', day.ctlInCard && day.todayHidden);
   check('feast / day headline shown', /Cyrus|Sergius/.test(day.summary));
-  const fast = await page.evaluate(()=>({ cat:document.getElementById('fastWrap').getAttribute('data-cat'), txt:document.getElementById('fastText').textContent,
-    exc:document.getElementById('fastExc').textContent, key:document.getElementById('fastKey').textContent }));
-  check('fasting guidance with colour category (wine & oil)', fast.cat==='wine' && fast.txt==='Apostles Fast' && /Wine and Oil/.test(fast.exc) && fast.key==='Fasting');
+  const fast = await page.evaluate(()=>{ const r=window.__dayRule(new Date());
+    return { cat:document.getElementById('fastWrap').getAttribute('data-cat'), txt:document.getElementById('fastText').textContent,
+      exc:document.getElementById('fastExc').textContent, key:document.getElementById('fastKey').textContent, r:{name:r.name, cat:r.cat, lv:r.lv},
+      src:document.getElementById('fastSrc').textContent, srcShown:!document.getElementById('fastSrc').classList.contains('hidden') }; });
+  check('fasting: the ROCOR rule for today with its colour category; the source calendar’s allowance shown beneath only where it differs',
+    fast.key==='Fasting' && fast.txt===fast.r.name && fast.cat===fast.r.cat &&
+    (fast.r.lv==='oil' ? !fast.srcShown : (fast.srcShown && /orthocal\.info, which follows the OCA’s calendar, gives: Apostles Fast — wine and oil allowed/.test(fast.src))));
   const seasonDom = await page.evaluate(()=>{ const s=window.__liturgicalSeason(new Date());
     return { name:document.getElementById('tdSeason').textContent, sub:document.getElementById('tdSeasonSub').textContent, exp:s,
       inCard: !!document.querySelector('#dayCard #seasonRow #tdSeason') }; });
@@ -357,13 +363,14 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   await page.click('#commemHead');
   check('Lives of the Saints inside Saints of the Day: expandable entries, Abbamoses attribution', /Sergius/.test(lifeTitle) && lifeParas===2 && /Abbamoses/.test(livesAttr) && /John Brady/.test(livesAttr));
 
-  // --- parish supplement (unchanged) ---
+  // --- the supplement: ROCOR commemorations and the parish supplement ---
   const suppUnit = await page.evaluate(()=>({
     iveron: window.__supplementFor(new Date(2026,10,24), ['Martyrs Menas, Victor and Vincent','Our Righteous Father Theodore the Studite (826)']),
     dedup:  window.__supplementFor(new Date(2026,10,24), ['Iveron Icon of the Mother of God']),
     gabriel:window.__supplementFor(new Date(2026,10,2), []), plain: window.__supplementFor(new Date(2026,10,25), []) }));
-  check('supplement: Montreal Iveron 24 Nov · skipped if upstream has it · St Gabriel 2 Nov · silent otherwise',
-    suppUnit.iveron.length===1 && /Montreal.*Iveron/.test(suppUnit.iveron[0]) && suppUnit.dedup.length===0 && suppUnit.gabriel.length===1 && /Urgebadze/.test(suppUnit.gabriel[0]) && suppUnit.plain.length===0);
+  check('supplement: Montreal Iveron 24 Nov · skipped if upstream has it · St Gabriel 2 Nov · silent otherwise; each names its source',
+    suppUnit.iveron.length===1 && /Montreal.*Iveron/.test(suppUnit.iveron[0].t) && suppUnit.iveron[0].src==='parish supplement' && suppUnit.dedup.length===0 &&
+    suppUnit.gabriel.length===1 && /Urgebadze/.test(suppUnit.gabriel[0].t) && suppUnit.plain.length===0);
   await setDate(page, '2026-11-24');
   await page.waitForFunction(()=>/24 November 2026/.test(document.getElementById('date').textContent),{timeout:5000});
   await page.click('#commemHead');
@@ -395,20 +402,38 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
     /Apostles’ Fast\|Mon Jun 08 2026\|Sat Jul 11 2026/.test(yr.fasts[2]) && /Dormition Fast\|Fri Aug 14 2026\|Thu Aug 27 2026/.test(yr.fasts[3]) &&
     /Nativity Fast\|Sat Nov 28 2026\|Wed Jan 06 2027/.test(yr.fasts[4]));
 
-  // --- fasting-rule engine (unchanged) + the colour categories built on it ---
-  const fr = await page.evaluate(()=>{ const f=(y,m,d)=>window.__fastRule(new Date(y,m,d)); return {
-    bright:f(2026,3,13), ordWed:f(2026,6,22), ordThu:f(2026,6,23), transfig:f(2026,7,19), dorm:f(2026,7,20), exalt:f(2026,8,27),
-    trinityFri:f(2026,5,5), apSat:f(2026,5,13), natStrict:f(2027,0,4), svyatki:f(2027,0,8), entryFri:f(2026,11,4), forerunWed:f(2027,6,7),
-    natMon:f(2026,11,7), lentSat:f(2027,2,20), lentWed:f(2027,2,17), apThu:f(2026,5,11), apMon:f(2026,5,8), lazarus:f(2027,3,24) }; });
-  check('fastRule: Bright Monday free · ordinary Wed fast · ordinary Thu free', fr.bright.f===0 && fr.ordWed.f===1 && fr.ordThu.f===0);
-  check('fastRule: Transfiguration strict with fish · Dormition weekday strict · Exaltation strict', fr.transfig.f===2 && fr.transfig.fish && /Transfiguration/.test(fr.transfig.feast) && fr.dorm.f===2 && !fr.dorm.fish && fr.exalt.f===2);
-  check('fastRule: Trinity-week Friday free · Apostles Saturday fish · Nativity final days strict · Svyatki free', fr.trinityFri.f===0 && fr.apSat.f===1 && fr.apSat.fish && fr.natStrict.f===2 && fr.svyatki.f===0);
-  check('fastRule: fish on the Entry (Fri 4 Dec 2026) and the Forerunner (Wed 7 Jul 2027)', fr.entryFri.fish && /Entry/.test(fr.entryFri.feast||'') && fr.forerunWed.f===1 && fr.forerunWed.fish);
-  check('fastRule: Nativity-fast Monday wine & oil · Lent Saturday wine & oil · Lent Wednesday strict', fr.natMon.wineOil && !fr.natMon.fish && fr.lentSat.f===2 && fr.lentSat.wineOil && fr.lentWed.f===2 && !fr.lentWed.wineOil && !fr.lentWed.fish);
-  check('fastRule: Apostles Thursday fish · Monday wine & oil · Lazarus Saturday wine & oil', fr.apThu.fish && fr.apMon.wineOil && fr.lazarus.f===2 && fr.lazarus.wineOil);
-  const cats = await page.evaluate(()=>{ const c=(y,m,d)=>window.__dayRule(new Date(y,m,d)); return [c(2026,3,13),c(2026,6,22),c(2026,11,4),c(2026,11,7),c(2026,8,27),c(2027,2,10)].map(r=>r.cat+':'+r.label); });
-  check('fasting categories: free · fast · fish · wine & oil · strict · cheesefare', cats.join('|')===
-    'free:No fast|fast:Fast day|fish:Fast — fish, wine and oil allowed|wine:Fast — wine and oil allowed|strict:Strict fast|fish:Cheesefare week — no meat; dairy, eggs and fish');
+  // --- the ROCOR fasting rule (Typikon) + the colour categories built on it; section 14 checks it against the references ---
+  const fr = await page.evaluate(()=>{ const f=(y,m,d)=>{ const r=window.__fastRule(new Date(y,m,d)); return r.lv+'/'+r.f; }; return {
+    bright:f(2026,3,13), ordWed:f(2027,6,21), ordThu:f(2026,6,23), transfig:f(2026,7,19), dorm:f(2026,7,20), exalt:f(2026,8,27), exaltMon:f(2027,8,27), beheading:f(2026,8,11),
+    trinityFri:f(2026,5,5), apSat:f(2026,5,13), apMon:f(2027,5,28), apTue:f(2027,5,29), apWed:f(2027,5,30), forerunWed:f(2027,6,7),
+    natMon:f(2026,10,30), natTue:f(2026,11,1), natWed:f(2026,11,2), natSat:f(2026,10,28), entryFri:f(2026,11,4), nicholasSat:f(2026,11,19),
+    natLateSat:f(2027,0,2), natLateMon:f(2027,0,4), natEve:f(2027,0,6), svyatki:f(2027,0,8), theophEve:f(2027,0,18), synaxisWed:f(2027,0,20),
+    cleanMon:f(2027,2,15), lentWed:f(2027,2,17), lentSat:f(2027,2,20), fortyMon:f(2027,2,22), annunciationWed:f(2027,3,7), greatCanonThu:f(2027,3,15),
+    lent5Wed:f(2027,3,14), lent5Fri:f(2027,3,16), lazarus:f(2027,3,24), palm:f(2027,3,25), gthu:f(2027,3,29), gfri:f(2027,3,30), gsat:f(2027,4,1),
+    cheesefareWed:f(2027,2,10), publicanWed:f(2027,1,24), paschalWed:f(2027,4,12), midfeast:f(2027,4,26), leavetakingPascha:f(2027,5,9),
+    philipFri:f(2026,10,27), kazanWed:f(2026,10,4), polyFri:f(2027,6,23), savaWed:f(2027,0,27),
+    feastEntry:window.__fastRule(new Date(2026,11,4)).feast, why:window.__fastRule(new Date(2026,11,4)).why }; });
+  check('fastRule: Bright Monday free · ordinary Wednesday strict · ordinary Thursday no fast · Trinity-week Friday free',
+    fr.bright==='free/0' && fr.ordWed==='strict/1' && fr.ordThu==='free/0' && fr.trinityFri==='free/0');
+  check('fastRule: Transfiguration fish · Dormition weekday strict · Exaltation and Beheading wine and oil, whatever the weekday',
+    fr.transfig==='fish/2' && fr.dorm==='strict/2' && fr.exalt==='oil/2' && fr.exaltMon==='oil/2' && fr.beheading==='oil/2');
+  check('fastRule (Typikon ch. 33): Apostles’ Fast — Saturday fish, Monday strict, Tuesday wine and oil, Wednesday strict; the Forerunner’s Nativity fish',
+    fr.apSat==='fish/1' && fr.apMon==='strict/1' && fr.apTue==='oil/1' && fr.apWed==='strict/1' && fr.forerunWed==='fish/1');
+  check('fastRule (Typikon ch. 33): Nativity Fast — Monday strict, Tuesday wine and oil, Wednesday strict, Saturday fish; Entry and St Nicholas fish',
+    fr.natMon==='strict/1' && fr.natTue==='oil/1' && fr.natWed==='strict/1' && fr.natSat==='fish/1' && fr.entryFri==='fish/1' && fr.nicholasSat==='fish/1' && /Entry/.test(fr.feastEntry||'') && /Entry/.test(fr.why));
+  check('fastRule: from 20 December (OS) no fish even on Saturday · 22 December Monday strict · the Eve strict · Christmastide free · Eve of Theophany strict · Synaxis of the Forerunner fish',
+    fr.natLateSat==='oil/2' && fr.natLateMon==='strict/2' && fr.natEve==='strict/2' && fr.svyatki==='free/0' && fr.theophEve==='strict/2' && fr.synaxisWed==='fish/1');
+  check('fastRule: Lent — weekdays strict, weekends wine and oil, Forty Martyrs wine and oil, Annunciation fish, Thursday of the Great Canon wine and oil (Wednesday and Friday of that week strict)',
+    fr.cleanMon==='strict/2' && fr.lentWed==='strict/2' && fr.lentSat==='oil/2' && fr.fortyMon==='oil/2' && fr.annunciationWed==='fish/2' && fr.greatCanonThu==='oil/2' && fr.lent5Wed==='strict/2' && fr.lent5Fri==='strict/2');
+  check('fastRule: Lazarus Saturday caviar · Palm Sunday fish · Great Thursday wine and oil · Great Friday strict · Great Saturday wine without oil',
+    fr.lazarus==='caviar/2' && fr.palm==='fish/2' && fr.gthu==='oil/2' && fr.gfri==='strict/2' && fr.gsat==='wine/2');
+  check('fastRule: Cheesefare Wednesday meat only · Publican week free · Paschal-season Wednesday fish (with Mid-Pentecost and the Leavetaking of Pascha)',
+    fr.cheesefareWed==='meat/1' && fr.publicanWed==='free/0' && fr.paschalWed==='fish/1' && fr.midfeast==='fish/1' && fr.leavetakingPascha==='fish/1');
+  check('fastRule: ranked days on Wednesday or Friday — Apostle Philip wine and oil · Kazan Icon fish · a polyeleos saint wine and oil · St Sava fish',
+    fr.philipFri==='oil/1' && fr.kazanWed==='fish/1' && fr.polyFri==='oil/1' && fr.savaWed==='fish/1');
+  const cats = await page.evaluate(()=>{ const c=(y,m,d)=>window.__dayRule(new Date(y,m,d)); return [c(2026,3,13),c(2027,6,21),c(2026,11,4),c(2026,11,1),c(2027,2,17),c(2027,2,10),c(2027,3,24),c(2027,4,1)].map(r=>r.cat+':'+r.label); });
+  check('fasting categories and plain words: free · fast · fish · wine & oil · strict · cheesefare · caviar · wine without oil', cats.join('|')===
+    'free:No fast|fast:Fast day — no wine or oil|fish:Fast — fish, wine and oil allowed|wine:Fast — wine and oil allowed|strict:Strict fast — no wine or oil|fish:Cheesefare week — meat excluded; dairy, eggs and fish allowed|wine:Fast — wine, oil and caviar allowed|strict:Strict fast — wine allowed, no oil');
   const season = await page.evaluate(()=>{ const s=window.__seasonOf(new Date(2026,11,4)); return s && s.name+'|'+s.day+'|'+s.len; });
   check('season engine: 4 Dec 2026 is day 7 of 40 of the Nativity Fast', season==='Nativity Fast|7|40');
 
@@ -568,11 +593,11 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
     tropar:document.getElementById('troparLink').getAttribute('href'), theo:document.getElementById('theophanLink').getAttribute('href'),
     az:document.getElementById('azbykaLink').getAttribute('href'), azShown:!document.getElementById('azbykaCard').classList.contains('hidden'),
     pro:document.getElementById('prologueLink').getAttribute('href'), theoSub:document.getElementById('theophanSub').textContent,
-    jv:document.querySelector('#troparLink .ltxt').textContent }));
+    jv:document.querySelector('#troparLink .ltxt').textContent, dio:document.getElementById('dioceseLink').getAttribute('href') }));
   const MONL=['january','february','march','april','may','june','july','august','september','october','november','december'];
-  check('Prayer tab: prayers, study links, saved sayings and parish support (8 rows)', pr.rows===8);
+  check('Prayer tab: prayers, study links (with the ROCOR diocesan calendar), saved sayings and parish support (9 rows)', pr.rows===9 && /rocor\.org\.au/.test(pr.dio));
   check('daily prayers: the prayers for this time of day come first', pr.hr>=16 ? (pr.t==='Prayers Before Sleep' && /evening\.htm$/.test(pr.h) && /morning\.htm$/.test(pr.alt)) : (pr.t==='Morning Prayers' && /morning\.htm$/.test(pr.h) && /evening\.htm$/.test(pr.alt)));
-  check('Jordanville (ROCOR) row → that day’s Holy Trinity calendar', pr.tropar===expHTM && /Jordanville Calendar \(ROCOR\)/.test(pr.jv));
+  check('Holy Trinity calendar row → that day’s page, named for what it is (the calendar Jordanville’s website shows)', pr.tropar===expHTM && /^Holy Trinity Calendar/.test(pr.jv) && /Jordanville/.test(pr.jv) && !/\(ROCOR\)/.test(pr.jv));
   check('St Theophan → OrthoChristian day page, citing the Liturgy Gospel', pr.theo===expectedOCUrl && /Matthew 9:18-26/.test(pr.theoSub) && !/Luke 24/.test(pr.theoSub));
   check('Full Service Texts → azbyka for the civil date', pr.azShown && pr.az===expAzbyka);
   check('Prologue of Ohrid → the Old Style day', pr.pro==='https://www.myrrh-bearers.org/prologue/'+MONL[jd.getMonth()]+'/'+jd.getDate()+'.htm');
@@ -601,8 +626,8 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   check('Greek editions offered separately: Byzantine Textform (chosen) and Patriarchal Text', st.eds==='rp*,pt');
   check('English text: King James Version; the NKJV is paused until its publisher grants permission', /King James Version \(public domain\)/.test(st.eng) && /paused until its publisher grants permission/.test(st.eng));
   check('calendar: Old Calendar in use; New Calendar shown as not yet available, with the reason', st.cal && st.nc && /cannot be made by shifting dates/.test(st.ncTxt));
-  check('About & sources folded; names every source and the Patriarchal transcription', !st.about && /Greek Horologion/.test(st.aboutTxt) && /Slavic Old-Calendar tradition/.test(st.aboutTxt) && /Antoniades/.test(st.aboutTxt) && /Robinson/.test(st.aboutTxt));
-  check('saved-data summary and version shown (Version 35 · build)', /days? of readings/.test(st.data) && /fasting notes?/.test(st.data) && /^ · Version 35 · build [0-9a-f]{10}$/.test(st.ver));
+  check('About & sources folded; names ROCOR as the tradition, the OCA basis of the day data, every source and the Patriarchal transcription', !st.about && /Greek Horologion/.test(st.aboutTxt) && /ROCOR/.test(st.aboutTxt) && /OCA’s calendar/.test(st.aboutTxt) && /Antoniades/.test(st.aboutTxt) && /Robinson/.test(st.aboutTxt));
+  check('saved-data summary and version shown (Version '+VER+' · build)', /days? of readings/.test(st.data) && /fasting notes?/.test(st.data) && new RegExp('^ · Version '+VER+' · build [0-9a-f]{10}$').test(st.ver));
   check('the ΛΟΓΟΣ link stays hidden until that app is published (no link to an unavailable app)', st.logos);
   check('“Sayings awaiting review” is off by default', st.review==='false');
   await page.click('#about summary'); await page.waitForTimeout(400);
@@ -857,12 +882,14 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   await ctx.close();
 
   // ================= 10. FASTING STATES, FALLBACKS, ERRORS =================
-  for(const [mock, name] of [[MOCK_STRICT,'strict'],[MOCK_NOFAST,'nofast']]){
+  for(const [mock, name, iso] of [[MOCK_STRICT,'strict','2027-07-21'],[MOCK_NOFAST,'nofast','2026-07-28']]){
     ctx = await browser.newContext({ viewport:{width:390,height:844} }); page = await ctx.newPage(); await mockApi(page, mock);
     await page.goto(base,{waitUntil:'networkidle'}); await page.waitForSelector('.reading',{timeout:5000});
-    const f = await page.evaluate(()=>({ exc:document.getElementById('fastExc').textContent, cat:document.getElementById('fastWrap').getAttribute('data-cat'), strict:document.getElementById('fastWrap').classList.contains('strict') }));
-    if(name==='strict') check('plain Fast day: strict norm explained honestly, strict colour', /traditionally strict/.test(f.exc) && /wine & oil/.test(f.exc) && f.cat==='strict' && f.strict);
-    else check('No-Fast day: no strict note and no spurious allowance (St Vladimir case)', f.exc.trim()==='' && f.cat==='free');
+    await setDate(page, iso); await page.waitForFunction(d=>document.getElementById('date').textContent.indexOf(d)>-1, iso==='2027-07-21' ? '21 July 2027' : '28 July 2026', {timeout:5000});
+    const f = await page.evaluate(()=>({ txt:document.getElementById('fastText').textContent, exc:document.getElementById('fastExc').textContent, cat:document.getElementById('fastWrap').getAttribute('data-cat'),
+      src:!document.getElementById('fastSrc').classList.contains('hidden') }));
+    if(name==='strict') check('a plain Wednesday (21 Jul 2027): “Fast day · no wine or oil”, fast colour, the source agrees so no second line', f.txt==='Fast day' && f.exc===' · no wine or oil' && f.cat==='fast' && !f.src);
+    else check('No-Fast day: no allowance shown and no second line (St Vladimir on a Tuesday, 28 Jul 2026)', f.txt==='No fast' && f.exc.trim()==='' && f.cat==='free' && !f.src);
     await ctx.close();
   }
   ctx = await browser.newContext({ viewport:{width:390,height:844} }); page = await ctx.newPage();
@@ -873,8 +900,9 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
     key:document.getElementById('fastKey').textContent, txt:document.getElementById('fastText').textContent, alt:document.getElementById('altdate').textContent,
     season:document.getElementById('tdSeason').textContent, card:!!document.getElementById('offlineDay'), content:!document.getElementById('content').classList.contains('hidden'),
     readings:document.querySelectorAll('.reading').length, saints:document.getElementById('commemCard').classList.contains('hidden'), quote:!document.getElementById('quoteCard').classList.contains('hidden') }));
-  check('nothing reachable: a plain notice naming the day; readings, saints and the day’s fast are not invented',
-    err.banner && err.btxt.indexOf(fmtLong(t0))>-1 && /not shown/.test(err.btxt) && err.readings===0 && err.saints && err.txt==='Not available without a connection' && err.card);
+  const expRule = await page.evaluate(()=>window.__dayRule(new Date()).name);
+  check('nothing reachable: a plain notice naming the day; readings and saints are not invented; the fasting rule is worked out on the device',
+    err.banner && err.btxt.indexOf(fmtLong(t0))>-1 && /not shown/.test(err.btxt) && err.readings===0 && err.saints && err.txt===expRule && err.card);
   check('…while the day card still shows what can be worked out exactly: the dates, tone and season', err.content && /Old\sStyle/.test(err.alt) && err.season.length>3 && err.quote);
   await ctx.close();
   ctx = await browser.newContext({ viewport:{width:390,height:844} }); page = await ctx.newPage();
@@ -1041,7 +1069,7 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   const dlPath = path.join(os.tmpdir(), 'dr-backup-test.json'); await dl.saveAs(dlPath);
   const bk = JSON.parse(fs.readFileSync(dlPath,'utf8'));
   check('the backup file: documented format and version, dated, named for the day', dl.suggestedFilename()==='daily-readings-backup-'+t0.getFullYear()+'-'+String(t0.getMonth()+1).padStart(2,'0')+'-'+String(t0.getDate()).padStart(2,'0')+'.json' &&
-    bk.format==='daily-readings-backup' && bk.version===1 && bk.app==='35' && !isNaN(Date.parse(bk.created)));
+    bk.format==='daily-readings-backup' && bk.version===1 && bk.app===VER && !isNaN(Date.parse(bk.created)));
   check('the backup holds the reader’s records and settings — and nothing else (no saved days, no offline texts)', bk.data.bookmarks.length===1 && bk.data.highlights.length===1 &&
     Object.keys(bk.data.fastlog).length===2 && bk.data.fastnotes['2026-07-22']==='With the family.' && bk.data.savedSayings.join(',')==='q001,q042' && bk.data.reader.v===16 &&
     bk.data.settings['pref:lang']==='par' && JSON.stringify(bk.data.settings['pref:todayHide'])==='["notes"]' && !/day:julian|pkg:|nkjv:/.test(JSON.stringify(bk)));
@@ -1053,7 +1081,7 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   await page.setInputFiles('#restoreFile', bkFile);
   await page.waitForSelector('#restoreSheet:not(.hidden)',{timeout:5000});
   const rs = await page.evaluate(()=>({ txt:document.getElementById('restoreBody').textContent, modes:[...document.querySelectorAll('#restoreBody .opt')].map(o=>o.getAttribute('data-mode')+(o.classList.contains('active')?'*':'')).join(',') }));
-  check('Restore shows the backup’s date and contents and offers Merge (chosen) or Replace', /Backup made .* · version 35/.test(rs.txt) && /In the backup: 1 bookmark/.test(rs.txt) && rs.modes==='merge*,replace');
+  check('Restore shows the backup’s date and contents and offers Merge (chosen) or Replace', new RegExp('Backup made .* · version '+VER).test(rs.txt) && /In the backup: 1 bookmark/.test(rs.txt) && rs.modes==='merge*,replace');
   await Promise.all([ page.waitForNavigation({waitUntil:'networkidle'}), page.click('#bkRestoreGo') ]);
   await page.waitForSelector('.reading',{timeout:5000});
   const merged = await page.evaluate(()=>({ bm:JSON.parse(localStorage.getItem('user:bookmarks')).map(x=>x.b+':'+x.c+':'+x.v).join(','), fl:JSON.parse(localStorage.getItem('user:fastlog')),
@@ -1091,6 +1119,178 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
     (await page.evaluate(()=>JSON.parse(localStorage.getItem('user:bookmarks')).length))===2);
   await ctx.close();
 
+  // ================= 14. ROCOR ALIGNMENT — fasting, colours, feasts, readings, the local date =================
+  // Reference data (each source is named in the ROCOR discrepancy report):
+  //   OC   orthocal.info day pages, Slavic tradition, Julian calendar, read on 28 November 2026 (62 dates, 2026–2027)
+  //   T98  the Nativity Fast table published by a ROCOR parish (St Nicholas, McKinney, Texas) for 1998, a year whose
+  //        weekdays fall exactly as 2026's
+  //   HT   the Holy Trinity calendar that jordanville.org shows (27 Nov 2026 read directly; the Paschal-season and
+  //        polyeleos samples as reported in orthocal's own audit of that calendar)
+  //   ANZ  the ROCOR Diocese of Australia and New Zealand calendar for November 2026
+  const OC_LIVE = {'2026-11-01':'free','2026-11-07':'free','2026-11-08':'free','2026-11-15':'free','2026-11-27':'oil','2026-11-28':'fish',
+    '2026-11-30':'strict','2026-12-01':'oil','2026-12-02':'strict','2026-12-03':'oil','2026-12-04':'fish','2026-12-19':'fish',
+    '2026-12-22':'oil','2026-12-24':'oil','2027-01-02':'oil','2027-01-04':'strict','2027-01-05':'oil','2027-01-06':'strict',
+    '2027-01-18':'strict','2027-01-20':'fish','2027-01-27':'strict','2027-03-15':'strict','2027-03-17':'strict','2027-03-18':'strict',
+    '2027-03-20':'oil','2027-03-22':'oil','2027-04-07':'fish','2027-04-15':'oil','2027-04-24':'caviar','2027-04-25':'fish',
+    '2027-04-30':'strict','2027-05-01':'wine','2027-05-12':'oil','2027-05-26':'fish','2027-06-23':'free','2027-06-28':'strict',
+    '2027-06-29':'oil','2027-06-30':'strict','2027-07-07':'fish','2026-08-19':'fish','2026-08-28':'fish','2026-09-11':'oil',
+    '2026-09-27':'oil','2026-10-09':'fish','2026-10-14':'fish','2026-11-04':'strict','2026-12-11':'strict','2026-12-13':'fish',
+    '2027-02-24':'free','2027-03-10':'meat','2027-03-09':'meat','2027-06-02':'oil','2027-06-09':'fish','2027-07-21':'strict',
+    '2027-09-11':'oil','2027-09-27':'oil','2026-02-08':'free','2027-02-07':'free','2026-07-02':'oil','2026-07-17':'strict',
+    '2026-12-10':'oil','2026-10-20':'free'};
+  // Where ROCOR practice differs from OC, with the source
+  const ROCOR_DIFF = {'2026-11-04':['fish','Kazan Icon, kept with a vigil (ANZ)'], '2026-12-10':['fish','Kursk Root Icon, vigil (ROCOR parish typikon note)'],
+    '2026-12-22':['fish','Conception of the Theotokos on a Tuesday (T98)'], '2027-01-27':['fish','Leavetaking of Theophany · St Sava (HT)'],
+    '2027-05-12':['fish','Paschal-season Wednesday (HT)'], '2027-06-02':['fish','Paschal-season Wednesday (HT)']};
+  ctx = await browser.newContext({ viewport:{width:390,height:844}, serviceWorkers:'block' }); page = await ctx.newPage();
+  const dayMock = (o)=>Object.assign(clone(MOCK), {stories:[], feasts:[], saints:[], service_notes:[]}, o);
+  const KAZAN = dayMock({ summary_title:'Wednesday of the 23rd week after Pentecost', titles:['Wednesday of the 23rd week after Pentecost'],
+    saints:['St Abercius, Equal-to-the-Apostles','Venerable Lot of Egypt (5th c.)','Holy Seven Youths of Ephesus'], fast_level_desc:'Fast', fast_exception_desc:'',
+    readings:[{source:'Epistle', display:'1 Thessalonians 2.1-8', passage:passage('1Th',1,8)}, {source:'Gospel', display:'Luke 9.44-50', passage:passage('Lk',44,50)}] });
+  const JOHNK = dayMock({ summary_title:'22nd Sunday after Pentecost', titles:['22nd Sunday after Pentecost'],
+    saints:['Prophet Joel','Relics Ven. John of Rila','Righteous John, Wonderworker of Kronstadt (1908).'], fast_level_desc:'No Fast', fast_exception_desc:'',
+    readings:[{source:'11th Matins Gospel', display:'John 21.15-25', passage:passage('Jn',15,25)}, {source:'Epistle', display:'Galatians 6.11-18', passage:passage('Gal',11,18)},
+      {source:'Gospel', display:'Luke 8.5-15', passage:passage('Lk',5,15)}] });
+  const UNMERC = dayMock({ summary_title:'Synaxis of the Holy Unmercenaries', titles:['Synaxis of the Holy Unmercenaries'],
+    saints:['Martyrs Acindynus, Pegasius, Aphthonius, Elpidophorus, and Anempodistus of Persia'], fast_level_desc:'No Fast', fast_exception_desc:'',
+    readings:[{source:'Epistle', display:'Ephesians 2.14-22', passage:passage('Eph',14,22)}, {source:'Epistle', desc:'Unmercenaries', display:'1 Corinthians 12.27-13.8', passage:passage('1Co',27,31)},
+      {source:'Gospel', display:'Luke 8.26-39', passage:passage('Lk',26,39)}, {source:'Gospel', desc:'Unmercenaries', display:'Matthew 10.1, 5-8', passage:passage('Mt',1,8)}] });
+  const PHILIP = dayMock({ summary_title:'Holy Apostle Philip', titles:['Holy Apostle Philip'],
+    saints:['Holy Great New Martyr Constantine of Hydra','St Gregory Palamas (1359)','Pious Emperor Justinian and His Wife Theodora (565)','Repose of Archimandrite Lazarus (Moore) (1992) (Nov. 14 OC)'],
+    fast_level_desc:'Fast', fast_exception_desc:'Wine and Oil are Allowed',
+    readings:[{source:'Epistle', display:'1 Timothy 4.4-8, 16', passage:passage('1Ti',4,8)}, {source:'Gospel', display:'Luke 13.31-35', passage:passage('Lk',31,35)}] });
+  const KURSK = dayMock({ summary_title:'Thursday of the 28th week after Pentecost', titles:['Thursday of the 28th week after Pentecost'],
+    saints:['Greatmartyr Jacob of Persia','James the Wonderworker, Bishop of Rostov'], fast_level_desc:'Nativity Fast', fast_exception_desc:'Wine and Oil are Allowed',
+    readings:[{source:'Epistle', display:'Titus 1.5-2.1', passage:passage('Tit',5,16)}, {source:'Gospel', display:'Luke 18.31-34', passage:passage('Lk',31,34)}] });
+  const DAYMOCKS = {'2026/11/4':KAZAN, '2026/11/1':JOHNK, '2026/11/15':UNMERC, '2026/11/27':PHILIP, '2026/12/10':KURSK};
+  await page.route('**orthocal.info/api/**', r=>{ const m=r.request().url().match(/julian\/(\d+\/\d+\/\d+)\//);
+    r.fulfill({status:200, contentType:'application/json', body:JSON.stringify((m && DAYMOCKS[m[1]]) || MOCK)}); });
+  await page.route('**allorigins.win/**', r=>r.abort()); await page.route('**bolls.life/**', mockBolls);
+  await page.goto(base,{waitUntil:'networkidle'}); await page.waitForSelector('.reading',{timeout:8000});
+  const rocor = await page.evaluate(([oc, diff])=>{
+    const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const lv=(y,m,d)=>window.__fastRule(new Date(y,m,d)).lv;
+    const ocOut=[]; let ocSame=0, ocDiff=0;
+    for(const k in oc){ const p=k.split('-'), a=window.__fastRule(new Date(+p[0],+p[1]-1,+p[2])).lv, exp=diff[k] ? diff[k][0] : oc[k];
+      if(a===exp){ if(diff[k]) ocDiff++; else ocSame++; } else ocOut.push(k+': app '+a+', expected '+exp); }
+    // T98 applied to the Nativity Fast of 2026 (28 Nov 2026 – 6 Jan 2027)
+    const t98=d=>{ const os=new Date(d.getFullYear(),d.getMonth(),d.getDate()-13), key=(os.getMonth()+1)*100+os.getDate(), w=d.getDay();
+      if(key===1224) return (w===0||w===6) ? 'oil' : 'strict';
+      if(w===0||w===6) return (key===1220||key===1221) ? 'oil' : 'fish';
+      if({1121:1,1125:1,1204:1,1209:1}[key]) return 'fish';
+      if(w===2||w===4) return 'oil';
+      if({1124:1,1205:1,1212:1,1217:1}[key]) return 'oil';
+      return 'strict'; };
+    const tOut=[]; let tN=0;
+    for(let d=new Date(2026,10,28); d<=new Date(2027,0,6); d=new Date(d.getFullYear(),d.getMonth(),d.getDate()+1)){
+      tN++; const a=window.__fastRule(d).lv, e=t98(d); if(a!==e) tOut.push(iso(d)+': app '+a+', T98 '+e); }
+    return { ocOut, ocSame, ocDiff, tOut, tN,
+      ht:{ apr22:lv(2026,3,22), apr24:lv(2026,3,24), apr29:lv(2026,3,29), philip:lv(2026,10,27), sava:lv(2027,0,27),
+           poly:[lv(2027,6,23),lv(2027,6,30),lv(2027,7,6),lv(2027,8,8),lv(2027,8,24)] },
+      tones:[[2026,10,1],[2026,10,7],[2026,10,8],[2026,10,15],[2026,10,27]].map(a=>window.__toneOfWeek(new Date(a[0],a[1],a[2]))),
+      demetrius: window.__liturgicalSeason(new Date(2026,10,7)).name, demetrius27: window.__liturgicalSeason(new Date(2027,10,6)).name,
+      lentSat: window.__liturgicalSeason(new Date(2027,2,27)).detail, radonitsa: window.__liturgicalSeason(new Date(2027,4,11)).detail,
+      nm:[2025,2026,2027,2028].map(y=>window.__newMartyrsSunday(y).toDateString()),
+      nmAdd: window.__supplementFor(new Date(2026,1,8), []).map(s=>s.t+' | '+s.src),
+      nmSkip: window.__supplementFor(new Date(2027,1,7), ['New Martyrs and Confessors of Russia; St Gregory the Theologian']).length,
+      memo: [window.__isMemorialOnly('Repose of Archimandrite Lazarus (Moore) (1992) (Nov. 14 OC)'), window.__isMemorialOnly('Repose of Hieromonk Seraphim (Rose) of Platina (1982).'),
+             window.__isMemorialOnly('Repose of St. John of Kronstadt'), window.__isMemorialOnly('Repose of Elder Joseph the Hesychast of Mt Athos (1959) (August 15 OC)')],
+      lit:{ ordinary:window.__litKey(new Date(2026,6,14), {summary_title:'Tuesday of the 6th week after Pentecost'}), natWk:window.__litKey(new Date(2026,11,1), {summary_title:'Tuesday of the 27th week after Pentecost'}),
+            nicholas:window.__litKey(new Date(2026,11,19), {summary_title:'St Nicholas the Wonderworker, Abp. of Myra in Lycia'}), kazan:window.__litKey(new Date(2026,10,4), null),
+            kursk:window.__litKey(new Date(2026,11,10), null), pascha:window.__litKey(new Date(2027,4,2), null), thomasWk:window.__litKey(new Date(2027,4,12), {summary_title:'Holy Martyr Isidore'}),
+            lentWk:window.__litKey(new Date(2027,2,17), {summary_title:'Ven. Somebody'}), lentSat:window.__litKey(new Date(2027,2,20), null), orthodoxy:window.__litKey(new Date(2027,2,21), null),
+            cross:window.__litKey(new Date(2027,3,4), null), akathist:window.__litKey(new Date(2027,3,17), null), forty:window.__litKey(new Date(2027,2,22), null),
+            gthu:window.__litKey(new Date(2027,3,29), null), gfri:window.__litKey(new Date(2027,3,30), null), exalt:window.__litKey(new Date(2026,8,27), null),
+            apWk:window.__litKey(new Date(2027,5,29), null), apSun:window.__litKey(new Date(2026,5,14), null), prophet:window.__litKey(new Date(2026,6,16), {summary_title:'Holy Prophet Elias'}),
+            venerable:window.__litKey(new Date(2026,9,8), {summary_title:'Repose of Ven. Sergius of Radonezh'}), martyr:window.__litKey(new Date(2026,9,20), {summary_title:'Great-martyr Artemius'}) } };
+  }, [OC_LIVE, ROCOR_DIFF]);
+  check('ROCOR fasting: the orthocal.info dates where ROCOR agrees ('+rocor.ocSame+') give the same allowance', rocor.ocSame===56 && rocor.ocOut.length===0 || console.log(rocor.ocOut));
+  check('ROCOR fasting: the six orthocal.info dates where ROCOR differs give the ROCOR allowance (Kazan, Kursk Root, Conception, St Sava, Paschal season)', rocor.ocDiff===6);
+  check('ROCOR fasting: the Nativity Fast of 2026, day by day, follows the ROCOR parish table (T98) on '+(rocor.tN-rocor.tOut.length)+' of '+rocor.tN+' days — the one difference is the Kursk Root Icon (vigil)',
+    rocor.tN===40 && rocor.tOut.length===1 && rocor.tOut[0]==='2026-12-10: app fish, T98 oil' || console.log(rocor.tOut));
+  check('ROCOR fasting: Holy Trinity calendar — fish on Paschal-season Wednesdays and Fridays (22, 24, 29 Apr 2026)', rocor.ht.apr22==='fish' && rocor.ht.apr24==='fish' && rocor.ht.apr29==='fish');
+  check('ROCOR fasting: Holy Trinity calendar — wine and oil for a polyeleos saint on a Wednesday or Friday; fish on the Leavetaking of Theophany (St Sava)',
+    rocor.ht.poly.every(x=>x==='oil') && rocor.ht.sava==='fish');
+  check('ROCOR fasting: Jordanville’s daily calendar, Friday 27 Nov 2026 (Apostle Philip): “Food with Oil”, tone eight', rocor.ht.philip==='oil' && rocor.tones[4]===8);
+  check('ROCOR tones: the diocesan calendar (ANZ), Nov 2026 — 1 Nov tone 5, 7 Nov tone 5, 8 Nov tone 6, 15 Nov tone 7', rocor.tones.slice(0,4).join(',')==='5,5,6,7');
+  check('memorial Saturdays: Demetrius Saturday 7 Nov 2026 (ANZ) and 6 Nov 2027; Saturdays of the Departed in Lent; Radonitsa',
+    /Demetrius Saturday/.test(rocor.demetrius) && /Demetrius Saturday/.test(rocor.demetrius27) && /2nd Saturday of Great Lent — Saturday of the Departed/.test(rocor.lentSat) && /^Radonitsa/.test(rocor.radonitsa));
+  check('New Martyrs and Confessors: the Sunday closest to 25 Jan OS — 9 Feb 2025, 8 Feb 2026, 7 Feb 2027, 6 Feb 2028; added when the data lacks it, skipped when it has it',
+    rocor.nm.join('|')==='Sun Feb 09 2025|Sun Feb 08 2026|Sun Feb 07 2027|Sun Feb 06 2028' && rocor.nmAdd.length===1 && /New Martyrs and Confessors of the Russian Church \| ROCOR calendar/.test(rocor.nmAdd[0]) && rocor.nmSkip===0);
+  check('memorials of the repose of people who are not saints are recognised (and saints are not)', rocor.memo.join(',')==='true,true,false,false');
+  const L=rocor.lit;
+  check('colours (ROCOR handbook): gold for ordinary days · red in the Nativity Fast · St Nicholas gold · Kazan and Kursk Root blue',
+    L.ordinary==='gold' && L.natWk==='red' && L.nicholas==='gold' && L.kazan==='blue' && L.kursk==='blue');
+  check('colours: Pascha and its season white · Lent weekday black, weekend purple · Orthodoxy and the Cross red · Akathist blue · polyeleos weekday purple',
+    L.pascha==='white' && L.thomasWk==='white' && L.lentWk==='black' && L.lentSat==='purple' && L.orthodoxy==='red' && L.cross==='red' && L.akathist==='blue' && L.forty==='purple');
+  check('colours: Great Thursday red, Great Friday black · Exaltation red · Apostles’ Fast red on weekdays, gold on Sundays · prophet gold · venerable green · martyr red',
+    L.gthu==='red' && L.gfri==='black' && L.exalt==='red' && L.apWk==='red' && L.apSun==='gold' && L.prophet==='gold' && L.venerable==='green' && L.martyr==='red');
+
+  // The Kazan Icon on a weekday (4 Nov 2026), as the diocesan calendar keeps it
+  await setDate(page, '2026-11-04'); await page.waitForFunction(()=>/4 November 2026/.test(document.getElementById('date').textContent),{timeout:5000});
+  await page.waitForFunction(()=>/Let this mind be in you/.test((document.querySelector('#readings .reading .txt')||{}).textContent||''),{timeout:5000}).catch(()=>{});
+  await page.click('#commemHead');
+  const kz = await page.evaluate(()=>({ main:[...document.querySelectorAll('#readings .reading .ref')].map(e=>e.firstChild.textContent),
+    other:[...document.querySelectorAll('#otherReadings .reading')].map(e=>e.querySelector('.src').textContent+' | '+e.querySelector('.ref').firstChild.textContent),
+    text:(document.querySelector('#readings .reading .txt')||{}).textContent||'', note:document.getElementById('rocorNote').textContent, noteShown:!document.getElementById('rocorNote').classList.contains('hidden'),
+    supp:[...document.querySelectorAll('#commemList li.supp')].map(e=>e.textContent), fast:document.getElementById('fastText').textContent+document.getElementById('fastExc').textContent,
+    src:document.getElementById('fastSrc').textContent, srcShown:!document.getElementById('fastSrc').classList.contains('hidden'), lit:document.getElementById('litText').textContent,
+    rsrc:(document.querySelector('#readings .reading .rsrc')||{}).textContent||'', summary:document.getElementById('summary').textContent }));
+  check('Kazan Icon (4 Nov 2026): the feast’s Epistle and Gospel first, in the King James text, marked as from the ROCOR diocesan calendar',
+    kz.main.join('|')==='Philippians 2:5-11|Luke 10:38-42, 11:27-28' && /Let this mind be in you/.test(kz.text) && /ROCOR — diocesan calendar \(Australia and New Zealand\)/.test(kz.rsrc));
+  check('Kazan Icon: the weekday’s readings and the feast’s Matins Gospel are under Other readings, labelled; a note says why',
+    kz.other.some(x=>/^Epistle — of the weekday \| 1 Thessalonians 2\.1-8/.test(x)) && kz.other.some(x=>/^Gospel — of the weekday \| Luke 9\.44-50/.test(x)) && kz.other.some(x=>/Matins Gospel — Kazan Icon \| Luke 1:39-49, 56/.test(x)) &&
+    kz.noteShown && /ROCOR keeps the Kazan Icon with a vigil/.test(kz.note));
+  check('Kazan Icon: heads the day, listed among the saints (ROCOR calendar), fish allowed on this Wednesday, the source calendar’s stricter line shown beneath; colour blue',
+    kz.supp.some(x=>/^Kazan Icon of the Mother of God — ROCOR calendar/.test(x)) && /^Fast day · fish, wine and oil allowed — the Kazan Icon/.test(kz.fast) &&
+    kz.srcShown && /orthocal\.info, which follows the OCA’s calendar, gives: Fast — no wine or oil/.test(kz.src) && kz.lit==='Blue' && kz.summary==='Kazan Icon of the Mother of God');
+  // St John of Kronstadt (1 Nov 2026, a Sunday)
+  await setDate(page, '2026-11-01'); await page.waitForFunction(()=>/1 November 2026/.test(document.getElementById('date').textContent),{timeout:5000}); await sleep(400);
+  const jk = await page.evaluate(()=>({ main:[...document.querySelectorAll('#readings .reading')].map(e=>e.querySelector('.src').textContent+' | '+e.querySelector('.ref').firstChild.textContent), note:document.getElementById('rocorNote').textContent }));
+  check('St John of Kronstadt (1 Nov 2026): the Sunday’s readings, then his Epistle and Gospel from the diocesan calendar',
+    jk.main.join(' / ')==='Epistle | Galatians 6.11-18 / Gospel | Luke 8.5-15 / Epistle — St John of Kronstadt | 1 John 4:7-11 / Gospel — St John of Kronstadt | Luke 6:31-36' && /St John of Kronstadt are added/.test(jk.note));
+  // The OCA's Sunday Synaxis of the Unmercenaries (15 Nov 2026)
+  await setDate(page, '2026-11-15'); await page.waitForFunction(()=>/15 November 2026/.test(document.getElementById('date').textContent),{timeout:5000}); await sleep(400);
+  const um = await page.evaluate(()=>({ summary:document.getElementById('summary').textContent, main:[...document.querySelectorAll('#readings .reading .ref')].map(e=>e.firstChild.textContent),
+    other:[...document.querySelectorAll('#otherReadings .reading .src')].map(e=>e.textContent), note:document.getElementById('rocorNote').textContent }));
+  check('15 Nov 2026: the OCA’s Sunday “Synaxis of the Holy Unmercenaries” is not the headline; its readings are under Other readings, labelled; a note explains',
+    !/Unmercenaries/.test(um.summary) && /Acindynus/.test(um.summary) && um.main.join('|')==='Ephesians 2.14-22|Luke 8.26-39' &&
+    um.other.filter(x=>/Unmercenaries · the OCA’s Sunday transfer — not in the ROCOR calendar/.test(x)).length===2 && /1 November \(Old Style\)/.test(um.note));
+  // Apostle Philip (27 Nov 2026): a memorial that is not a saint's commemoration is not listed
+  await setDate(page, '2026-11-27'); await page.waitForFunction(()=>/27 November 2026/.test(document.getElementById('date').textContent),{timeout:5000}); await sleep(300);
+  const ph = await page.evaluate(()=>({ li:[...document.querySelectorAll('#commemList li')].map(e=>e.textContent), hid:document.getElementById('commemHidden').textContent,
+    hidShown:!document.getElementById('commemHidden').classList.contains('hidden'), fast:document.getElementById('fastText').textContent+document.getElementById('fastExc').textContent,
+    srcShown:!document.getElementById('fastSrc').classList.contains('hidden') }));
+  check('27 Nov 2026: “Repose of Archimandrite Lazarus (Moore)” is not listed among the saints, and a line says one entry was left out',
+    !ph.li.some(x=>/Lazarus \(Moore\)/.test(x)) && ph.li.some(x=>/Gregory Palamas/.test(x)) && ph.hidShown && /Not listed: 1 entry/.test(ph.hid));
+  check('27 Nov 2026: “Fast day · wine and oil allowed — the Apostle Philip”, the same as the source, so no second line', /^Fast day · wine and oil allowed — the Apostle Philip/.test(ph.fast) && !ph.srcShown);
+  // The Kursk Root Icon (10 Dec 2026)
+  await setDate(page, '2026-12-10'); await page.waitForFunction(()=>/10 December 2026/.test(document.getElementById('date').textContent),{timeout:5000}); await sleep(300);
+  const ku = await page.evaluate(()=>({ supp:[...document.querySelectorAll('#commemList li.supp')].map(e=>e.textContent), fast:document.getElementById('fastText').textContent+document.getElementById('fastExc').textContent, lit:document.getElementById('litText').textContent, summary:document.getElementById('summary').textContent }));
+  check('Kursk Root Icon (10 Dec 2026): heads the day, in the saints (ROCOR calendar), fish allowed, colour blue', ku.supp.some(x=>/Kursk Root Icon/.test(x)) && /^Kursk Root Icon/.test(ku.summary) && /^Nativity Fast · fish, wine and oil allowed — the Kursk Root Icon/.test(ku.fast) && ku.lit==='Blue');
+  // Settings: tradition and calendar; the pastoral note
+  await tab(page,'settings');
+  const stR = await page.evaluate(()=>({ trad:document.getElementById('tradVal').textContent, cal:document.getElementById('calVal').textContent,
+    tradLbl:document.querySelector('#traditionCard .srow .sl').firstChild.textContent.trim(), about:document.getElementById('about').textContent }));
+  check('Settings: “Liturgical tradition: ROCOR” and “Church calendar: Traditional Julian (Old Calendar)”', stR.tradLbl==='Liturgical tradition' && stR.trad==='ROCOR' && stR.cal==='Traditional Julian (Old Calendar)');
+  check('About keeps the pastoral note: fasting is the general norm, to be discussed with one’s spiritual father', /general norm/.test(stR.about) && /discussed with your spiritual father/.test(stR.about));
+  await ctx.close();
+
+  // The local civil date decides the day — Australia/Sydney before dawn and late at night (not an American date)
+  for(const [utc, expDay, label] of [['2026-11-27T20:00:00Z','2026/11/28','07:00 on Saturday 28 November'], ['2026-11-28T12:45:00Z','2026/11/28','23:45 on Saturday 28 November'], ['2026-11-28T13:15:00Z','2026/11/29','00:15 on Sunday 29 November']]){
+    ctx = await browser.newContext({ viewport:{width:390,height:844}, timezoneId:'Australia/Sydney', serviceWorkers:'block' }); page = await ctx.newPage();
+    const asked=[];
+    await page.route('**orthocal.info/api/**', r=>{ asked.push(r.request().url()); r.fulfill({status:200, contentType:'application/json', body:JSON.stringify(MOCK)}); });
+    await page.route('**allorigins.win/**', r=>r.abort()); await page.route('**bolls.life/**', mockBolls);
+    await page.clock.install({ time: new Date(utc) });
+    await page.goto(base,{waitUntil:'domcontentloaded'}); await page.waitForSelector('.reading',{timeout:8000});
+    const sy = await page.evaluate(()=>({ date:document.getElementById('date').textContent, alt:document.getElementById('altdate').textContent }));
+    const expD = expDay.split('/'), dObj = new Date(+expD[0], +expD[1]-1, +expD[2]);
+    const expTxt = dObj.toLocaleDateString('en-AU',{weekday:'long'})+' '+dObj.toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+    check('Sydney time, '+label+': the app asks for and shows '+expTxt, asked.length>0 && asked[0].indexOf('/julian/'+expDay+'/')>-1 && sy.date===expTxt);
+    await ctx.close();
+  }
+
   await browser.close();
   await new Promise(r=>server.close(r));
 
@@ -1108,14 +1308,14 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   const cacheKeys = p => p.evaluate(()=>caches.keys());
   const PREVIEW_CACHE = APP_CACHE.replace('orthodox-readings-','dr-preview-');
 
-  // 13a. v35 alone: installs, keeps itself offline, repairs a damaged copy
+  // 13a. This version alone: installs, keeps itself offline, repairs a damaged copy
   ctx = await browser2.newContext({ viewport:{width:390,height:844} }); page = await ctx.newPage(); await mockApi(ctx, MOCK);
   await page.goto(swBase,{waitUntil:'networkidle'}); await page.waitForSelector('.reading',{timeout:8000});
   const ctl = await swReady(page);
   const keys1 = await cacheKeys(page);
   const pre = await page.evaluate(async n=>{ const c=await caches.open(n); return (await c.keys()).map(r=>new URL(r.url).pathname); }, APP_CACHE);
   check('service worker installs (cache named for version and build) and keeps the app, fonts, sayings, package list and source registry',
-    ctl && keys1.includes(APP_CACHE) && /^orthodox-readings-v35-[0-9a-f]{10}$/.test(APP_CACHE) && ['index.html','fathers.json','packages.json','data/sources.json','fonts/literata-latin-400-normal.woff2'].every(f=>pre.some(p=>p==='/daily-readings/'+f)));
+    ctl && keys1.includes(APP_CACHE) && new RegExp('^orthodox-readings-v'+VER+'-[0-9a-f]{10}$').test(APP_CACHE) && ['index.html','fathers.json','packages.json','data/sources.json','fonts/literata-latin-400-normal.woff2'].every(f=>pre.some(p=>p==='/daily-readings/'+f)));
   await page.click('#setBtn'); await page.waitForSelector('#pkg-nt-kjv .pkbtn:not(.hidden)',{timeout:8000});
   await page.click('#pkg-nt-kjv .pkbtn'); await page.click('#pkg-nt-rp .pkbtn');
   const swSaved = (await waitPkg(page,'nt-kjv',/^Saved on this device/,60000)) && (await waitPkg(page,'nt-rp',/^Saved on this device/,90000));
@@ -1144,7 +1344,7 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
   await ctx.close();
 
   if(haveV34){
-    // 13b. A phone with v34 installed receives v35 on its next open, and keeps everything it saved.
+    // 13b. A phone with v34 installed receives this version on its next open, and keeps everything it saved.
     liveRoot = V34;
     ctx = await browser2.newContext({ viewport:{width:390,height:844} }); page = await ctx.newPage(); await mockApi(ctx, MOCK);
     await page.goto(swBase,{waitUntil:'networkidle'}); await page.waitForSelector('.reading',{timeout:8000});
@@ -1156,15 +1356,15 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
     await page.waitForFunction(()=>/^Saved —/.test(document.getElementById('ntOffLbl').textContent),{timeout:60000}).catch(()=>{});
     const before = await page.evaluate(()=>{ const o={}; for(const k of Object.keys(localStorage)) o[k]=localStorage.getItem(k); return o; });
     const k34 = await cacheKeys(page);
-    liveRoot = DIR;                                                      // "deploy" v35
+    liveRoot = DIR;                                                      // "deploy" this version
     await page.reload({waitUntil:'networkidle'}); await page.waitForSelector('.tabs',{timeout:8000}).catch(()=>{});
     let k35 = []; for(let i=0;i<40;i++){ k35 = await cacheKeys(page); if(k35.includes(APP_CACHE) && !k35.includes('orthodox-readings-v34')) break; await sleep(250); }
     await page.waitForTimeout(5500);                                     // housekeeping
     const after = await page.evaluate(()=>{ const o={}; for(const k of Object.keys(localStorage)) o[k]=localStorage.getItem(k); return o; });
     const ui = await page.evaluate(()=>({ v35:!!document.getElementById('tdSeason'), lang:(document.querySelector('#langSeg button.active')||{}).getAttribute?.('data-lang'),
       theme:document.documentElement.getAttribute('data-theme'), badges:[...document.querySelectorAll('.reading .ver')].map(b=>b.textContent).join(',') }));
-    check('v34 phone: one open of the app shows v35 (page is network-first)', ui.v35===true);
-    check('v34 phone: old app copy removed; Greek and text stores carried over; v35 in place', k34.includes('orthodox-readings-v34') && k34.includes('orthodox-readings-greek-1') &&
+    check('v34 phone: one open of the app shows v'+VER+' (page is network-first)', ui.v35===true);
+    check('v34 phone: old app copy removed; Greek and text stores carried over; v'+VER+' in place', k34.includes('orthodox-readings-v34') && k34.includes('orthodox-readings-greek-1') &&
       k35.includes(APP_CACHE) && !k35.includes('orthodox-readings-v34') && k35.includes('orthodox-readings-greek-1') && k35.includes('orthodox-readings-texts-1'));
     const personalKeys = Object.keys(before).filter(k=>/^(pref|user|reader):/.test(k));
     check('v34 phone: every preference and personal record kept and honoured (Parallel, dark theme, bookmark, fasting note)',
@@ -1174,7 +1374,7 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
     check('v34 phone: the New Testament saved by v34 is recognised as on this device — nothing to download again', /^On this device|^Saved on this device/.test(await pkgStat(page,'nt-kjv')) && /^On this device|^Saved on this device/.test(await pkgStat(page,'nt-rp')));
     await ctx.setOffline(true); await page.reload({waitUntil:'domcontentloaded'}); await page.waitForSelector('.tabs',{timeout:8000}).catch(()=>{});
     await page.waitForSelector('.reading',{timeout:8000}).catch(()=>{});
-    check('v34 phone after the update: v35 opens with no connection', await page.evaluate(()=>!!document.getElementById('tdSeason') && document.querySelectorAll('.reading').length===3));
+    check('v34 phone after the update: v'+VER+' opens with no connection', await page.evaluate(()=>!!document.getElementById('tdSeason') && document.querySelectorAll('.reading').length===3));
     await ctx.close();
 
     // 13c. The review copy at /daily-readings/preview/ beside the live v34 app on the same phone
@@ -1201,16 +1401,16 @@ const ACCENTS = /[̀-ͯΆΈ-ΊΌΎ-ΐά-ΰό-ώἀ-῿]/;
     const liveOff = await page.evaluate(()=>!!document.querySelector('.tabs') && !document.getElementById('tdSeason') && !document.querySelector('.top .preview'));
     await page.goto(swBase+'preview/',{waitUntil:'domcontentloaded'}).catch(()=>{}); await page.waitForTimeout(800);
     const prevOff = await page.evaluate(()=>!!document.querySelector('.top .preview') && !!document.getElementById('tdSeason'));
-    check('offline afterwards: the live address still opens live v34; the preview address opens the v35 preview', liveOff && prevOff);
+    check('offline afterwards: the live address still opens live v34; the preview address opens the v'+VER+' preview', liveOff && prevOff);
     await ctx.close();
 
-    // 13d. Once v35 is live, its service worker leaves /preview/ alone
+    // 13d. Once this version is live, its service worker leaves /preview/ alone
     liveRoot = DIR;
     ctx = await browser2.newContext({ viewport:{width:390,height:844} }); page = await ctx.newPage(); await mockApi(ctx, MOCK);
     await page.goto(swBase,{waitUntil:'networkidle'}); await page.waitForSelector('.reading',{timeout:8000}); await swReady(page);
     await page.goto(swBase+'preview/',{waitUntil:'networkidle'}); await sleep(600);
     const liveCopy = await page.evaluate(async n=>{ const hit=await (await caches.open(n)).match(new URL('../index.html', location.href).href); return hit ? !(await hit.text()).includes('class="preview"') : false; }, APP_CACHE);
-    check('live v35 never stores the review copy as its own page', liveCopy===true);
+    check('live v'+VER+' never stores the review copy as its own page', liveCopy===true);
     await ctx.close();
   } else {
     check('v34 backup branch available for the update tests (git branch backup-v34)', false);

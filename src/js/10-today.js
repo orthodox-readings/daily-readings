@@ -1,15 +1,18 @@
 
   // ---------- rendering the day ----------
-  var LIT_NAME = { blue:"Blue", red:"Red", green:"Green", violet:"Violet", white:"White", gold:"Gold" };
-  var LIT_DOT  = { burgundy:"#641E28", blue:"#2F4F86", red:"#A3262A", green:"#2F6B3F", violet:"#5B3A86", white:"#F3EEDF", gold:"#C5A46D" };
+  // Liturgical colours (ROCOR Liturgical Handbook): names and the dots that show them
+  var LIT_NAME = { gold:"Gold", red:"Red", white:"White", blue:"Blue", green:"Green", purple:"Purple", black:"Black" };
+  var LIT_DOT  = { burgundy:"#641E28", gold:"#C5A46D", red:"#A3262A", white:"#F3EEDF", blue:"#2F4F86", green:"#2F6B3F", purple:"#5B3A86", black:"#26211E" };
   var CAT_SHORT = { free:"No fast", fast:"Fast", strict:"Strict fast", fish:"Fish allowed", wine:"Wine & oil" };
 
   // The appointed Epistle and Gospel of the Liturgy are shown first and in full; other readings of the day
   // (Matins Gospel, Vespers readings, the Hours) are listed below them.
-  function isLiturgyReading(r){ return /^(epistle|gospel)$/i.test(String(r.source||"").split(",")[0].trim()); }
+  function isLiturgyReading(r){ return !r.demoted && /^(epistle|gospel)$/i.test(String(r.source||"").split(",")[0].trim()); }
 
   function render(data, opts){
     opts = opts || {};
+    var adj = rocorAdjust(data, state.date);            // ROCOR corrections to the day's data (see 40-day-links.js)
+    data = adj.data;
     var dkey = keyOf(state.cal, state.date), keepOpen = [], livesOpen = [], othersOpen = false;
     if(lastRender && lastRender.key===dkey){          // same day again (fresh data, or a reading setting changed)
       each("#readings .reading, #otherReadings .reading", function(r,i){ if(r.classList.contains("open")) keepOpen.push(i); });
@@ -34,43 +37,26 @@
     show(el("tdSeasonSub"), !!season.detail);
 
     // Without the day's data the app shows only what it can work out exactly — the dates, the tone, the
-    // season and a great feast. Readings, saints and the day's own fast are never guessed.
+    // season, a great feast and the fasting rule. Readings and saints are never guessed.
     var rule = dayRule(t0);
     el("summary").textContent = data ? ((data.summary_title || (data.titles && data.titles[0])) || "") : (rule.feast || "");
 
-    // Fast — when the calendar notes no relaxation, the traditional strict norm applies; say so.
+    // Fast — the ROCOR rule (Typikon), worked out on the device. The day's source calendar follows the OCA; where it
+    // gives a different allowance, that is shown beneath, so nothing from another tradition is passed off as ROCOR's.
     var fdesc = (data && (data.fast_level_desc || data.fast_level_description)) || "";
-    var fexc  = (data && (data.fast_exception_desc || (data.fast_exception && String(data.fast_exception)))) || "";
-    var isFastDay = /fast/i.test(fdesc) && !/no fast|fast[\s-]?free/i.test(fdesc);
-    var hasExc = !!(fexc && fexc !== "0");
-    // An allowance only means something on an actual fast day. Some calendar records
-    // carry a great saint's allowance (e.g. St Vladimir: fish) that applies only when
-    // his feast falls on a Wednesday or Friday — on non-fast years it must be suppressed.
-    var showExc = hasExc && isFastDay, cat;
+    var cat = rule.cat;
     el("fastWrap").classList.remove("hidden","strict");
     el("fastDay").textContent = "";
-    if(!data){
-      cat = "none";
-      el("fastKey").textContent = "Fasting";
-      el("fastText").textContent = "Not available without a connection";
-      el("fastExc").textContent = " · the Calendar tab shows the Church’s general rule";
-    } else {
-      el("fastKey").textContent = "Fasting";
-      el("fastText").textContent = fdesc || "—";
-      if(showExc){
-        cat = /fish|caviar/i.test(fexc) ? "fish" : (/wine|oil/i.test(fexc) ? "wine" : "fast");
-        el("fastExc").textContent = " · " + fexc;
-      } else if(isFastDay){
-        cat = "strict";
-        el("fastWrap").classList.add("strict");
-        el("fastExc").textContent = " · traditionally strict — many saints’ days allow wine & oil";
-      } else {
-        cat = "free";
-        el("fastExc").textContent = (hasExc && /fast[\s-]?free/i.test(fexc)) ? " · fast-free week" : "";
-      }
-    }
+    el("fastKey").textContent = "Fasting";
+    el("fastText").textContent = rule.name;
+    el("fastExc").textContent = rule.lv==="free" ? (rule.r.season==="free" ? " · fast-free" : "")
+      : " · " + LV_WORDS[rule.lv] + (rule.why ? " — " + rule.why : "");
+    if(cat==="strict") el("fastWrap").classList.add("strict");
+    var srcF = sourceFast(data), fsEl = el("fastSrc");
+    if(srcF && srcF.lv!==rule.lv){ fsEl.textContent = "orthocal.info, which follows the OCA’s calendar, gives: " + srcF.text; show(fsEl, true); }
+    else { fsEl.textContent = ""; show(fsEl, false); }
     el("fastWrap").setAttribute("data-cat", cat);
-    el("fastDot").style.background = cat==="none" ? "transparent" : "var(--k-"+cat+")";
+    el("fastDot").style.background = "var(--k-"+cat+")";
     el("tdSeasonDot").style.background = season.fast ? "var(--k-fast)" : "var(--gold)";
 
     // Commemorations — show the FULL list: union of titles + feasts + saints (deduped), minus the headline
@@ -94,16 +80,25 @@
         addCommem(typeof x === "string" ? x : (x && (x.title || x.name || x.feast_name)));
       });
     });
+    // Memorials of the repose of revered people who are not commemorated among the saints are not listed (see rocorAdjust)
+    var hidden = list.filter(isMemorialOnly).length;
+    list = list.filter(function(t){ return !isMemorialOnly(t); });
     var ul = el("commemList"); ul.innerHTML="";
     list.forEach(function(t){ ul.appendChild(mk("li", "", t)); });
-    // Parish supplement: ROCOR commemorations the upstream data lacks (see SUPPLEMENT)
+    // ROCOR commemorations the upstream data lacks, and the parish supplement (see SUPPLEMENT)
     var supp = data ? supplementFor(state.date, [summary].concat(list)) : [];
-    supp.forEach(function(t){ ul.appendChild(mk("li", "supp", t)); });
+    supp.forEach(function(s){ var li=mk("li", "supp", s.t); li.appendChild(mk("small","sref"," — "+s.src)); ul.appendChild(li); });
+    // A ROCOR feast the data lacks heads the day when the data has only the weekday's name (e.g. the Kazan Icon)
+    var rocorFeast = supp.filter(function(x){ return x.feast; })[0];
+    if(rocorFeast && /\bweek after Pentecost\b|^(monday|tuesday|wednesday|thursday|friday|saturday|sunday) of /i.test(summary)) el("summary").textContent = rocorFeast.t;
     show(el("commemSuppNote"), supp.length>0);
+    el("commemHidden").textContent = hidden ? (hidden===1 ? "Not listed: 1 entry in the source data is a memorial of the repose of a revered person, not the commemoration of a saint."
+      : "Not listed: "+hidden+" entries in the source data are memorials of the repose of revered people, not commemorations of saints.") : "";
+    show(el("commemHidden"), hidden>0);
     el("commemLink").setAttribute("href", orthoChristianURL(state.date));
     el("commemCount").textContent = String(list.length+supp.length);
     var peek = list.filter(function(t){ return !/^begin/i.test(t); });
-    el("commemPeek").textContent = (peek[0] || list[0] || supp[0] || "") + ((list.length+supp.length)>1 ? " …" : "");
+    el("commemPeek").textContent = (peek[0] || list[0] || (supp[0] && supp[0].t) || "") + ((list.length+supp.length)>1 ? " …" : "");
 
     // Service notes
     var notes = data && data.service_notes;
@@ -138,8 +133,9 @@
       if(srcLabel.indexOf(",") > -1 && !qual){
         var sp = srcLabel.split(/,\s*/); srcLabel = sp[0]; qual = sp.slice(1).join(", ");
       }
-      var fullLabel = srcLabel + (qual ? " — " + qual : "");
+      var fullLabel = srcLabel + (qual ? " — " + qual : "") + (r.demotedNote ? (qual ? " · " : " — ") + r.demotedNote : "");
       if(fullLabel) h.appendChild(mk("div","src",fullLabel));
+      if(r.supp) h.appendChild(mk("div","rsrc","ROCOR — "+r.suppSrc));
       var disp = r.display||r.short_display||"";
       var ref=mk("div","ref", disp||"Reading");
       var badge=mk("span","ver","KJV");
@@ -153,7 +149,8 @@
       card.appendChild(head);
 
       var body=mk("div","body"), txt=mk("div","txt");
-      renderPassageKJV(txt, r);
+      if(r.supp && !(r.passage && r.passage.length)) fillPassageKJV(txt, r, state.renderSeq);
+      else renderPassageKJV(txt, r);
       body.appendChild(txt);
       var pr = parseRef(disp);
       if(pr && pr.book>=40){
@@ -168,6 +165,9 @@
       if(NKJV_ENABLED && state.txt==="nkjv") applyNKJV(txt, badge, disp, state.renderSeq);
     });
     el("otherCount").textContent = rest.length ? String(rest.length) : "";
+    // What was adjusted for ROCOR on this day, said plainly
+    el("rocorNote").textContent = adj.notes.join(" ");
+    show(el("rocorNote"), adj.notes.length>0);
     el("otherCard").classList.toggle("open", othersOpen);
     el("otherHead").setAttribute("aria-expanded", othersOpen ? "true" : "false");
 
@@ -180,7 +180,7 @@
     show(gn, readings.length>0 && state.lang!=="en");
 
     // Liturgical colour, lives, tracker, links, quote, St Theophan
-    applyLit(liturgicalKey(state.date, data, fdesc));
+    applyLit(litInfo(state.date, data));
     renderLives(data);
     each("#livesList .life", function(d,i){ if(livesOpen.indexOf(i)>-1) d.open=true; });
     renderTracker(fdesc);

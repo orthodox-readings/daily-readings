@@ -1,5 +1,65 @@
 # Daily Readings — changelog
 
+## Version 36 — ROCOR alignment (development version, for review; not live)
+
+Built on version 35. Everything in version 35 is kept. The changes follow the ROCOR liturgical alignment brief; every
+choice and its source is in the ROCOR discrepancy report.
+
+### Fasting — the ROCOR rule, worked out on the device
+- A new fasting engine follows the **Typikon (chapters 32–33) as kept in ROCOR**, with seven levels: strict (no wine
+  or oil), wine without oil, wine and oil, wine/oil/caviar, fish, meat excluded, no fast.
+- **Today now shows the ROCOR rule** — also with no connection. orthocal.info's own line (its Slavic data follows the
+  OCA's calendar) is shown beneath, labelled, only on days where it differs.
+- Corrections to version 35's rule: the Apostles' and Nativity Fasts follow the Typikon (Monday, Wednesday, Friday
+  without wine or oil; Tuesday and Thursday wine and oil; fish at weekends; no fish from 20 December, Old Style);
+  Lazarus Saturday caviar; Great Thursday wine and oil; Great Saturday wine without oil; the Beheading and the
+  Exaltation wine and oil; the Forty Martyrs and the Thursday of the Great Canon wine and oil; great and vigil feasts
+  on a Wednesday or Friday fish; polyeleos saints on a Wednesday or Friday wine and oil; Theophany on a Wednesday or
+  Friday fast-free.
+- ROCOR practice where orthocal.info differs: fish on Wednesdays and Fridays of the Paschal season; the ranked days of
+  the Nativity Fast (St Catherine, the Leavetaking of the Entry, St Barbara, St Sabbas, the Conception, St Spyridon,
+  the Prophet Daniel); the Kazan Icon and the Kursk Root Icon (vigil, fish); the Leavetaking of Theophany (fish); the
+  Wednesday and Friday of the fifth week of Lent stay strict (orthocal.info's allowance there is the OCA's); OCA-only
+  allowances (St Raphael of Brooklyn, St Innocent, St Tikhon on 7 April, St Alexis Toth, St Jacob Netsvetov and
+  others) are not used.
+- Checked: all 730 days of 2026–2027 against orthocal.info (673 the same; the 57 differences are each the ROCOR
+  rules above), the 62 orthocal.info pages read on 28 Nov 2026, the ROCOR parish Nativity Fast table (40 of 40
+  days, one documented exception), and the Holy Trinity calendar shown by Jordanville.
+
+### Liturgical colours — the ROCOR Liturgical Handbook
+- Gold for ordinary days; red for the Nativity, Apostles' and Dormition Fasts, martyrs, the Cross, the Forerunner and
+  the Archangels; black on Lenten weekdays, purple at Lenten weekends; white for Pascha to its leavetaking, the
+  Nativity, Theophany, the Transfiguration and the Ascension; blue for the Theotokos; green for Lazarus Saturday,
+  Palm Sunday, Pentecost and venerable saints. Every day now names its colour.
+
+### Feasts, saints and readings
+- ROCOR feasts the data lacks: the **Kazan Icon** (22 Oct OS) and the **Kursk Root Icon** (27 Nov OS), and the
+  **Synaxis of the New Martyrs and Confessors** (the Sunday closest to 25 Jan OS; orthocal.info misses it in years
+  of an early Pascha, such as 2026). A missing ROCOR feast heads the day when the data has only the weekday's name.
+- The **Kazan Icon's** Epistle and Gospel (and **St John of Kronstadt's**, 19 Oct OS) from the ROCOR diocesan
+  calendar, in the bundled King James text; on a weekday the feast's readings come first and the weekday's are
+  listed under Other readings, labelled.
+- The OCA's Sunday "Synaxis of the Holy Unmercenaries" is not used as the headline; its readings are listed under
+  Other readings, labelled. A note on Today says what was adjusted and why.
+- Memorials of the repose of revered people who are not saints (e.g. Archimandrite Lazarus Moore) are not listed
+  among the saints; a line says so.
+- Memorial Saturdays named in the season line: the 2nd, 3rd and 4th Saturdays of Lent, Demetrius Saturday,
+  Radonitsa (with Meatfare and Trinity Saturdays as before).
+
+### Names and settings
+- Settings → **Tradition and calendar**: "Liturgical tradition: ROCOR" and "Church calendar: Traditional Julian
+  (Old Calendar)", with a plain note on what comes from where.
+- The link that version 35 called "Jordanville Calendar (ROCOR)" is the Holy Trinity calendar (a Moscow
+  Patriarchate parish in Baltimore) that Jordanville's website displays; it is now named for what it is.
+- New in the Prayer tab: the **ROCOR diocesan calendar** (Australia and New Zealand).
+- About & sources: ROCOR named as the tradition, the pastoral note on fasting kept, and the registry extended
+  (Jordanville's daily calendar, the ANZ diocesan calendar, the ROCOR Liturgical Handbook, the Typikon, the St George
+  parish table, the Jordanville Prayer Book's permission terms).
+- The day always follows the phone's own date (checked for Sydney before dawn and near midnight).
+
+### Tests
+- 261 automated checks, including a new section 14 for ROCOR alignment.
+
 ## Version 35 — Phase 1 (development version, for review; not live)
 
 Built on version 34 (live). Nothing that version 34 offers was removed, except the New King James Version,

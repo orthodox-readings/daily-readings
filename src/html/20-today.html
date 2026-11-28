@@ -25,7 +25,7 @@
           </div>
           <div class="mrow faststrip hidden" id="fastWrap">
             <span class="dot" id="fastDot"></span>
-            <span class="x"><span class="k" id="fastKey">Fasting</span><span id="fastText">—</span><span id="fastDay"></span><span id="fastExc"></span></span>
+            <span class="x"><span class="k" id="fastKey">Fasting</span><span id="fastText">—</span><span id="fastDay"></span><span id="fastExc"></span><small class="sub hidden" id="fastSrc"></small></span>
           </div>
           <div class="mrow hidden" id="litRow">
             <span class="dot litdot" id="litDot"></span>
@@ -62,6 +62,7 @@
           </span>
         </div>
         <div id="readings"></div>
+        <p class="note rocornote hidden" id="rocorNote"></p>
         <section class="card others hidden" id="otherCard" data-sec="others">
           <div class="chead" id="otherHead" role="button" tabindex="0" aria-expanded="false">
             <p class="eyebrow">Other readings today</p><span class="count" id="otherCount"></span><span class="chev">▼</span>
@@ -77,7 +78,8 @@
           <p class="cpeek" id="commemPeek"></p>
           <div class="cbody">
             <ul id="commemList"></ul>
-            <p class="tattr hidden" id="commemSuppNote">✦ From the ROCOR calendar — parish supplement, cross-checked with OrthoChristian.</p>
+            <p class="tattr hidden" id="commemSuppNote">✦ Not in the daily data: added from the ROCOR calendar, or from the parish supplement (to be confirmed by Fr Dionysios).</p>
+            <p class="tattr hidden" id="commemHidden"></p>
             <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">The complete list of the day’s saints — OrthoChristian →</a>
             <div class="lives hidden" id="livesCard">
               <p class="eyebrow">Lives of the Saints</p>
@@ -89,7 +91,7 @@
 
         <a class="card erow" id="tdHymns" data-sec="hymns" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
           <span class="licon"><svg class="i"><use href="#i-note"/></svg></span>
-          <span class="ltxt">Troparia &amp; Kontakia of the Day<small>Holy Trinity Monastery, Jordanville · opens their calendar</small></span><span class="larr">›</span>
+          <span class="ltxt">Troparia &amp; Kontakia of the Day<small>Holy Trinity calendar — the one Jordanville shows on its website · opens for this date</small></span><span class="larr">›</span>
         </a>
 
         <a class="card erow" id="tdEvening" data-sec="prayers" href="https://www.myrrh-bearers.org/evening.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">

@@ -1,4 +1,4 @@
-/* Daily Readings — offline support (service worker), version 35, build 71131c05f4.
+/* Daily Readings — offline support (service worker), version 36, build 823edba0ed.
    Made by tools/build.py from src/sw.template.js: edit the template, not sw.js.
 
    What it keeps:
@@ -9,7 +9,7 @@
      TEXT_CACHE   KJV and Patriarchal Text, one file per book                } chapters are read or packages saved
    Day data (readings, saints, fasts) is kept by the page itself, not here. Nothing personal is ever stored here. */
 var PREFIX = "orthodox-readings-";
-var CACHE = PREFIX + "v35-71131c05f4";
+var CACHE = PREFIX + "v36-823edba0ed";
 var GREEK_CACHE = PREFIX + "greek-1";
 var TEXT_CACHE = PREFIX + "texts-1";
 var KEEP = [CACHE, GREEK_CACHE, TEXT_CACHE];

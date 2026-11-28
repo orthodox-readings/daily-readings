@@ -69,6 +69,11 @@
   window.__parseRef = parseRef;       // exposed for automated tests
   window.__paschaCivil = paschaCivil;
   window.__litKey = liturgicalKey;
+  window.__litInfo = litInfo;
+  window.__sourceFast = sourceFast;
+  window.__rocorAdjust = rocorAdjust;
+  window.__newMartyrsSunday = newMartyrsSunday;
+  window.__isMemorialOnly = isMemorialOnly;
   window.__fastRule = fastRule;
   window.__dayRule = dayRule;
   window.__seasonOf = seasonOf;

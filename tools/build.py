@@ -19,7 +19,7 @@ ships. The service worker's cache name carries both, so every change reaches ins
 """
 import hashlib, json, os, re, sys
 
-VERSION = "35"                       # the human version number shown in Settings
+VERSION = "36"                       # the human version number shown in Settings
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "src")
 

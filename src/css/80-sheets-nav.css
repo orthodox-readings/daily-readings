@@ -1,0 +1,68 @@
+  /* ---------- sheets ---------- */
+  .scrim{position:fixed;inset:0;z-index:40;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+  .sheet{background:var(--card);width:100%;max-width:560px;max-height:86vh;overflow:auto;border-radius:20px 20px 0 0;
+    padding:8px max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+    box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+  .sheet .grab{width:38px;height:4px;border-radius:4px;background:var(--line);margin:4px auto 8px}
+  .shead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .shead h3{flex:1;font:500 1.12rem/1.3 var(--serif);margin:0;min-width:0}
+  .shead .ibtn{margin-right:-10px}
+  .arow{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:13px 2px;border-top:1px solid var(--line);font-weight:600;font-size:.95rem}
+  .arow small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem}
+  .arow .i{color:var(--accent)}
+  .shead + .arow,.arow.first{border-top:0}
+  .sheet blockquote{margin:0 0 8px;padding:0 .2em 0 .35em;font:calc(1rem * var(--rs))/1.6 var(--serif);color:var(--ink);max-height:9.6em;overflow:auto;white-space:pre-line}  /* padding keeps a capital's breathing mark inside the scroll box */
+  .bkgrp{font:600 .68rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink);margin:14px 0 6px}
+  .bklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+  .bklist button{padding:11px 12px;border-radius:10px;background:var(--tint);text-align:left;font-size:.9rem;font-weight:500}
+  .bklist button.cur{box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent);font-weight:600}
+  .chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;margin-top:10px}
+  .chgrid button{aspect-ratio:1/1;border-radius:10px;background:var(--tint);font-weight:600;font-variant-numeric:tabular-nums}
+  .chgrid button.cur{background:var(--accent-fill);color:var(--on-accent)}
+  .svrow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+  .svrow .go{flex:1;min-width:0;text-align:left}
+  .svrow .go b{display:block;font:500 .95rem var(--serif)} .svrow .go span{display:block;font-size:.82rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .svrow .rm{color:var(--muted2);font-size:.8rem;padding:6px 4px}
+  .empty{color:var(--muted2);font-size:.88rem;padding:8px 0 4px}
+  .supName{font:500 1.08rem/1.35 var(--serif);margin:4px 0 2px}
+  .supSub{font-size:.84rem;color:var(--muted2);margin:0 0 12px}
+  .suprow{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+  .suplbl{width:74px;font:600 .68rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+  .supval{flex:1;font:600 1.05rem var(--sans);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .supcopy{font-size:.8rem;font-weight:600;color:var(--accent);padding:6px 12px;border:1px solid var(--line);border-radius:9px;min-width:62px;text-align:center}
+  span.supcopy{border:0}
+  .supcopy.done{background:var(--tint)}
+  .supnote{font-size:.82rem;color:var(--muted2);margin:12px 0 0}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 18px);z-index:60;
+    background:var(--ink);color:var(--bg);font-size:.86rem;font-weight:600;padding:9px 16px;border-radius:999px;box-shadow:var(--shadow);pointer-events:none}
+
+  /* ---------- bottom navigation ---------- */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);
+    padding:0 max(4px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(4px,env(safe-area-inset-left,0px))}
+  .tabs .in{display:flex;max-width:680px;margin:0 auto;height:var(--navh)}
+  .tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted2);position:relative;
+    font:500 .66rem/1 var(--sans);letter-spacing:.02em}
+  .tab span{white-space:nowrap}
+  .tab.active{color:var(--accent);font-weight:700}
+  .tab.active::before{content:"";position:absolute;top:0;left:50%;width:28px;margin-left:-14px;height:2.5px;border-radius:0 0 3px 3px;background:var(--gold)}
+
+
+  /* ---------- sheets v35: backup, restore, saved sayings, customise; calendar note ---------- */
+  .warn{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--c-wine);font-size:.86rem;line-height:1.5}
+  .bkcount{margin:0 0 12px;font-size:.9rem;line-height:1.5}
+  .bkmade{margin:0 0 4px;font-weight:600}
+  #backupBody .btn,#restoreBody > .btn{width:100%;margin-top:8px}
+  #backupBody .note{margin-top:10px}
+  .bkopts{margin:6px 0 4px}
+  .bkconfirm{margin-top:10px}
+  .bkconfirm .btn{margin-top:8px;width:100%}
+  .sqrow{padding:12px 0;border-top:1px solid var(--line)}
+  .sqrow:first-child{border-top:0}
+  .sqtext{font:400 calc(1.02rem * var(--rs))/1.6 var(--serif);margin:0}
+  .sqby{margin:8px 0 0;font-size:.85rem;font-weight:600}
+  .sqby small{display:block;font-weight:400;color:var(--muted2);font-size:.78rem}
+  .sqacts{display:flex;gap:18px;margin-top:4px}
+  #custList .srow:first-child{border-top:0}
+  #custList .srow .sl{flex:1;min-width:0;font-weight:600;font-size:.94rem;line-height:1.3}
+  #custList .srow .sl small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem;margin-top:2px}
+  .fnote{display:block;width:100%;margin-top:10px;font:inherit;font-size:.9rem;line-height:1.45;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical;min-height:64px}

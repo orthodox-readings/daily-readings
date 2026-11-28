@@ -1,0 +1,34 @@
+  /* ---------- Scripture (daily readings + reader) ---------- */
+  .rctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .seg.sm button{padding:5px 10px;min-height:30px}
+  .rctl .spacer{flex:1}
+  .reading{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  #readings{display:flex;flex-direction:column;gap:10px}
+  .reading .head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer}
+  .reading .head .h{flex:1;min-width:0}
+  .reading .src{font:600 .68rem/1.3 var(--sans);letter-spacing:.11em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:2px}
+  .reading .ref{font:500 1.06rem/1.3 var(--serif)}
+  .ver{font:600 .62rem/1 var(--sans);letter-spacing:.06em;color:var(--muted2);border:1px solid var(--line);border-radius:6px;padding:3px 5px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+  .reading.open .chev{transform:rotate(180deg)}
+  .reading .body{display:none;padding:2px 18px 16px;border-top:1px solid var(--line)}
+  .reading.open .body{display:block}
+  .v,.gk{font-family:var(--serif);font-size:calc(1.06rem * var(--rs));line-height:1.72;margin:.55em 0}
+  .gk{color:var(--gk);line-height:1.78}
+  .lang-par .v + .gk{margin-top:-.3em}
+  .v sup,.gk sup{font:600 .62em/1 var(--sans);color:var(--gold-ink);margin-right:.45em;vertical-align:.5em}
+  .lang-par .gk sup{display:none}
+  .lang-grc .v.haspair{display:none}
+  .lang-grc .gk{color:var(--ink)}
+  .rbody .v,.rbody .gk{font-size:calc(1.14rem * var(--rs))}
+  @media (min-width:680px){
+    .lang-par .txt.has-gk{display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start}
+    .lang-par .txt.has-gk .v{grid-column:1}
+    .lang-par .txt.has-gk .gk{grid-column:2;margin-top:.55em}
+    .lang-par .txt.has-gk .gknote,.lang-par .txt.has-gk .none{grid-column:1/-1}
+    .lang-par .vs.pair{display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start}
+    .lang-par .vs.pair .gk{margin-top:.55em}
+    body.tab-scripture.par .shell{max-width:980px}
+  }
+  .gknote,.none{font-size:.82rem;color:var(--muted2);font-style:italic;margin:.8em 0 0}
+  .reading .more{display:inline-block;margin-top:10px}
+

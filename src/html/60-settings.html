@@ -1,0 +1,105 @@
+    <!-- ======================= SETTINGS ======================= -->
+    <section class="view" id="view-settings" hidden>
+      <h2 class="vtitle">Settings</h2>
+      <section class="card set">
+        <p class="eyebrow">Appearance</p>
+        <div class="srow">
+          <span class="sl">Theme<small>Automatic follows your phone.</small></span>
+          <span class="seg" id="themeSeg" role="group" aria-label="Theme"><button data-theme="auto">Auto</button><button data-theme="light">Light</button><button data-theme="dark">Dark</button></span>
+        </div>
+        <div class="srow">
+          <span class="sl">Reading size<small id="scaleLbl">100%</small></span>
+          <span class="seg" id="setSizeSeg" role="group" aria-label="Reading size"><button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button></span>
+          <p class="sample" style="flex-basis:100%">Blessed are the pure in heart: for they shall see God. <span lang="grc">Μακάριοι οἱ καθαροὶ τῇ καρδίᾳ.</span></p>
+        </div>
+        <div class="srow">
+          <span class="sl">Today screen<small>Choose which sections appear on Today.</small></span>
+          <button class="btn soft" id="setCustomiseBtn">Customise</button>
+        </div>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">Reading</p>
+        <div class="srow">
+          <span class="sl">Language<small>English, Greek, or both together.</small></span>
+          <span class="seg" id="setLangSeg" role="group" aria-label="Language"><button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button></span>
+        </div>
+        <div class="srow">
+          <span class="sl">English text<small id="engTextLbl">King James Version (public domain). The New King James Version is paused until its publisher grants permission.</small></span>
+        </div>
+        <div class="srow col">
+          <span class="sl">Greek New Testament edition<small>Two separate editions. They are never mixed.</small></span>
+          <div id="gkEdOpts">
+            <button class="opt" data-ed="rp"><span class="rd"></span><span><b>Byzantine Textform</b><small>Robinson &amp; Pierpont, 2018. Fully accented (polytonic). Public domain.</small></span></button>
+            <button class="opt" data-ed="pt"><span class="rd"></span><span><b>Patriarchal Text</b><small>Antoniades, Constantinople 1904/1912 — the edition authorised by the Ecumenical Patriarchate. This transcription (Robinson &amp; Ala-Konni) is unaccented and in lower case. [Brackets] mark words the printed edition set in small type. Public domain.</small></span></button>
+          </div>
+        </div>
+        <div class="srow">
+          <span class="sl">Sayings awaiting review<small>Include the sayings of the Fathers whose source is not yet confirmed. They are marked when shown.</small></span>
+          <button class="switch" id="reviewQuotesSw" role="switch" aria-checked="false" aria-label="Include sayings awaiting review"><span></span></button>
+        </div>
+      </section>
+
+      <section class="card set" id="offlineCard">
+        <p class="eyebrow">Offline reading</p>
+        <p class="note setnote">Save texts on this device to read them without a connection — at church, travelling or at a monastery.</p>
+        <div id="pkgList"></div>
+        <p class="note setnote">Not yet available offline: the prayer book, the Psalter and the Old Testament — planned for later stages. The New King James Version cannot be saved: its licence does not allow it.</p>
+        <p class="note setnote" id="storageLbl"></p>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">Backup and restore</p>
+        <p class="note setnote">Your bookmarks, highlights, fasting notes, saved sayings, reading position and settings stay on this device. Save a backup file to keep them safe or move them to another phone.</p>
+        <div class="srow">
+          <span class="sl">Save a backup<small id="backupSub">The file holds your private notes and records. Keep it somewhere safe.</small></span>
+          <button class="btn soft" id="backupBtn"><svg class="i"><use href="#i-down"/></svg>Save</button>
+        </div>
+        <div class="srow">
+          <span class="sl">Restore from a backup<small>You choose whether to merge it with this device or replace what is here.</small></span>
+          <button class="btn soft" id="restoreBtn">Choose file</button>
+          <input type="file" id="restoreFile" class="vh" accept=".json,application/json" tabindex="-1" aria-hidden="true">
+        </div>
+        <div class="srow hidden" id="undoRow">
+          <span class="sl">Undo the last restore<small id="undoLbl"></small></span>
+          <button class="btn soft" id="undoBtn">Undo</button>
+        </div>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">Calendar</p>
+        <div class="srow col">
+          <div>
+            <button class="opt active" data-cal="julian"><span class="rd"></span><span><b>Old Calendar (Julian)</b><small>The Church calendar this app follows: feasts, fasts and readings in the Slavic tradition.</small></span></button>
+            <button class="opt" data-cal="revised" disabled aria-disabled="true"><span class="rd"></span><span><b>Revised Julian (New) Calendar</b><small>Not available. It needs its own verified tables of fixed feasts, fasts and readings — it cannot be made by shifting dates — so it is held for a later version.</small></span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">This app</p>
+        <div class="srow">
+          <span class="sl">Saved on this device<small id="dataLbl">—</small></span>
+        </div>
+        <div class="srow hidden" id="setInstallRow">
+          <span class="sl">Add to your home screen<small id="setInstallLbl">Opens like an app and works offline.</small></span>
+          <button class="btn soft hidden" id="setInstallBtn">Install</button>
+        </div>
+        <div class="srow hidden" id="logosRow"><a class="lrow first" id="logosLink" href="#" target="_blank" rel="noopener" style="padding:0"><span class="ltxt">Learn Biblical Greek — ΛΟΓΟΣ<small>A separate app for learning the Greek of the New Testament</small></span><span class="larr">›</span></a></div>
+        <div class="srow"><button class="lrow first" id="supportLink2" style="padding:0"><span class="ltxt">Support Holy Dormition, Corrimal<small>Bank details for a direct gift to the parish</small></span><span class="larr">›</span></button></div>
+        <details class="about" id="about" style="border-top:1px solid var(--line)"><summary>About &amp; sources</summary>
+          <p>Daily Readings is a companion for the daily readings, prayers, saints and fasts of the Orthodox Church on the Old Calendar. It does not replace the guidance of your priest or spiritual father, nor the services of the Church.</p>
+          <p>Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition. English Scripture: King James Version.</p>
+          <p>Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
+          <p id="nkjvNote" class="hidden">New King James Version® © 1982 Thomas Nelson.</p>
+          <p>Greek New Testament: Byzantine Textform, ed. Robinson &amp; Pierpont (2018) — public domain. Patriarchal Text of 1904/1912 (Antoniades), transcribed by M. A. Robinson &amp; J. Ala-Konni — public domain.</p>
+          <p>Sayings of the Fathers are a parish selection. Each shows its source where it has been confirmed; adapted wording is marked. Liturgical colours follow common Russian practice and are a guide only.</p>
+          <p class="eyebrow" style="margin-top:14px">Sources &amp; licences</p>
+          <div id="sourcesList"><p>Loading…</p></div>
+          <p><span id="stamp"></span><span id="verLbl"></span></p>
+        </details>
+      </section>
+    </section>
+  </main>
+</div>
+

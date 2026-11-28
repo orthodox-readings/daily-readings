@@ -1,0 +1,59 @@
+  /* ---------- Settings ---------- */
+  .set{padding:6px 18px}
+  .set .eyebrow{padding:12px 0 2px}
+  .srow{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+  .set .eyebrow + .srow{border-top:0}
+  .srow .sl{flex:1;min-width:150px;font-weight:600;font-size:.94rem;line-height:1.3}
+  .srow .sl small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem;margin-top:2px;line-height:1.45}
+  .srow.col{flex-direction:column;align-items:stretch}
+  .srow.col .sl{min-width:0}
+  .sample{font:calc(1.08rem * var(--rs))/1.6 var(--serif);margin:4px 0 0;color:var(--ink)}
+  .opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px}
+  .opt + .opt{margin-top:8px}
+  .opt.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+  .opt[disabled]{opacity:.55;cursor:default}
+  .opt .rd{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--muted);margin-top:2px;flex:none;position:relative}
+  .opt.active .rd{border-color:var(--accent)}
+  .opt.active .rd::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent)}
+  .opt b{display:block;font-size:.93rem} .opt small{display:block;color:var(--muted2);font-size:.8rem;line-height:1.45;margin-top:2px}
+  .about p{font-size:.84rem;line-height:1.55;color:var(--muted2);margin:0 0 10px}
+  .about summary{cursor:pointer;font-weight:600;font-size:.94rem;padding:13px 0;list-style:none}
+  .about summary::-webkit-details-marker{display:none}
+  .about summary::after{content:"+";float:right;color:var(--muted);font-weight:400}
+  .about[open] summary::after{content:"–"}
+
+
+  /* ---------- Settings v35: switches, offline packages, sources ---------- */
+  .setnote{margin:2px 0 10px}
+  .switch{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .2s}
+  .switch span{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s}
+  .switch[aria-checked="true"]{background:var(--accent-fill)}
+  .switch[aria-checked="true"] span{transform:translateX(18px)}
+  .pkg{padding:12px 0;border-top:1px solid var(--line)}
+  .pkg:first-child{border-top:0}
+  .pkrow{display:flex;align-items:center;gap:12px}
+  .pkrow .sl{flex:1;min-width:0;font-size:.94rem;line-height:1.3}
+  .pkrow .sl b{font-weight:600}
+  .pkrow .sl small{display:block;color:var(--muted2);font-size:.8rem;margin-top:2px;line-height:1.45}
+  .pkg .pkrow .sl .pkstat{color:var(--ink)}
+  .pkg.ok .pkstat::before{content:"✓ ";color:var(--k-free);font-weight:700}
+  .pkbtn{flex:none;min-width:92px}
+  .pkbtn[disabled]{opacity:.6;cursor:default}
+  .pkbar{height:6px;border-radius:999px;background:var(--tint2);overflow:hidden;margin-top:10px}
+  .pkbar i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+  .pkrm{font-size:.8rem;padding:6px 0 0;min-height:30px;color:var(--muted2)}
+  .pkconfirm{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--tint);font-size:.86rem;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .pkconfirm span{flex-basis:100%}
+  .pkconfirm .btn{min-height:38px;padding:6px 14px}
+  .pkconfirm .btn.soft{background:var(--card);border:1px solid var(--line)}
+  .srcitem{border-top:1px solid var(--line)}
+  .srcitem summary{list-style:none;cursor:pointer;padding:10px 0;display:flex;gap:8px;align-items:baseline;font-size:.86rem;font-weight:600;color:var(--ink)}
+  .srcitem summary::-webkit-details-marker{display:none}
+  .srcitem .stitle{flex:1;min-width:0}
+  .stag{font:600 .6rem/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);border:1px solid var(--line);border-radius:999px;padding:3px 7px;flex:none;max-width:45%;text-align:center}
+  .stag.paused{color:var(--k-strict);border-color:var(--k-strict)}
+  .about .srcitem .sline{margin:0 0 6px;font-size:.8rem}
+  .about .srcitem .sline b{color:var(--ink);font-weight:600}
+  .about .srcitem[open]{padding-bottom:8px}
+  .about .srcitem summary::after{content:"+";float:none;flex:none;color:var(--muted);font-weight:400;margin-left:4px}
+  .about .srcitem[open] summary::after{content:"–"}

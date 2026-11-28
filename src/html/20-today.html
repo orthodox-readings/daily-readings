@@ -1,0 +1,127 @@
+    <!-- ======================= TODAY ======================= -->
+    <!-- Order (brief §3): A date & season · B daily reading · C Wisdom of the Fathers · D what the reader chose to add -->
+    <section class="view" id="view-today">
+      <div class="install hidden" id="installBanner">
+        <span class="itxt" id="installTxt">Keep Daily Readings with you — add it to your home screen.</span>
+        <button class="ibtn2" id="installGo">Install</button>
+        <button class="ix" id="installNo" aria-label="Dismiss">✕</button>
+      </div>
+
+      <!-- A. Liturgical date and season -->
+      <section class="card day" id="dayCard">
+        <div class="dayNav">
+          <button id="prev" class="hbtn" aria-label="Previous day">‹</button>
+          <div class="dayHead">
+            <h1 class="date" id="date" title="Open the calendar">—</h1>
+            <p class="altdate" id="altdate"></p>
+          </div>
+          <button id="next" class="hbtn" aria-label="Next day">›</button>
+        </div>
+        <p class="summary" id="summary"></p>
+        <div class="dayMeta">
+          <div class="mrow" id="seasonRow">
+            <span class="dot seasondot" id="tdSeasonDot"></span>
+            <span class="x"><span class="k">Season</span><span id="tdSeason">—</span><small class="sub" id="tdSeasonSub"></small></span>
+          </div>
+          <div class="mrow faststrip hidden" id="fastWrap">
+            <span class="dot" id="fastDot"></span>
+            <span class="x"><span class="k" id="fastKey">Fasting</span><span id="fastText">—</span><span id="fastDay"></span><span id="fastExc"></span></span>
+          </div>
+          <div class="mrow hidden" id="litRow">
+            <span class="dot litdot" id="litDot"></span>
+            <span class="x"><span class="k">Liturgical colour</span><span id="litText"></span></span>
+          </div>
+          <div class="mrow" id="trackerRow" data-sec="tracker"><span class="x tracker" id="tracker"></span></div>
+        </div>
+        <div class="dayActs">
+          <button id="today" class="btn hidden">Return to today</button>
+          <button id="calBtn" class="btn ghost"><svg class="i"><use href="#i-cal"/></svg>Calendar</button>
+          <button id="shareBtn" class="btn ghost"><svg class="i"><use href="#i-share"/></svg>Share</button>
+        </div>
+      </section>
+      <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
+
+      <div class="banner offline" id="offlineBanner" role="status"></div>
+      <div class="banner error" id="errorBanner" role="status"></div>
+      <div id="loading" class="loading"><div class="spin"></div>Loading the day’s readings…</div>
+
+      <div id="content" class="hidden">
+        <!-- B. Daily reading: morning prayers → Epistle → Gospel → saints → hymns → evening prayers -->
+        <div class="sechead" id="scriptureHead"><p class="eyebrow">Daily Reading</p><button class="linkbtn hidden" id="openAllBtn">Open all</button>
+          <span class="seg sm" id="sizeSeg" role="group" aria-label="Reading size"><button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button></span>
+        </div>
+
+        <a class="card erow" id="tdMorning" data-sec="prayers" href="https://www.myrrh-bearers.org/morning.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          <span class="licon"><svg class="i"><use href="#i-candle"/></svg></span>
+          <span class="ltxt">Morning Prayers<small>Holy Myrrh-bearers · opens their website</small></span><span class="larr">›</span>
+        </a>
+
+        <div class="rctl hidden" id="readingsCtl">
+          <span class="seg" id="langSeg" role="group" aria-label="Language">
+            <button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button>
+          </span>
+        </div>
+        <div id="readings"></div>
+        <section class="card others hidden" id="otherCard" data-sec="others">
+          <div class="chead" id="otherHead" role="button" tabindex="0" aria-expanded="false">
+            <p class="eyebrow">Other readings today</p><span class="count" id="otherCount"></span><span class="chev">▼</span>
+          </div>
+          <div class="cbody" id="otherReadings"></div>
+        </section>
+        <p class="note hidden" id="gkEdNote"></p>
+
+        <section class="card commem hidden" id="commemCard" data-sec="saints">
+          <div class="chead" id="commemHead" role="button" tabindex="0" aria-expanded="false">
+            <p class="eyebrow">Saints of the Day</p><span class="count" id="commemCount"></span><span class="chev">▼</span>
+          </div>
+          <p class="cpeek" id="commemPeek"></p>
+          <div class="cbody">
+            <ul id="commemList"></ul>
+            <p class="tattr hidden" id="commemSuppNote">✦ From the ROCOR calendar — parish supplement, cross-checked with OrthoChristian.</p>
+            <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">The complete list of the day’s saints — OrthoChristian →</a>
+            <div class="lives hidden" id="livesCard">
+              <p class="eyebrow">Lives of the Saints</p>
+              <div id="livesList"></div>
+              <p class="tattr">Lives by John Brady (Abbamoses.com), with permission.</p>
+            </div>
+          </div>
+        </section>
+
+        <a class="card erow" id="tdHymns" data-sec="hymns" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          <span class="licon"><svg class="i"><use href="#i-note"/></svg></span>
+          <span class="ltxt">Troparia &amp; Kontakia of the Day<small>Holy Trinity Monastery, Jordanville · opens their calendar</small></span><span class="larr">›</span>
+        </a>
+
+        <a class="card erow" id="tdEvening" data-sec="prayers" href="https://www.myrrh-bearers.org/evening.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          <span class="licon"><svg class="i"><use href="#i-moon"/></svg></span>
+          <span class="ltxt">Evening Prayers<small>Prayers before sleep · Holy Myrrh-bearers</small></span><span class="larr">›</span>
+        </a>
+
+        <!-- C. Wisdom of the Fathers -->
+        <section class="card quote hidden" id="quoteCard" data-sec="wisdom">
+          <div class="qhead">
+            <p class="eyebrow">Wisdom of the Fathers</p>
+            <button class="ibtn" id="quoteFav" aria-label="Save this saying" aria-pressed="false"><svg class="i"><use href="#i-heart"/></svg></button>
+            <button class="ibtn" id="quoteShare" aria-label="Share this saying"><svg class="i"><use href="#i-share"/></svg></button>
+          </div>
+          <p class="qtext" id="quoteText"></p>
+          <button class="linkbtn hidden" id="quoteMore">Read the whole saying</button>
+          <div class="qrule"></div>
+          <p class="qby" id="quoteBy"></p>
+          <p class="qstatus hidden" id="quoteStatus">Source awaiting review</p>
+        </section>
+
+        <!-- D. Further sections the reader can show or hide (Customise Today) -->
+        <section class="card hidden" id="notesCard" data-sec="notes">
+          <p class="eyebrow">Service Notes</p>
+          <div id="notesText"></div>
+        </section>
+
+        <button class="card lrow first" id="toPrayer" data-sec="more" style="padding:14px 18px">
+          <span class="licon"><svg class="i"><use href="#i-book"/></svg></span>
+          <span class="ltxt">More for this day<small>St Theophan, the Prologue of Ohrid, service texts</small></span><span class="larr">›</span>
+        </button>
+        <div class="custrow"><button class="linkbtn" id="customiseBtn">Customise Today</button></div>
+      </div>
+    </section>
+

@@ -1,0 +1,82 @@
+<!-- ======================= bottom navigation ======================= -->
+<nav class="tabs" id="tabs" aria-label="Sections">
+  <div class="in">
+    <button class="tab active" data-tab="today" aria-current="page"><svg class="i"><use href="#i-today"/></svg><span>Today</span></button>
+    <button class="tab" data-tab="calendar"><svg class="i"><use href="#i-cal"/></svg><span>Calendar</span></button>
+    <button class="tab" data-tab="scripture"><svg class="i"><use href="#i-book"/></svg><span>Scripture</span></button>
+    <button class="tab" data-tab="prayer"><svg class="i"><use href="#i-candle"/></svg><span>Prayer</span></button>
+    <button class="tab" data-tab="settings"><svg class="i"><use href="#i-set"/></svg><span>Settings</span></button>
+  </div>
+</nav>
+
+<!-- ======================= sheets ======================= -->
+<div class="scrim hidden" id="shareMenu"><div class="sheet" role="dialog" aria-label="Share">
+  <div class="grab"></div>
+  <div class="shead"><h3 id="shareTitle">Share</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <button class="arow" data-ctx="day" id="shareTextBtn"><svg class="i"><use href="#i-text"/></svg><span>As text<small>Date, saints, fast &amp; readings</small></span></button>
+  <button class="arow" data-ctx="day" id="shareDayBtn"><svg class="i"><use href="#i-img"/></svg><span>As an image<small>Date, feast &amp; fast on a square card</small></span></button>
+  <button class="arow" data-ctx="quote" id="shareWisdomBtn"><svg class="i"><use href="#i-img"/></svg><span>As an image<small>The saying on a square card</small></span></button>
+  <button class="arow" data-ctx="quote" id="shareQuoteTextBtn"><svg class="i"><use href="#i-text"/></svg><span>As text<small>The saying with its attribution</small></span></button>
+  <button class="arow" data-ctx="quote" id="copyQuoteBtn"><svg class="i"><use href="#i-copy"/></svg><span>Copy<small>To paste anywhere</small></span></button>
+</div></div>
+
+<div class="scrim hidden" id="supportOverlay"><div class="sheet supPanel" role="dialog" aria-label="Support the parish">
+  <div class="grab"></div>
+  <div class="shead"><h3>Support the Parish</h3><button class="ibtn" id="supClose" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="supName">Russian Orthodox Church Abroad<br>Wollongong Parish</p>
+  <p class="supSub">Holy Dormition of the Mother of God, Corrimal</p>
+  <div class="suprow"><span class="suplbl">Bank</span><span class="supval">Westpac</span><span class="supcopy"></span></div>
+  <div class="suprow"><span class="suplbl">BSB</span><span class="supval">032-695</span><button class="supcopy" data-copy="032695">Copy</button></div>
+  <div class="suprow"><span class="suplbl">Account</span><span class="supval">458 013</span><button class="supcopy" data-copy="458013">Copy</button></div>
+  <p class="supnote">A direct bank transfer — every dollar goes to the parish. Please use your name as the payment reference.</p>
+  <p class="supnote"><a href="https://wollongong.cerkov.ru/" target="_blank" rel="noopener noreferrer">Parish website →</a></p>
+</div></div>
+
+<div class="scrim hidden" id="pickSheet"><div class="sheet" role="dialog" aria-label="Choose a book and chapter">
+  <div class="grab"></div>
+  <div class="shead"><button class="linkbtn hidden" id="pickBack">‹ Books</button><h3 id="pickTitle">New Testament</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="pickBody"></div>
+</div></div>
+
+<div class="scrim hidden" id="verseSheet"><div class="sheet" role="dialog" aria-label="Verse">
+  <div class="grab"></div>
+  <div class="shead"><h3 id="vsRef">—</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <blockquote id="vsText"></blockquote>
+  <button class="arow" id="vsCopy"><svg class="i"><use href="#i-copy"/></svg><span>Copy</span></button>
+  <button class="arow" id="vsShare"><svg class="i"><use href="#i-share"/></svg><span>Share</span></button>
+  <button class="arow" id="vsMark"><svg class="i"><use href="#i-mark"/></svg><span id="vsMarkTxt">Bookmark</span></button>
+  <button class="arow" id="vsHl"><svg class="i"><use href="#i-pen"/></svg><span id="vsHlTxt">Highlight</span></button>
+</div></div>
+
+<div class="scrim hidden" id="savedSheet"><div class="sheet" role="dialog" aria-label="Bookmarks and highlights">
+  <div class="grab"></div>
+  <div class="shead"><h3>Saved verses</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="savedBody"></div>
+</div></div>
+
+<div class="scrim hidden" id="customiseSheet"><div class="sheet" role="dialog" aria-label="Customise Today">
+  <div class="grab"></div>
+  <div class="shead"><h3>Customise Today</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="note" style="margin:0 0 6px">The date, season, fast and the Epistle and Gospel always appear. Choose the rest.</p>
+  <div id="custList"></div>
+</div></div>
+
+<div class="scrim hidden" id="savedQuotesSheet"><div class="sheet" role="dialog" aria-label="Saved sayings">
+  <div class="grab"></div>
+  <div class="shead"><h3>Saved sayings</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="savedQuotesBody"></div>
+</div></div>
+
+<div class="scrim hidden" id="backupSheet"><div class="sheet" role="dialog" aria-label="Save a backup">
+  <div class="grab"></div>
+  <div class="shead"><h3>Save a backup</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="backupBody"></div>
+</div></div>
+
+<div class="scrim hidden" id="restoreSheet"><div class="sheet" role="dialog" aria-label="Restore from a backup">
+  <div class="grab"></div>
+  <div class="shead"><h3>Restore from a backup</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="restoreBody"></div>
+</div></div>
+
+<div class="toast hidden" id="toast" role="status"></div>

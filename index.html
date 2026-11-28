@@ -160,6 +160,30 @@
   .qby small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem;margin-top:1px}
   .qrule{width:36px;height:1px;background:var(--gold);margin:14px 0 0}
 
+
+  /* ---------- Today v35: season, linked rows, other readings, saved sayings, customise ---------- */
+  #tdSeason{font-weight:600}
+  .mrow .sub{display:block;color:var(--muted2);font-size:.82rem;margin-top:1px}
+  .erow{display:flex;align-items:center;gap:14px;padding:12px 16px;text-decoration:none;color:var(--ink)}
+  .erow:active{background:var(--tint)}
+  .others{padding:14px 16px}
+  .others .chead{display:flex;align-items:center;gap:10px;cursor:pointer;margin:-2px 0}
+  .others .chead .eyebrow{flex:1}
+  .others .count{font-size:.8rem;color:var(--muted2)}
+  .others.open .chev{transform:rotate(180deg)}
+  .others .cbody{display:none;margin-top:12px;flex-direction:column;gap:10px}
+  .others.open .cbody{display:flex}
+  .others .reading{box-shadow:none}
+  .cpeek{margin:6px 0 0;font-size:.9rem;color:var(--muted2);line-height:1.45}
+  .cpeek:empty,.commem.open .cpeek{display:none}
+  .commem .lives{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .quote .qhead .ibtn{margin:-10px 0}
+  .quote .qhead .ibtn:last-child{margin-right:-10px}
+  #quoteFav.on{color:var(--accent)}
+  #quoteFav.on svg{fill:currentColor}
+  .qstatus{margin:8px 0 0;font:600 .66rem/1.3 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+  .custrow{text-align:center;margin-top:-6px}
+  .netchip{font:600 .62rem/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);border:1px solid var(--line);border-radius:999px;padding:5px 8px;flex:none}
   /* ---------- Scripture (daily readings + reader) ---------- */
   .rctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
   .seg.sm button{padding:5px 10px;min-height:30px}
@@ -335,6 +359,41 @@
   .about summary::after{content:"+";float:right;color:var(--muted);font-weight:400}
   .about[open] summary::after{content:"–"}
 
+
+  /* ---------- Settings v35: switches, offline packages, sources ---------- */
+  .setnote{margin:2px 0 10px}
+  .switch{width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .2s}
+  .switch span{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--card);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .2s}
+  .switch[aria-checked="true"]{background:var(--accent-fill)}
+  .switch[aria-checked="true"] span{transform:translateX(18px)}
+  .pkg{padding:12px 0;border-top:1px solid var(--line)}
+  .pkg:first-child{border-top:0}
+  .pkrow{display:flex;align-items:center;gap:12px}
+  .pkrow .sl{flex:1;min-width:0;font-size:.94rem;line-height:1.3}
+  .pkrow .sl b{font-weight:600}
+  .pkrow .sl small{display:block;color:var(--muted2);font-size:.8rem;margin-top:2px;line-height:1.45}
+  .pkg .pkrow .sl .pkstat{color:var(--ink)}
+  .pkg.ok .pkstat::before{content:"✓ ";color:var(--k-free);font-weight:700}
+  .pkbtn{flex:none;min-width:92px}
+  .pkbtn[disabled]{opacity:.6;cursor:default}
+  .pkbar{height:6px;border-radius:999px;background:var(--tint2);overflow:hidden;margin-top:10px}
+  .pkbar i{display:block;height:100%;width:0;background:var(--gold);transition:width .2s}
+  .pkrm{font-size:.8rem;padding:6px 0 0;min-height:30px;color:var(--muted2)}
+  .pkconfirm{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--tint);font-size:.86rem;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .pkconfirm span{flex-basis:100%}
+  .pkconfirm .btn{min-height:38px;padding:6px 14px}
+  .pkconfirm .btn.soft{background:var(--card);border:1px solid var(--line)}
+  .srcitem{border-top:1px solid var(--line)}
+  .srcitem summary{list-style:none;cursor:pointer;padding:10px 0;display:flex;gap:8px;align-items:baseline;font-size:.86rem;font-weight:600;color:var(--ink)}
+  .srcitem summary::-webkit-details-marker{display:none}
+  .srcitem .stitle{flex:1;min-width:0}
+  .stag{font:600 .6rem/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted2);border:1px solid var(--line);border-radius:999px;padding:3px 7px;flex:none;max-width:45%;text-align:center}
+  .stag.paused{color:var(--k-strict);border-color:var(--k-strict)}
+  .about .srcitem .sline{margin:0 0 6px;font-size:.8rem}
+  .about .srcitem .sline b{color:var(--ink);font-weight:600}
+  .about .srcitem[open]{padding-bottom:8px}
+  .about .srcitem summary::after{content:"+";float:none;flex:none;color:var(--muted);font-weight:400;margin-left:4px}
+  .about .srcitem[open] summary::after{content:"–"}
   /* ---------- sheets ---------- */
   .scrim{position:fixed;inset:0;z-index:40;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
   .sheet{background:var(--card);width:100%;max-width:560px;max-height:86vh;overflow:auto;border-radius:20px 20px 0 0;
@@ -383,6 +442,26 @@
   .tab.active{color:var(--accent);font-weight:700}
   .tab.active::before{content:"";position:absolute;top:0;left:50%;width:28px;margin-left:-14px;height:2.5px;border-radius:0 0 3px 3px;background:var(--gold)}
 
+
+  /* ---------- sheets v35: backup, restore, saved sayings, customise; calendar note ---------- */
+  .warn{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--c-wine);font-size:.86rem;line-height:1.5}
+  .bkcount{margin:0 0 12px;font-size:.9rem;line-height:1.5}
+  .bkmade{margin:0 0 4px;font-weight:600}
+  #backupBody .btn,#restoreBody > .btn{width:100%;margin-top:8px}
+  #backupBody .note{margin-top:10px}
+  .bkopts{margin:6px 0 4px}
+  .bkconfirm{margin-top:10px}
+  .bkconfirm .btn{margin-top:8px;width:100%}
+  .sqrow{padding:12px 0;border-top:1px solid var(--line)}
+  .sqrow:first-child{border-top:0}
+  .sqtext{font:400 calc(1.02rem * var(--rs))/1.6 var(--serif);margin:0}
+  .sqby{margin:8px 0 0;font-size:.85rem;font-weight:600}
+  .sqby small{display:block;font-weight:400;color:var(--muted2);font-size:.78rem}
+  .sqacts{display:flex;gap:18px;margin-top:4px}
+  #custList .srow:first-child{border-top:0}
+  #custList .srow .sl{flex:1;min-width:0;font-weight:600;font-size:.94rem;line-height:1.3}
+  #custList .srow .sl small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem;margin-top:2px}
+  .fnote{display:block;width:100%;margin-top:10px;font:inherit;font-size:.9rem;line-height:1.45;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical;min-height:64px}
   @media (max-width:360px){
     .top{gap:8px} .top .ibtn{width:36px;height:36px} .brand .t{font-size:1.2rem} .brand .s{font-size:.72rem}
   }
@@ -440,12 +519,14 @@
       <p class="t">Daily Readings</p>
       <p class="s">Your daily spiritual companion.</p>
     </div>
+    <span class="netchip hidden" id="netChip" role="status">Offline</span>
     <button class="ibtn" id="themeBtn" aria-label="Switch between light and dark"><svg class="i"><use href="#i-moon"/></svg></button>
     <button class="ibtn" id="setBtn" aria-label="Settings"><svg class="i"><use href="#i-set"/></svg></button>
   </header>
 
   <main id="app">
     <!-- ======================= TODAY ======================= -->
+    <!-- Order (brief §3): A date & season · B daily reading · C Wisdom of the Fathers · D what the reader chose to add -->
     <section class="view" id="view-today">
       <div class="install hidden" id="installBanner">
         <span class="itxt" id="installTxt">Keep Daily Readings with you — add it to your home screen.</span>
@@ -453,6 +534,7 @@
         <button class="ix" id="installNo" aria-label="Dismiss">✕</button>
       </div>
 
+      <!-- A. Liturgical date and season -->
       <section class="card day" id="dayCard">
         <div class="dayNav">
           <button id="prev" class="hbtn" aria-label="Previous day">‹</button>
@@ -464,15 +546,19 @@
         </div>
         <p class="summary" id="summary"></p>
         <div class="dayMeta">
+          <div class="mrow" id="seasonRow">
+            <span class="dot seasondot" id="tdSeasonDot"></span>
+            <span class="x"><span class="k">Season</span><span id="tdSeason">—</span><small class="sub" id="tdSeasonSub"></small></span>
+          </div>
           <div class="mrow faststrip hidden" id="fastWrap">
             <span class="dot" id="fastDot"></span>
-            <span class="x"><span class="k" id="fastKey">Fasting today</span><span id="fastText">—</span><span id="fastDay"></span><span id="fastExc"></span></span>
+            <span class="x"><span class="k" id="fastKey">Fasting</span><span id="fastText">—</span><span id="fastDay"></span><span id="fastExc"></span></span>
           </div>
           <div class="mrow hidden" id="litRow">
             <span class="dot litdot" id="litDot"></span>
             <span class="x"><span class="k">Liturgical colour</span><span id="litText"></span></span>
           </div>
-          <div class="mrow"><span class="x tracker" id="tracker"></span></div>
+          <div class="mrow" id="trackerRow" data-sec="tracker"><span class="x tracker" id="tracker"></span></div>
         </div>
         <div class="dayActs">
           <button id="today" class="btn hidden">Return to today</button>
@@ -482,63 +568,87 @@
       </section>
       <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
 
-      <div class="banner offline" id="offlineBanner">Showing your saved copy — you appear to be offline.</div>
-      <div class="banner error" id="errorBanner"></div>
+      <div class="banner offline" id="offlineBanner" role="status"></div>
+      <div class="banner error" id="errorBanner" role="status"></div>
       <div id="loading" class="loading"><div class="spin"></div>Loading the day’s readings…</div>
 
       <div id="content" class="hidden">
-        <section class="card quote hidden" id="quoteCard">
+        <!-- B. Daily reading: morning prayers → Epistle → Gospel → saints → hymns → evening prayers -->
+        <div class="sechead" id="scriptureHead"><p class="eyebrow">Daily Reading</p><button class="linkbtn hidden" id="openAllBtn">Open all</button>
+          <span class="seg sm" id="sizeSeg" role="group" aria-label="Reading size"><button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button></span>
+        </div>
+
+        <a class="card erow" id="tdMorning" data-sec="prayers" href="https://www.myrrh-bearers.org/morning.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          <span class="licon"><svg class="i"><use href="#i-candle"/></svg></span>
+          <span class="ltxt">Morning Prayers<small>Holy Myrrh-bearers · opens their website</small></span><span class="larr">›</span>
+        </a>
+
+        <div class="rctl hidden" id="readingsCtl">
+          <span class="seg" id="langSeg" role="group" aria-label="Language">
+            <button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button>
+          </span>
+        </div>
+        <div id="readings"></div>
+        <section class="card others hidden" id="otherCard" data-sec="others">
+          <div class="chead" id="otherHead" role="button" tabindex="0" aria-expanded="false">
+            <p class="eyebrow">Other readings today</p><span class="count" id="otherCount"></span><span class="chev">▼</span>
+          </div>
+          <div class="cbody" id="otherReadings"></div>
+        </section>
+        <p class="note hidden" id="gkEdNote"></p>
+
+        <section class="card commem hidden" id="commemCard" data-sec="saints">
+          <div class="chead" id="commemHead" role="button" tabindex="0" aria-expanded="false">
+            <p class="eyebrow">Saints of the Day</p><span class="count" id="commemCount"></span><span class="chev">▼</span>
+          </div>
+          <p class="cpeek" id="commemPeek"></p>
+          <div class="cbody">
+            <ul id="commemList"></ul>
+            <p class="tattr hidden" id="commemSuppNote">✦ From the ROCOR calendar — parish supplement, cross-checked with OrthoChristian.</p>
+            <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">The complete list of the day’s saints — OrthoChristian →</a>
+            <div class="lives hidden" id="livesCard">
+              <p class="eyebrow">Lives of the Saints</p>
+              <div id="livesList"></div>
+              <p class="tattr">Lives by John Brady (Abbamoses.com), with permission.</p>
+            </div>
+          </div>
+        </section>
+
+        <a class="card erow" id="tdHymns" data-sec="hymns" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          <span class="licon"><svg class="i"><use href="#i-note"/></svg></span>
+          <span class="ltxt">Troparia &amp; Kontakia of the Day<small>Holy Trinity Monastery, Jordanville · opens their calendar</small></span><span class="larr">›</span>
+        </a>
+
+        <a class="card erow" id="tdEvening" data-sec="prayers" href="https://www.myrrh-bearers.org/evening.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">
+          <span class="licon"><svg class="i"><use href="#i-moon"/></svg></span>
+          <span class="ltxt">Evening Prayers<small>Prayers before sleep · Holy Myrrh-bearers</small></span><span class="larr">›</span>
+        </a>
+
+        <!-- C. Wisdom of the Fathers -->
+        <section class="card quote hidden" id="quoteCard" data-sec="wisdom">
           <div class="qhead">
             <p class="eyebrow">Wisdom of the Fathers</p>
+            <button class="ibtn" id="quoteFav" aria-label="Save this saying" aria-pressed="false"><svg class="i"><use href="#i-heart"/></svg></button>
             <button class="ibtn" id="quoteShare" aria-label="Share this saying"><svg class="i"><use href="#i-share"/></svg></button>
           </div>
           <p class="qtext" id="quoteText"></p>
           <button class="linkbtn hidden" id="quoteMore">Read the whole saying</button>
           <div class="qrule"></div>
           <p class="qby" id="quoteBy"></p>
+          <p class="qstatus hidden" id="quoteStatus">Source awaiting review</p>
         </section>
 
-        <div class="sechead" id="scriptureHead"><p class="eyebrow">Holy Scripture</p><button class="linkbtn hidden" id="openAllBtn">Open all</button>
-          <span class="seg sm" id="sizeSeg" role="group" aria-label="Reading size"><button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button></span>
-        </div>
-        <div class="rctl hidden" id="readingsCtl">
-          <span class="seg" id="langSeg" role="group" aria-label="Language">
-            <button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button>
-          </span>
-          <span class="seg" id="txtSeg" role="group" aria-label="English translation">
-            <button data-txt="kjv">KJV</button><button data-txt="nkjv" class="active">NKJV</button>
-          </span>
-        </div>
-        <div id="readings"></div>
-        <p class="note hidden" id="gkEdNote"></p>
-
-        <div class="sechead hidden" id="saintsHead"><p class="eyebrow">Saints of the Day</p></div>
-        <section class="card commem hidden" id="commemCard">
-          <div class="chead" id="commemHead" role="button" tabindex="0" aria-expanded="false">
-            <p class="eyebrow">Commemorations</p><span class="count" id="commemCount"></span><span class="chev">▼</span>
-          </div>
-          <div class="cbody">
-            <ul id="commemList"></ul>
-            <p class="tattr hidden" id="commemSuppNote">✦ From the ROCOR calendar — parish supplement, cross-checked with OrthoChristian.</p>
-            <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">The complete list of the day’s saints — OrthoChristian →</a>
-          </div>
-        </section>
-
-        <section class="card lives hidden" id="livesCard">
-          <p class="eyebrow">Lives of the Saints</p>
-          <div id="livesList"></div>
-          <p class="tattr">Lives by John Brady (Abbamoses.com), with permission.</p>
-        </section>
-
-        <section class="card hidden" id="notesCard">
+        <!-- D. Further sections the reader can show or hide (Customise Today) -->
+        <section class="card hidden" id="notesCard" data-sec="notes">
           <p class="eyebrow">Service Notes</p>
           <div id="notesText"></div>
         </section>
 
-        <button class="card lrow first" id="toPrayer" style="padding:14px 18px">
-          <span class="licon"><svg class="i"><use href="#i-candle"/></svg></span>
-          <span class="ltxt">Prayers &amp; study for this day<small>Daily prayers, the Prologue, St Theophan</small></span><span class="larr">›</span>
+        <button class="card lrow first" id="toPrayer" data-sec="more" style="padding:14px 18px">
+          <span class="licon"><svg class="i"><use href="#i-book"/></svg></span>
+          <span class="ltxt">More for this day<small>St Theophan, the Prologue of Ohrid, service texts</small></span><span class="larr">›</span>
         </button>
+        <div class="custrow"><button class="linkbtn" id="customiseBtn">Customise Today</button></div>
       </div>
     </section>
 
@@ -596,6 +706,8 @@
           <div class="seg" id="logSeg" role="group" aria-label="My fasting note for this day">
             <button data-log="k">Kept</button><button data-log="p">In part</button><button data-log="">No note</button>
           </div>
+          <label class="vh" for="fastNoteText">A private note for this day</label>
+          <textarea id="fastNoteText" class="fnote" maxlength="500" rows="2" placeholder="A private note for this day (optional)"></textarea>
         </div>
       </section>
 
@@ -606,7 +718,7 @@
           <div class="prog" role="img" id="seasonProg" aria-label="How far through the fasting season"><i id="seasonBar" style="width:0%"></i></div>
         </div>
         <p class="fsum" id="logSum"></p>
-        <p class="note" style="margin:12px 0 0">The colours show the general rule of the Church — open a day for its precise fast. Your notes stay on this device and are seen by no one else. Personal fasting should be guided by your spiritual father.</p>
+        <p class="note" style="margin:12px 0 0">The colours show the Church’s general rule, as kept in monasteries — open a day for its precise fast. It does not apply in the same way to everyone: personal fasting should be guided by your spiritual father, taking account of health and circumstances. Your notes stay on this device and are seen by no one else.</p>
       </section>
     </section>
 
@@ -657,10 +769,14 @@
         <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg class="i"><use href="#i-note"/></svg></span><span class="ltxt">Full Service Texts<small>Church Slavonic · azbyka.ru</small></span><span class="larr">›</span></a></span>
       </section>
       <section class="card rows">
+        <p class="eyebrow">For reflection</p>
+        <button class="lrow" id="savedQuotesLink"><span class="licon"><svg class="i"><use href="#i-heart"/></svg></span><span class="ltxt">Saved sayings of the Fathers<small id="savedQuotesSub">Sayings you have saved from Today</small></span><span class="larr">›</span></button>
+      </section>
+      <section class="card rows">
         <p class="eyebrow">The parish</p>
         <button class="lrow" id="supportLink"><span class="licon"><svg class="i"><use href="#i-heart"/></svg></span><span class="ltxt">Support Holy Dormition, Corrimal<small>Bank details for a direct gift to the parish</small></span><span class="larr">›</span></button>
       </section>
-      <p class="note">These rows open the source’s own website in your browser.</p>
+      <p class="note">The prayer and study rows open the source’s own website. A full prayer book inside the app is the next stage of development. A personal rule of prayer is best kept with the guidance of your spiritual father.</p>
     </section>
 
     <!-- ======================= SETTINGS ======================= -->
@@ -677,6 +793,10 @@
           <span class="seg" id="setSizeSeg" role="group" aria-label="Reading size"><button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button></span>
           <p class="sample" style="flex-basis:100%">Blessed are the pure in heart: for they shall see God. <span lang="grc">Μακάριοι οἱ καθαροὶ τῇ καρδίᾳ.</span></p>
         </div>
+        <div class="srow">
+          <span class="sl">Today screen<small>Choose which sections appear on Today.</small></span>
+          <button class="btn soft" id="setCustomiseBtn">Customise</button>
+        </div>
       </section>
 
       <section class="card set">
@@ -686,8 +806,7 @@
           <span class="seg" id="setLangSeg" role="group" aria-label="Language"><button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button></span>
         </div>
         <div class="srow">
-          <span class="sl">English text of the daily readings<small>The Scripture reader uses the King James Version.</small></span>
-          <span class="seg" id="setTxtSeg" role="group" aria-label="English translation"><button data-txt="kjv">KJV</button><button data-txt="nkjv">NKJV</button></span>
+          <span class="sl">English text<small id="engTextLbl">King James Version (public domain). The New King James Version is paused until its publisher grants permission.</small></span>
         </div>
         <div class="srow col">
           <span class="sl">Greek New Testament edition<small>Two separate editions. They are never mixed.</small></span>
@@ -697,8 +816,34 @@
           </div>
         </div>
         <div class="srow">
-          <span class="sl">New Testament offline<small id="ntOffLbl">Save both languages on this device for reading without a connection.</small></span>
-          <button class="btn soft" id="ntOffBtn"><svg class="i"><use href="#i-down"/></svg>Save</button>
+          <span class="sl">Sayings awaiting review<small>Include the sayings of the Fathers whose source is not yet confirmed. They are marked when shown.</small></span>
+          <button class="switch" id="reviewQuotesSw" role="switch" aria-checked="false" aria-label="Include sayings awaiting review"><span></span></button>
+        </div>
+      </section>
+
+      <section class="card set" id="offlineCard">
+        <p class="eyebrow">Offline reading</p>
+        <p class="note setnote">Save texts on this device to read them without a connection — at church, travelling or at a monastery.</p>
+        <div id="pkgList"></div>
+        <p class="note setnote">Not yet available offline: the prayer book, the Psalter and the Old Testament — planned for later stages. The New King James Version cannot be saved: its licence does not allow it.</p>
+        <p class="note setnote" id="storageLbl"></p>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">Backup and restore</p>
+        <p class="note setnote">Your bookmarks, highlights, fasting notes, saved sayings, reading position and settings stay on this device. Save a backup file to keep them safe or move them to another phone.</p>
+        <div class="srow">
+          <span class="sl">Save a backup<small id="backupSub">The file holds your private notes and records. Keep it somewhere safe.</small></span>
+          <button class="btn soft" id="backupBtn"><svg class="i"><use href="#i-down"/></svg>Save</button>
+        </div>
+        <div class="srow">
+          <span class="sl">Restore from a backup<small>You choose whether to merge it with this device or replace what is here.</small></span>
+          <button class="btn soft" id="restoreBtn">Choose file</button>
+          <input type="file" id="restoreFile" class="vh" accept=".json,application/json" tabindex="-1" aria-hidden="true">
+        </div>
+        <div class="srow hidden" id="undoRow">
+          <span class="sl">Undo the last restore<small id="undoLbl"></small></span>
+          <button class="btn soft" id="undoBtn">Undo</button>
         </div>
       </section>
 
@@ -721,14 +866,17 @@
           <span class="sl">Add to your home screen<small id="setInstallLbl">Opens like an app and works offline.</small></span>
           <button class="btn soft hidden" id="setInstallBtn">Install</button>
         </div>
+        <div class="srow hidden" id="logosRow"><a class="lrow first" id="logosLink" href="#" target="_blank" rel="noopener" style="padding:0"><span class="ltxt">Learn Biblical Greek — ΛΟΓΟΣ<small>A separate app for learning the Greek of the New Testament</small></span><span class="larr">›</span></a></div>
         <div class="srow"><button class="lrow first" id="supportLink2" style="padding:0"><span class="ltxt">Support Holy Dormition, Corrimal<small>Bank details for a direct gift to the parish</small></span><span class="larr">›</span></button></div>
         <details class="about" id="about" style="border-top:1px solid var(--line)"><summary>About &amp; sources</summary>
-          <p>Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition. English text of the daily readings: King James Version.</p>
+          <p>Daily Readings is a companion for the daily readings, prayers, saints and fasts of the Orthodox Church on the Old Calendar. It does not replace the guidance of your priest or spiritual father, nor the services of the Church.</p>
+          <p>Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition. English Scripture: King James Version.</p>
           <p>Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
-          <p id="nkjvNote" class="hidden">New King James Version® © 1982 Thomas Nelson (unofficial text; KJV shown if unavailable). Shown for the daily readings only.</p>
-          <p>Scripture reader: King James Version (public domain; text from eBible.org).</p>
+          <p id="nkjvNote" class="hidden">New King James Version® © 1982 Thomas Nelson.</p>
           <p>Greek New Testament: Byzantine Textform, ed. Robinson &amp; Pierpont (2018) — public domain. Patriarchal Text of 1904/1912 (Antoniades), transcribed by M. A. Robinson &amp; J. Ala-Konni — public domain.</p>
-          <p>Sayings of the Fathers are a parish selection; some are adapted or paraphrased and are marked so. Liturgical colours follow common Russian practice and are a guide only.</p>
+          <p>Sayings of the Fathers are a parish selection. Each shows its source where it has been confirmed; adapted wording is marked. Liturgical colours follow common Russian practice and are a guide only.</p>
+          <p class="eyebrow" style="margin-top:14px">Sources &amp; licences</p>
+          <div id="sourcesList"><p>Loading…</p></div>
           <p><span id="stamp"></span><span id="verLbl"></span></p>
         </details>
       </section>
@@ -792,11 +940,46 @@
   <div id="savedBody"></div>
 </div></div>
 
+<div class="scrim hidden" id="customiseSheet"><div class="sheet" role="dialog" aria-label="Customise Today">
+  <div class="grab"></div>
+  <div class="shead"><h3>Customise Today</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="note" style="margin:0 0 6px">The date, season, fast and the Epistle and Gospel always appear. Choose the rest.</p>
+  <div id="custList"></div>
+</div></div>
+
+<div class="scrim hidden" id="savedQuotesSheet"><div class="sheet" role="dialog" aria-label="Saved sayings">
+  <div class="grab"></div>
+  <div class="shead"><h3>Saved sayings</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="savedQuotesBody"></div>
+</div></div>
+
+<div class="scrim hidden" id="backupSheet"><div class="sheet" role="dialog" aria-label="Save a backup">
+  <div class="grab"></div>
+  <div class="shead"><h3>Save a backup</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="backupBody"></div>
+</div></div>
+
+<div class="scrim hidden" id="restoreSheet"><div class="sheet" role="dialog" aria-label="Restore from a backup">
+  <div class="grab"></div>
+  <div class="shead"><h3>Restore from a backup</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="restoreBody"></div>
+</div></div>
+
 <div class="toast hidden" id="toast" role="status"></div>
 <script>
 (function(){
   "use strict";
-  var APP_VERSION = "v34";
+  // Filled in by tools/build.py: the human version and a hash of everything the app ships.
+  var APP_VERSION = "35", APP_BUILD = "71131c05f4";
+  // Offline storage names; the service worker (sw.js) uses the same prefix. tools/make_preview.py changes it
+  // for the review copy, so a preview never touches the live app's offline storage.
+  var CACHE_PREFIX = "orthodox-readings-";
+  // The New King James Version stays off until its publisher (HarperCollins Christian Publishing) grants
+  // permission. The code that fetched it is kept so it can be switched back on once permission is in writing.
+  var NKJV_ENABLED = false;
+  // ΛΟΓΟΣ (Logos), the separate Greek-learning app: set its published address here to show a link in Settings.
+  // Leave it empty until that app is actually available.
+  var LOGOS_URL = "";
   // Storage shim: real localStorage where available, in-memory fallback where it's blocked
   // (sandboxed previews, some private-browsing modes) so the app always boots.
   var store = (function(){
@@ -820,6 +1003,9 @@
   //   day:julian:Y-M-D (saved days) · nkjv:book:chapter (saved NKJV chapters)
   // New in v34: pref:lang (en|par|grc) · pref:theme (auto|light|dark) · pref:gkEd (rp|pt)
   //   reader:pos · user:bookmarks · user:highlights · user:fastlog
+  // New in v35: pref:todayHide (Today sections hidden) · pref:reviewQuotes ("1" = include sayings awaiting review)
+  //   user:fastnotes (private note per fast day) · user:favQuotes (saved sayings) · pkg:<cache prefix><package>
+  //   All user:*, pref:* and reader:* items go into a backup; day:* and pkg:* are working copies, not personal data.
   function initialLang(){
     var l = store.getItem("pref:lang");
     if(l==="en" || l==="par" || l==="grc") return l;
@@ -828,11 +1014,15 @@
   function initialTheme(){ var t=store.getItem("pref:theme"); return (t==="light"||t==="dark") ? t : "auto"; }
   var state = {
     cal: "julian",   // the app follows the Old Calendar — a stored "gregorian" pref from old versions is deliberately ignored
-    txt: store.getItem("pref:txt") || "nkjv",   // English text of the daily readings: "kjv" (in the calendar data) or "nkjv" (fetched)
+    // English text of the daily readings: "kjv" (in the calendar data) or "nkjv" (fetched; paused — see NKJV_ENABLED).
+    // A stored "nkjv" choice is left as it is, so it returns if the NKJV is ever licensed.
+    txt: NKJV_ENABLED ? (store.getItem("pref:txt") || "nkjv") : "kjv",
     lang: initialLang(),                          // en = English · par = English with Greek · grc = Greek
     gkEd: store.getItem("pref:gkEd")==="pt" ? "pt" : "rp",   // Greek edition: Robinson–Pierpont or Patriarchal 1904
     theme: initialTheme(),
     scale: parseInt(store.getItem("pref:scale")||"100",10) || 100,
+    todayHide: (function(){ var a=jget("pref:todayHide", []); return Array.isArray(a) ? a : []; })(),
+    reviewQuotes: store.getItem("pref:reviewQuotes")==="1",
     date: startOfToday(),
     tab: "today",
     renderSeq: 0
@@ -972,17 +1162,23 @@
     b.addEventListener("click", function(){ bumpScale(b.getAttribute("data-sz")==="+" ? 1 : -1); });
   });
 
+
   // ---------- rendering the day ----------
   var LIT_NAME = { blue:"Blue", red:"Red", green:"Green", violet:"Violet", white:"White", gold:"Gold" };
   var LIT_DOT  = { burgundy:"#641E28", blue:"#2F4F86", red:"#A3262A", green:"#2F6B3F", violet:"#5B3A86", white:"#F3EEDF", gold:"#C5A46D" };
   var CAT_SHORT = { free:"No fast", fast:"Fast", strict:"Strict fast", fish:"Fish allowed", wine:"Wine & oil" };
 
+  // The appointed Epistle and Gospel of the Liturgy are shown first and in full; other readings of the day
+  // (Matins Gospel, Vespers readings, the Hours) are listed below them.
+  function isLiturgyReading(r){ return /^(epistle|gospel)$/i.test(String(r.source||"").split(",")[0].trim()); }
+
   function render(data, opts){
     opts = opts || {};
-    var dkey = keyOf(state.cal, state.date), keepOpen = [], livesOpen = [];
+    var dkey = keyOf(state.cal, state.date), keepOpen = [], livesOpen = [], othersOpen = false;
     if(lastRender && lastRender.key===dkey){          // same day again (fresh data, or a reading setting changed)
-      each("#readings .reading", function(r,i){ if(r.classList.contains("open")) keepOpen.push(i); });
+      each("#readings .reading, #otherReadings .reading", function(r,i){ if(r.classList.contains("open")) keepOpen.push(i); });
       each("#livesList .life", function(d,i){ if(d.open) livesOpen.push(i); });
+      othersOpen = el("otherCard").classList.contains("open");
     }
     state.renderSeq++;                       // invalidates any in-flight NKJV/Greek swaps from a previous day
     lastRender = { data: data, opts: opts, key: dkey }; // lets the reading controls re-render instantly
@@ -993,10 +1189,16 @@
     dEl.appendChild(mk("span","dmy",state.date.toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"})));
     var tone = toneOfWeek(state.date);
     // non-breaking spaces keep "Old Style" and "Tone 8" whole on narrow screens
-    el("altdate").textContent = tMonthDay(menaionOf(state.date)).replace(" ", "\u00a0") + ", Old\u00a0Style" + (tone ? " · Tone\u00a0" + tone : "");
+    el("altdate").textContent = tMonthDay(menaionOf(state.date)).replace(" ", " ") + ", Old Style" + (tone ? " · Tone " + tone : "");
 
-    // With no saved copy and no connection the app still shows what it can work out by itself:
-    // the date, tone, great feast and the general fasting rule. Nothing else is invented.
+    // Season: worked out from the Paschalion and the Old Style date (the same engines as the Calendar).
+    var season = liturgicalSeason(t0);
+    el("tdSeason").textContent = season.name;
+    el("tdSeasonSub").textContent = season.detail || "";
+    show(el("tdSeasonSub"), !!season.detail);
+
+    // Without the day's data the app shows only what it can work out exactly — the dates, the tone, the
+    // season and a great feast. Readings, saints and the day's own fast are never guessed.
     var rule = dayRule(t0);
     el("summary").textContent = data ? ((data.summary_title || (data.titles && data.titles[0])) || "") : (rule.feast || "");
 
@@ -1010,11 +1212,12 @@
     // his feast falls on a Wednesday or Friday — on non-fast years it must be suppressed.
     var showExc = hasExc && isFastDay, cat;
     el("fastWrap").classList.remove("hidden","strict");
+    el("fastDay").textContent = "";
     if(!data){
-      isFastDay = rule.r.f>0; cat = rule.cat;
-      el("fastKey").textContent = "Fasting · general rule";
-      el("fastText").textContent = rule.label;
-      el("fastExc").textContent = "";
+      cat = "none";
+      el("fastKey").textContent = "Fasting";
+      el("fastText").textContent = "Not available without a connection";
+      el("fastExc").textContent = " · the Calendar tab shows the Church’s general rule";
     } else {
       el("fastKey").textContent = "Fasting";
       el("fastText").textContent = fdesc || "—";
@@ -1031,12 +1234,8 @@
       }
     }
     el("fastWrap").setAttribute("data-cat", cat);
-    el("fastDot").style.background = "var(--k-"+cat+")";
-    // Day of the fasting season (only inside a real season: 1–49 covers the longest, Great Lent)
-    var so = seasonOf(t0);
-    var fseason = isFastDay ? (data ? seasonInfo(t0, fdesc) : so) : null;
-    el("fastDay").textContent = (fseason && fseason.day>=1 && fseason.day<=49)
-      ? (" · day "+fseason.day+((so && so.day===fseason.day) ? " of "+so.len : "")) : "";
+    el("fastDot").style.background = cat==="none" ? "transparent" : "var(--k-"+cat+")";
+    el("tdSeasonDot").style.background = season.fast ? "var(--k-fast)" : "var(--gold)";
 
     // Commemorations — show the FULL list: union of titles + feasts + saints (deduped), minus the headline
     var summary = el("summary").textContent;
@@ -1067,30 +1266,35 @@
     show(el("commemSuppNote"), supp.length>0);
     el("commemLink").setAttribute("href", orthoChristianURL(state.date));
     el("commemCount").textContent = String(list.length+supp.length);
-    show(el("commemCard"), (list.length+supp.length)>0);
+    var peek = list.filter(function(t){ return !/^begin/i.test(t); });
+    el("commemPeek").textContent = (peek[0] || list[0] || supp[0] || "") + ((list.length+supp.length)>1 ? " …" : "");
 
     // Service notes
     var notes = data && data.service_notes;
     if(Array.isArray(notes)) notes = notes.filter(Boolean).join(" · ");
-    if(notes){ el("notesText").textContent = notes; show(el("notesCard"), true); }
-    else show(el("notesCard"), false);
+    el("notesText").textContent = notes || "";
 
-    // Readings
-    var wrap = el("readings"); wrap.innerHTML="";
-    wrap.className = "lang-"+state.lang;
+    // Readings: the Liturgy Epistle and Gospel first, then the day's other readings
+    var wrap = el("readings"), others = el("otherReadings");
+    wrap.innerHTML=""; others.innerHTML="";
+    wrap.className = "lang-"+state.lang; others.className = "cbody lang-"+state.lang;
     var readings = (data && data.readings) || [];
     if(!data){
       var off=mk("div","card"); off.id="offlineDay";
       off.appendChild(mk("p","eyebrow","Readings and saints"));
-      var op=mk("p","note","The readings and saints for this day need a connection the first time. Once a day has been opened it is kept on this device. The New Testament is in the Scripture tab.");
+      var op=mk("p","note","The readings, saints and fast of this day need a connection the first time. Days you have opened, and the days you save in Settings → Offline reading, are kept on this device. The New Testament can be read in the Scripture tab.");
       op.style.margin="8px 0 0"; off.appendChild(op);
       wrap.appendChild(off);
     } else if(readings.length===0){
       var none=mk("div","card","No readings are listed for this day."); none.style.color="var(--muted2)";
       wrap.appendChild(none);
     }
-    readings.forEach(function(r, idx){
-      var card=mk("div","reading"+(keepOpen.indexOf(idx)>-1 ? " open" : ""));
+    var main = readings.filter(isLiturgyReading), rest = readings.filter(function(r){ return !isLiturgyReading(r); });
+    if(!main.length){ main = rest; rest = []; }          // a day without a Liturgy (e.g. Great Friday): show what is appointed
+    var idx = 0;
+    main.concat(rest).forEach(function(r){
+      var i = idx++;
+      var card=mk("div","reading"+(keepOpen.indexOf(i)>-1 ? " open" : "")+(i<main.length ? " primary" : ""));
       var head=mk("div","head"), h=mk("div","h");
       // Full lectionary label: e.g. "Vespers", "6th Matins Gospel", "Epistle — Apostles"
       var qual = String(r.desc || r.description || r.commemorated || "").trim();
@@ -1106,7 +1310,7 @@
       ref.appendChild(badge); h.appendChild(ref); head.appendChild(h);
       head.appendChild(mk("span","chev","▼"));
       head.setAttribute("role","button"); head.setAttribute("tabindex","0");
-      head.setAttribute("aria-expanded", keepOpen.indexOf(idx)>-1 ? "true" : "false");
+      head.setAttribute("aria-expanded", keepOpen.indexOf(i)>-1 ? "true" : "false");
       function toggle(){ card.classList.toggle("open"); head.setAttribute("aria-expanded", card.classList.contains("open") ? "true":"false"); syncOpenAll(); }
       head.addEventListener("click", toggle);
       head.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
@@ -1122,15 +1326,18 @@
         body.appendChild(more);
       }
       card.appendChild(body);
-      wrap.appendChild(card);
+      (i<main.length ? wrap : others).appendChild(card);
 
       if(state.lang!=="en") applyGreek(txt, disp, state.renderSeq);
-      if(state.txt==="nkjv") applyNKJV(txt, badge, disp, state.renderSeq);
+      if(NKJV_ENABLED && state.txt==="nkjv") applyNKJV(txt, badge, disp, state.renderSeq);
     });
+    el("otherCount").textContent = rest.length ? String(rest.length) : "";
+    el("otherCard").classList.toggle("open", othersOpen);
+    el("otherHead").setAttribute("aria-expanded", othersOpen ? "true" : "false");
 
-    // Reading tools: language, version and size sit with the readings; open-all only when several
+    // Reading tools: language and size sit with the readings; open-all only when several
     show(el("readingsCtl"), readings.length>0);
-    show(el("openAllBtn"), readings.length>1);
+    show(el("openAllBtn"), main.length>1);
     syncOpenAll();
     var gn=el("gkEdNote");
     gn.textContent = "Greek text: " + GK_ED[state.gkEd].cite + ".";
@@ -1140,15 +1347,21 @@
     applyLit(liturgicalKey(state.date, data, fdesc));
     renderLives(data);
     each("#livesList .life", function(d,i){ if(livesOpen.indexOf(i)>-1) d.open=true; });
-    show(el("saintsHead"), !el("commemCard").classList.contains("hidden") || !el("livesCard").classList.contains("hidden"));
     renderTracker(fdesc);
     renderPrayersLink();
     el("studyFor").textContent = "For " + state.date.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long"});
     el("troparLink").setAttribute("href", htmURL(state.date));
+    el("tdHymns").setAttribute("href", htmURL(state.date));
     el("prologueLink").setAttribute("href", prologueURL(state.date));
     renderAzbyka();
     renderQuote();
     renderTheophan(readings);
+
+    // What is shown depends on the day's content and on the reader's own choice (Customise Today)
+    el("commemCard").setAttribute("data-has", (list.length+supp.length)>0 ? "1" : "");
+    el("notesCard").setAttribute("data-has", notes ? "1" : "");
+    el("otherCard").setAttribute("data-has", rest.length ? "1" : "");
+    applyTodayLayout();
 
     var stamp = !data ? "Not connected" : (opts.cached ? ("Saved copy" + (opts.when? " · "+opts.when : "")) : ("Updated " + new Date().toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"})));
     el("stamp").textContent = stamp;
@@ -1157,11 +1370,52 @@
     el("loading").classList.add("hidden");
   }
   function syncOpenAll(){
-    var rs=document.querySelectorAll(".reading");
+    var rs=document.querySelectorAll("#readings .reading");
     var anyClosed=Array.prototype.some.call(rs, function(r){ return !r.classList.contains("open"); });
     el("openAllBtn").textContent = anyClosed ? "Open all" : "Close all";
   }
 
+  // ---------- Customise Today: which supplementary sections appear ----------
+  // The date, season, fast and the Epistle and Gospel always show. A section with nothing to show for the day
+  // (no service notes, say) stays hidden whatever the choice.
+  var TODAY_SECTIONS = [
+    {id:"prayers", name:"Morning and evening prayers", sub:"Links to the day’s prayers"},
+    {id:"others",  name:"Other readings of the day", sub:"Matins Gospel, Vespers readings and others"},
+    {id:"saints",  name:"Saints of the Day", sub:"Commemorations and Lives of the Saints"},
+    {id:"hymns",   name:"Troparia and kontakia", sub:"Link to the day’s hymns"},
+    {id:"wisdom",  name:"Wisdom of the Fathers", sub:"A saying for the day"},
+    {id:"tracker", name:"Next feast and Pascha", sub:"Countdown in the date card"},
+    {id:"notes",   name:"Service notes", sub:"When the calendar gives them"},
+    {id:"more",    name:"More for this day", sub:"St Theophan, the Prologue, service texts"}
+  ];
+  function sectionOn(id){ return state.todayHide.indexOf(id)<0; }
+  function applyTodayLayout(){
+    each("#view-today [data-sec]", function(n){
+      var id=n.getAttribute("data-sec"), on=sectionOn(id);
+      if(n.hasAttribute("data-has") && !n.getAttribute("data-has")) on=false;
+      if(id==="wisdom" && !currentQuote) on=false;
+      show(n, on);
+    });
+  }
+  function renderCustomise(){
+    var box=el("custList"); box.innerHTML="";
+    TODAY_SECTIONS.forEach(function(s){
+      var row=mk("div","srow"), lab=mk("span","sl",s.name); lab.appendChild(mk("small","",s.sub));
+      var sw=mk("button","switch"); sw.setAttribute("role","switch"); sw.setAttribute("aria-label", s.name);
+      sw.setAttribute("aria-checked", sectionOn(s.id) ? "true" : "false"); sw.setAttribute("data-sec-id", s.id);
+      sw.appendChild(mk("span"));
+      sw.addEventListener("click", function(){
+        var on = sw.getAttribute("aria-checked")!=="true";
+        sw.setAttribute("aria-checked", on ? "true" : "false");
+        state.todayHide = state.todayHide.filter(function(x){ return x!==s.id; });
+        if(!on) state.todayHide.push(s.id);
+        jset("pref:todayHide", state.todayHide);
+        applyTodayLayout();
+      });
+      row.appendChild(lab); row.appendChild(sw); box.appendChild(row);
+    });
+  }
+  function openCustomise(){ renderCustomise(); openSheet("customiseSheet"); }
   // ---------- Paschalion + feast & fast tracker (Old Calendar, civil dates, valid 1900–2099) ----------
   function paschaCivil(y){
     var a=y%4, b=y%7, c=y%19;
@@ -1355,34 +1609,194 @@
     return out;
   }
 
+
+  // ---------- Liturgical season of a day (Old Calendar) ----------
+  // The movable cycle follows the Paschalion; the fixed fasts, Christmastide and Theophany follow the Old Style
+  // date. Week names follow the calendar's own usage (orthocal.info: "Wednesday of the Third Week of Lent",
+  // "Wednesday of the 2nd Sunday of Pascha", "Wednesday of Meatfare", "Wednesday of the 26th week after Pentecost").
+  // Returns {name, detail, fast, day, len}: name is the season (with "Day N of M" in a fasting season), detail the
+  // week or day within it. Informational only — never a measure of keeping the fast.
+  function ordinal(n){ var s=["th","st","nd","rd"], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+  var WEEKDAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var PASCHA_SUNDAYS={7:"Thomas Sunday — 2nd Sunday of Pascha", 14:"3rd Sunday of Pascha — the Myrrh-bearing Women",
+    21:"4th Sunday of Pascha — the Paralytic", 28:"5th Sunday of Pascha — the Samaritan Woman",
+    35:"6th Sunday of Pascha — the Blind Man", 42:"7th Sunday of Pascha — the Holy Fathers of the First Council"};
+  // The Sundays of Great Lent and whom they commemorate
+  var LENT_SUNDAYS = {1:"the Triumph of Orthodoxy", 2:"St Gregory Palamas", 3:"the Veneration of the Cross", 4:"St John of the Ladder", 5:"St Mary of Egypt"};
+  function movableWeek(t){
+    var y=t.getFullYear(), P=paschaCivil(y), diff=Math.round((t-P)/86400000), dow=t.getDay();
+    if(diff < -70){ P=paschaCivil(y-1); diff=Math.round((t-P)/86400000); }   // still in last year's weeks after Pentecost
+    var r={diff:diff, season:"", label:"", fast:false};
+    if(diff>=-70 && diff<=-49){
+      r.season="Pre-Lenten weeks (Triodion)";
+      if(diff===-70) r.label="Sunday of the Publican and the Pharisee";
+      else if(diff<-63) r.label="Week of the Publican and the Pharisee — fast-free";
+      else if(diff===-63) r.label="Sunday of the Prodigal Son";
+      else if(diff===-57) r.label="Meatfare Saturday — Saturday of the Departed";
+      else if(diff<-56) r.label="Meatfare week";
+      else if(diff===-56) r.label="Meatfare Sunday — the Last Judgement";
+      else if(diff<-49) r.label="Cheesefare week";
+      else r.label="Forgiveness Sunday (Cheesefare Sunday)";
+    } else if(diff>=-48 && diff<=-9){
+      var wk=Math.floor((diff+48)/7)+1;
+      r.season="Great Lent"; r.fast=true; r.day=diff+49; r.len=40;
+      r.label = dow===0 ? ordinal(wk)+" Sunday of Great Lent"+(LENT_SUNDAYS[wk] ? " — "+LENT_SUNDAYS[wk] : "") : ordinal(wk)+" week of Great Lent";
+    } else if(diff===-8){ r.season="Lazarus Saturday"; r.fast=true; r.label="The eve of Palm Sunday";
+    } else if(diff===-7){ r.season="Palm Sunday"; r.fast=true; r.label="The Entry of the Lord into Jerusalem";
+    } else if(diff>=-6 && diff<=-1){ r.season="Holy Week"; r.fast=true; r.label="Great and Holy "+WEEKDAYS[dow];
+    } else if(diff===0){ r.season="Pascha"; r.label="The Resurrection of Christ";
+    } else if(diff>=1 && diff<=6){ r.season="Bright Week"; r.label="Bright "+WEEKDAYS[dow]+" — fast-free";
+    } else if(diff>=7 && diff<=48){
+      r.season="Paschal season";
+      if(PASCHA_SUNDAYS[diff]) r.label=PASCHA_SUNDAYS[diff];
+      else if(diff===24) r.label="Mid-Pentecost";
+      else if(diff===39) r.label="The Ascension of the Lord";
+      else if(diff===48) r.label="Saturday of the Departed (Trinity Saturday)";
+      else r.label=ordinal(Math.floor(diff/7)+1)+" week of Pascha";
+    } else if(diff===49){ r.season="Pentecost"; r.label="The Holy Trinity";
+    } else if(diff>=50){
+      if(diff===50) r.label="Monday of the Holy Spirit";
+      else if(diff===56) r.label="1st Sunday after Pentecost — All Saints";
+      else if(diff===63) r.label="2nd Sunday after Pentecost — All Saints of Russia";
+      else if(dow===0) r.label=ordinal((diff-49)/7)+" Sunday after Pentecost";
+      else r.label=ordinal(Math.floor((diff-50)/7)+1)+" week after Pentecost";
+      if(diff>=50 && diff<=55) r.label += " — fast-free week";
+    }
+    return r;
+  }
+  function liturgicalSeason(d){
+    var t=dayOnly(d), mv=movableWeek(t), md=menaionOf(t), x=(md.getMonth()+1)*100+md.getDate();
+    var out={name:"", detail:"", fast:false};
+    function fastSeason(name){
+      var so=seasonOf(t);                                   // the fasting seasons as listed in the Year view
+      out.fast=true;
+      if(so){ out.day=so.day; out.len=so.len; out.name=name+" — Day "+so.day+" of "+so.len; }
+      else out.name=name;
+    }
+    // Fixed seasons first (they fall in the weeks after Pentecost, whose week becomes the detail)
+    if(x>=1115 && x<=1224){ fastSeason("Nativity Fast"); out.detail = x===1224 ? "Eve of the Nativity of Christ" : mv.label; return out; }
+    if(x===1225){ out.name="The Nativity of Christ"; out.detail="Christmastide — fast-free until the Eve of Theophany"; return out; }
+    if(x>=1226 || x<=104){ out.name="Christmastide"; out.detail="Fast-free until the Eve of Theophany"; return out; }
+    if(x===105){ out.name="Eve of Theophany"; out.detail=mv.label; out.fast=true; return out; }
+    if(x===106){ out.name="The Theophany of the Lord"; out.detail=""; return out; }
+    if(x>=107 && x<=114){ out.name="Afterfeast of Theophany"; out.detail=mv.label; return out; }
+    if(x>=801 && x<=814){ fastSeason("Dormition Fast"); out.detail=mv.label; return out; }
+    if(x===815){ out.name="The Dormition of the Theotokos"; out.detail=mv.label; return out; }
+    // Apostles' Fast: from the Monday after All Saints to 28 June Old Style (it can be short, or absent)
+    var y=t.getFullYear(), P=paschaCivil(y), ap=new Date(P.getFullYear(),P.getMonth(),P.getDate()+57);
+    if(t>=ap && x<=628 && x>=500){ fastSeason("Apostles’ Fast"); out.detail=mv.label; return out; }
+    // Movable seasons
+    if(mv.season==="Great Lent"){ out.fast=true; out.day=mv.day; out.len=mv.len; out.name="Great Lent — Day "+mv.day+" of "+mv.len; out.detail=mv.label; return out; }
+    if(mv.season){ out.name=mv.season; out.detail=mv.label; out.fast=mv.fast; return out; }
+    out.name=mv.label; out.detail="";                     // the weeks after Pentecost
+    return out;
+  }
   // ---------- Wisdom of the Fathers (bundled, rotates with the viewed day) ----------
+  // fathers.json (format 2) gives each saying an id, its source and a status:
+  //   "sourced"  the work (and where known the place in it) is identified and the wording is a faithful rendering
+  //   "adapted"  the passage is identified but the wording is condensed or paraphrased (shown as "adapted")
+  //   "review"   the source is not yet confirmed, or the attribution needs a priest's or scholar's review.
+  //              These are left out of the daily rotation unless the reader asks for them in Settings,
+  //              and are then marked "Source awaiting review". Nothing is ever attributed by guesswork.
   var FATHERS=null, currentQuote=null;
   function loadFathers(){
-    fetch("fathers.json").then(function(r){ return r.ok? r.json():null; }).then(function(j){
+    fetchJSONWithRepair("fathers.json").then(function(j){
       FATHERS=j; if(lastRender) renderQuote();
     }).catch(function(){});
   }
+  function quoteStatus(q){ return q.status || "sourced"; }
+  function quotePool(){
+    if(!FATHERS || !Array.isArray(FATHERS.quotes)) return [];
+    return FATHERS.quotes.filter(function(q){ return state.reviewQuotes || quoteStatus(q)!=="review"; });
+  }
+  function quoteSource(q){
+    // "Work, place · tr. Translator", with "adapted" where the wording is condensed
+    var parts=[];
+    if(q.work) parts.push(q.work + (q.ref ? ", " + q.ref : ""));
+    else if(q.src && quoteStatus(q)!=="review") parts.push(q.src);
+    if(quoteStatus(q)==="adapted" && !/adapted/i.test(parts.join(" "))) parts.push("adapted");
+    return parts.join(" · ");
+  }
+  function quoteForDay(d){
+    var pool=quotePool(); if(!pool.length) return null;
+    var start=new Date(d.getFullYear(),0,1), doy=Math.round((dayOnly(d)-start)/86400000);
+    return pool[((doy % pool.length)+pool.length) % pool.length];
+  }
   function renderQuote(){
     var card=el("quoteCard");
-    if(!FATHERS || !FATHERS.quotes || !FATHERS.quotes.length){ card.classList.add("hidden"); currentQuote=null; return; }
-    var d=state.date, start=new Date(d.getFullYear(),0,1);
-    var doy=Math.round((d-start)/86400000);
-    var q=FATHERS.quotes[((doy % FATHERS.quotes.length)+FATHERS.quotes.length) % FATHERS.quotes.length];
+    var q=quoteForDay(state.date);
     currentQuote=q;
+    if(!q){ card.classList.add("hidden"); applyTodayLayoutSafe(); return; }
     el("quoteText").textContent="“"+q.q+"”";
     var by=el("quoteBy"); by.textContent=q.by;
-    if(q.src) by.appendChild(mk("small","",q.src));
+    var src=quoteSource(q);
+    if(src) by.appendChild(mk("small","",src));
+    show(el("quoteStatus"), quoteStatus(q)==="review");
     var long = q.q.length > 220;   // long sayings fold to four lines
     el("quoteText").classList.toggle("clamped", long);
     show(el("quoteMore"), long);
     el("quoteMore").textContent = "Read the whole saying";
+    paintQuoteFav();
     card.classList.remove("hidden");
+    applyTodayLayoutSafe();
   }
-  function quoteLine(){ return currentQuote ? ("“"+currentQuote.q+"” — "+currentQuote.by+(currentQuote.src ? " ("+currentQuote.src+")" : "")) : ""; }
+  function applyTodayLayoutSafe(){ if(lastRender) applyTodayLayout(); }
+  function quoteLine(q){
+    q = q || currentQuote; if(!q) return "";
+    var src=quoteSource(q);
+    return "“"+q.q+"” — "+q.by+(src ? " ("+src+")" : "");
+  }
   el("quoteMore").addEventListener("click", function(){
     var clamped = el("quoteText").classList.toggle("clamped");
     el("quoteMore").textContent = clamped ? "Read the whole saying" : "Show less";
   });
+
+  // Saved sayings: a private list of ids on this device (user:favQuotes)
+  function favQuotes(){ var a=jget("user:favQuotes", []); return Array.isArray(a) ? a : []; }
+  function isFavQuote(q){ return !!q && !!q.id && favQuotes().indexOf(q.id)>-1; }
+  function paintQuoteFav(){
+    var on=isFavQuote(currentQuote), b=el("quoteFav");
+    b.classList.toggle("on", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.setAttribute("aria-label", on ? "Remove from saved sayings" : "Save this saying");
+  }
+  function toggleFavQuote(q){
+    if(!q || !q.id) return false;
+    var a=favQuotes(), i=a.indexOf(q.id);
+    if(i>-1) a.splice(i,1); else a.push(q.id);
+    jset("user:favQuotes", a); paintQuoteFav(); renderSavedQuotesSub();
+    return i<0;
+  }
+  el("quoteFav").addEventListener("click", function(){
+    var on=toggleFavQuote(currentQuote);
+    toast(on ? "Saved to your sayings" : "Removed from your sayings");
+  });
+  function quoteById(id){
+    if(!FATHERS || !Array.isArray(FATHERS.quotes)) return null;
+    for(var i=0;i<FATHERS.quotes.length;i++) if(FATHERS.quotes[i].id===id) return FATHERS.quotes[i];
+    return null;
+  }
+  function renderSavedQuotesSub(){
+    var n=favQuotes().length;
+    el("savedQuotesSub").textContent = n ? (n===1 ? "1 saying saved" : n+" sayings saved") : "Tap ♡ on a saying to keep it here";
+  }
+  function renderSavedQuotes(){
+    var body=el("savedQuotesBody"); body.innerHTML="";
+    var ids=favQuotes();
+    if(!ids.length){ body.appendChild(mk("p","empty","No saved sayings yet. Tap ♡ on the Wisdom of the Fathers card to keep a saying here.")); return; }
+    ids.slice().reverse().forEach(function(id){
+      var q=quoteById(id); if(!q) return;
+      var row=mk("div","sqrow");
+      row.appendChild(mk("p","sqtext","“"+q.q+"”"));
+      var by=mk("p","sqby",q.by); var src=quoteSource(q); if(src) by.appendChild(mk("small","",src)); row.appendChild(by);
+      var acts=mk("div","sqacts");
+      var cp=mk("button","linkbtn","Copy"); cp.addEventListener("click", function(){ copyText(quoteLine(q), function(){ toast("Copied"); }); });
+      var sh=mk("button","linkbtn","Share"); sh.addEventListener("click", function(){ shareText(quoteLine(q)+"\n"+appURL(), "Wisdom of the Fathers"); });
+      var rm=mk("button","linkbtn","Remove"); rm.addEventListener("click", function(){ toggleFavQuote(q); renderSavedQuotes(); });
+      acts.appendChild(cp); acts.appendChild(sh); acts.appendChild(rm); row.appendChild(acts);
+      body.appendChild(row);
+    });
+  }
+  el("savedQuotesLink").addEventListener("click", function(){ renderSavedQuotes(); openSheet("savedQuotesSheet"); });
 
   // ---------- Lives of the Saints (Abbamoses notes carried by orthocal) ----------
   function renderLives(data){
@@ -1661,7 +2075,20 @@
     show(el("dpJournal"), dr.r.f>0 && calSel<=startOfToday());   // a note can be made on the day or afterwards
     var cur=fastLog()[isoKey(calSel)] || "";
     each("#logSeg button", function(b){ b.classList.toggle("active", b.getAttribute("data-log")===cur); });
+    var ta=el("fastNoteText");
+    if(document.activeElement!==ta){ ta.setAttribute("data-day", isoKey(calSel)); ta.value = fastNotes()[isoKey(calSel)] || ""; }
   }
+  // A private written note for a fast day (user:fastnotes), kept on this device only
+  function fastNotes(){ var o=jget("user:fastnotes", {}); return (o && typeof o==="object" && !Array.isArray(o)) ? o : {}; }
+  var noteT=null;
+  function saveFastNote(){
+    clearTimeout(noteT);
+    var ta=el("fastNoteText"), o=fastNotes(), k=ta.getAttribute("data-day") || isoKey(calSel), v=ta.value.slice(0,500);
+    if(v.trim()) o[k]=v; else delete o[k];
+    jset("user:fastnotes", o);
+  }
+  el("fastNoteText").addEventListener("input", function(){ clearTimeout(noteT); noteT=setTimeout(saveFastNote, 400); });
+  el("fastNoteText").addEventListener("blur", saveFastNote);
   each("#logSeg button", function(b){ b.addEventListener("click", function(){
     var log=fastLog(), k=isoKey(calSel), v=b.getAttribute("data-log");
     if(v) log[k]=v; else delete log[k];
@@ -2058,9 +2485,7 @@
   var greekMem = {}, ptMem = {}, kjvMem = {};
   function fetchBookFile(dir, mem, book){
     if(mem[book]) return Promise.resolve(mem[book]);
-    return fetch(dir+"/"+book+".json").then(function(r){
-      if(!r.ok) throw new Error("HTTP "+r.status); return r.json();
-    }).then(function(obj){ mem[book]=obj; return obj; });
+    return fetchJSONWithRepair(dir+"/"+book+".json").then(function(obj){ mem[book]=obj; return obj; });
   }
   function fetchGreekChapter(book, ch){
     if(state.gkEd==="pt"){
@@ -2070,9 +2495,7 @@
     }
     var key = book+"/"+ch;
     if(greekMem[key]) return Promise.resolve(greekMem[key]);
-    return fetch("greek/"+key+".json").then(function(r){
-      if(!r.ok) throw new Error("HTTP "+r.status); return r.json();
-    }).then(function(obj){ greekMem[key]=obj; return obj; });
+    return fetchJSONWithRepair("greek/"+key+".json").then(function(obj){ greekMem[key]=obj; return obj; });
   }
   function gkPara(n, text){
     var gp=mk("p","gk"); gp.setAttribute("lang","grc");
@@ -2378,49 +2801,57 @@
   });
   el("focusExit").addEventListener("click", function(){ if(topKind()==="focus") closeLayer(); else document.documentElement.classList.remove("focus"); });
 
-  // save the whole New Testament for reading without a connection (the service worker keeps what is fetched)
-  var ntSaving=false;
-  function saveNT(){
-    if(ntSaving) return;
-    var lbl=el("ntOffLbl");
-    if(!("serviceWorker" in navigator) || !navigator.serviceWorker.controller){
-      lbl.textContent="Offline saving starts once the app has finished installing itself — close and reopen the app, then try again."; return;
-    }
-    var urls=[], ed=state.gkEd;
-    NT.forEach(function(bk){
-      urls.push("kjv/"+bk[0]+".json");
-      if(ed==="pt") urls.push("greek-pt/"+bk[0]+".json");
-      else for(var c=1;c<=bk[2];c++) urls.push("greek/"+bk[0]+"/"+c+".json");
-    });
-    var i=0, ok=0, total=urls.length; ntSaving=true;
-    function next(){
-      if(i>=total){
-        ntSaving=false;
-        if(ok===total){ store.setItem("pref:ntSaved", ed); lbl.textContent="Saved — the New Testament (KJV and "+GK_ED[ed].name+") is on this device."; }
-        else lbl.textContent="Saved "+ok+" of "+total+" parts. Check your connection and try again to finish.";
-        return;
-      }
-      var u=urls[i++];
-      fetch(u).then(function(r){ if(r.ok) ok++; }).catch(function(){}).then(function(){
-        if(i%8===0 || i===total) lbl.textContent="Saving… "+i+" of "+total;
-        next();
-      });
-    }
-    lbl.textContent="Saving… 0 of "+total;
-    next(); next(); next(); next();
-  }
-  el("ntOffBtn").addEventListener("click", saveNT);
+  // Saving the New Testament for reading offline is now in Settings → Offline reading (85-offline.js).
 
   // ---------- Settings view ----------
   function renderSettings(){
     paintPrefs(); paintTheme(); applyScale(); renderInstallRow();
     var days=0;
     try{ for(var i=0;i<localStorage.length;i++){ if(/^day:julian:/.test(localStorage.key(i)||"")) days++; } }catch(e){}
-    var nb=savedList("user:bookmarks").length, nh=savedList("user:highlights").length, nf=Object.keys(fastLog()).length;
-    el("dataLbl").textContent = days+(days===1?" day":" days")+" of readings · "+nb+(nb===1?" bookmark":" bookmarks")+" · "+nh+(nh===1?" highlight":" highlights")+" · "+nf+(nf===1?" fasting note":" fasting notes")+". Kept in this browser only.";
-    var sv=store.getItem("pref:ntSaved");
-    if(sv && !ntSaving) el("ntOffLbl").textContent="Saved — the New Testament (KJV and "+GK_ED[sv==="pt"?"pt":"rp"].name+") is on this device.";
-    el("verLbl").textContent = " · "+APP_VERSION;
+    var d=deviceData();
+    el("dataLbl").textContent = plural(days,"day")+" of readings · "+countsText(d)+". Kept on this device only.";
+    el("reviewQuotesSw").setAttribute("aria-checked", state.reviewQuotes ? "true" : "false");
+    show(el("logosRow"), !!LOGOS_URL);
+    if(LOGOS_URL) el("logosLink").setAttribute("href", LOGOS_URL);
+    el("verLbl").textContent = " · Version "+APP_VERSION+" · build "+APP_BUILD;
+    renderPackages(); paintBackupCard(); renderSources();
+  }
+  el("reviewQuotesSw").addEventListener("click", function(){
+    state.reviewQuotes = !state.reviewQuotes;
+    store.setItem("pref:reviewQuotes", state.reviewQuotes ? "1" : "0");
+    el("reviewQuotesSw").setAttribute("aria-checked", state.reviewQuotes ? "true" : "false");
+    renderQuote();
+  });
+  el("setCustomiseBtn").addEventListener("click", openCustomise);
+  el("customiseBtn").addEventListener("click", openCustomise);
+
+  // ---------- Sources & licences (data/sources.json, the content source registry) ----------
+  var SOURCES=null;
+  function renderSources(){
+    var box=el("sourcesList");
+    if(SOURCES){ paintSources(box); return; }
+    fetchJSONWithRepair("data/sources.json").then(function(j){
+      SOURCES = (j && Array.isArray(j.sources)) ? j.sources : [];
+      paintSources(box);
+    }).catch(function(){ box.textContent="The list of sources needs a connection the first time."; });
+  }
+  function paintSources(box){
+    box.innerHTML="";
+    var stats = (FATHERS && Array.isArray(FATHERS.quotes)) ? FATHERS.quotes.reduce(function(a,q){ a[quoteStatus(q)]=(a[quoteStatus(q)]||0)+1; return a; }, {}) : null;
+    SOURCES.forEach(function(s){
+      var det=document.createElement("details"); det.className="srcitem";
+      var sum=document.createElement("summary"); sum.appendChild(mk("span","stitle",s.title||""));
+      if(s.status) sum.appendChild(mk("span","stag"+(/paused/i.test(s.status) ? " paused" : (/link/i.test(s.status) ? " link" : "")), s.status));
+      det.appendChild(sum);
+      function line(label, value){ if(!value) return; var p=mk("p","sline"); p.appendChild(mk("b","",label+": ")); p.appendChild(document.createTextNode(value)); det.appendChild(p); }
+      line("By", s.author); line("Edition", s.edition); line("Translation", s.translator); line("Publisher", s.publisher);
+      line("Tradition", s.tradition); line("Used for", s.use); line("How", s.how); line("Licence", s.licence); line("Attribution", s.attribution);
+      if(s.id==="sayings" && stats) line("In the collection", (stats.sourced||0)+" sourced · "+(stats.adapted||0)+" adapted · "+(stats.review||0)+" awaiting review (not shown unless turned on)");
+      line("Checked", s.checked ? new Date(s.checked+"T00:00:00").toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"}) : "");
+      line("Review", s.review);
+      if(s.url){ var a=mk("a","",s.url.replace(/^https?:\/\//,"").replace(/\/$/,"")); a.href=s.url; a.target="_blank"; a.rel="noopener noreferrer"; var p=mk("p","sline"); p.appendChild(a); det.appendChild(p); }
+      box.appendChild(det);
+    });
   }
 
   // ---------- Support the Parish sheet ----------
@@ -2436,6 +2867,546 @@
     });
   });
 
+  // ---------- Offline reading: texts the reader chooses to keep on this device ----------
+  // packages.json (made by tools/build.py) lists each bundled text with its files, total size and a version (a hash
+  // of its contents). A package counts as saved only when every file has been downloaded, read back as complete
+  // JSON and found in the offline store; its record (pkg:<cache prefix><id>) is written only then. What is on the
+  // device is always worked out from the offline store itself, so an interrupted download shows as incomplete and
+  // never as saved.
+  //
+  // The coming 30 days (readings, saints and fasts from orthocal.info) are kept as saved days in localStorage, the
+  // same way the app keeps every day it opens. Once saved, the app tops the 30 days up quietly whenever it is online.
+  var DAYS_PKG = { id:"days-30", kind:"days", days:30, name:"The coming 30 days", sub:"Readings, saints and fasting for each day", unit:"days" };
+  var PK = { list:null, state:{}, queue:[], running:null, present:{} };
+  function pkgKey(id){ return "pkg:"+CACHE_PREFIX+id; }
+  function pkgRecord(id){ var r=jget(pkgKey(id), null); return (r && typeof r==="object") ? r : null; }
+  function pkgCache(p){ return p.cache==="greek" ? GREEK_CACHE : TEXT_CACHE; }
+  function pkgTotal(p){ return p.kind==="days" ? p.days : p.files.length; }
+  function fmtBytes(n){ if(n < 1048576) return Math.max(1, Math.round(n/1024))+" KB"; return (n/1048576).toFixed(1).replace(/\.0$/,"")+" MB"; }
+  function textsOK(){ return cachesOK() && ("serviceWorker" in navigator); }
+  function loadPackages(){
+    if(PK.list) return Promise.resolve(PK.list);
+    return fetchJSONWithRepair("packages.json").then(function(j){
+      PK.list = (j && Array.isArray(j.packages)) ? j.packages.filter(function(p){ return p && p.id && Array.isArray(p.files); }) : [];
+      return PK.list;
+    });
+  }
+  function allPackages(){ return [DAYS_PKG].concat(PK.list||[]); }
+
+  // Runs `worker` on every item, at most `limit` at a time, and resolves ONCE — after every item has finished,
+  // successfully or not — with the items that failed. (Version 34 ran four chains and reported the result as soon
+  // as the first chain ran out of work, while the others were still downloading.)
+  function pool(items, limit, worker, progress){
+    return new Promise(function(resolve){
+      var next=0, settled=0, failed=[];
+      if(!items.length){ resolve(failed); return; }
+      function launch(){
+        if(next>=items.length) return;
+        var item=items[next++];
+        Promise.resolve().then(function(){ return worker(item); })
+          .catch(function(){ failed.push(item); })
+          .then(function(){
+            settled++;
+            try{ if(progress) progress(settled, items.length); }catch(e){}
+            if(settled===items.length) resolve(failed); else launch();
+          });
+      }
+      for(var k=0;k<Math.min(limit, items.length);k++) launch();
+    });
+  }
+
+  // ----- the coming days -----
+  function comingDays(n){
+    var b=startOfToday(), out=[];
+    for(var i=0;i<n;i++) out.push(new Date(b.getFullYear(), b.getMonth(), b.getDate()+i));
+    return out;
+  }
+  function daySaved(d){ var c=readCache(state.cal,d); return !!(c && c.data); }
+  function daysPresent(){ return comingDays(DAYS_PKG.days).filter(daySaved).length; }
+  function daysAhead(){ return comingDays(DAYS_PKG.days).slice(1).filter(daySaved).length; }   // saved days after today
+  function daysBytes(){
+    var n=0, k=0;
+    comingDays(DAYS_PKG.days).forEach(function(d){ var r=store.getItem(keyOf(state.cal,d)); if(r){ n+=r.length*2; k++; } });
+    return {bytes:n, days:k};
+  }
+  function isDayData(data){ return !!data && typeof data==="object" && Array.isArray(data.readings); }
+  function saveDays(p, st, onlyMissing){
+    var days=comingDays(p.days);
+    if(onlyMissing) days=days.filter(function(d){ var c=readCache(state.cal,d); return !(c && c.data); });
+    st.total=days.length; st.done=0; paintPkgProgress(p);
+    return pool(days, 3, function(d){                       // three at a time: gentle on the calendar service
+      return fetchDay(state.cal, d).then(function(data){
+        if(!isDayData(data)) throw new Error("unexpected reply");
+        writeCache(state.cal, d, data);
+        var back=readCache(state.cal, d);
+        if(!back || !back.data) throw new Error("not stored");  // the device's storage is full
+      });
+    }, function(n){ st.done=n; paintPkgProgress(p); }).then(function(){
+      return { missing: p.days - daysPresent() };
+    });
+  }
+
+  // ----- bundled texts -----
+  function storeFile(cache, f){
+    return fetch(f, FRESH).then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      var copy=r.clone();
+      return r.text().then(function(t){ JSON.parse(t); return cache.put(absURL(f), copy); });   // only complete, readable files are kept
+    });
+  }
+  function filesPresent(p){
+    if(!textsOK()) return Promise.resolve(0);
+    return caches.open(pkgCache(p)).then(function(c){
+      return c.keys().then(function(reqs){
+        var have={}; reqs.forEach(function(r){ have[r.url.split("?")[0]]=1; });
+        return p.files.filter(function(f){ return have[absURL(f)]; }).length;
+      });
+    }).catch(function(){ return 0; });
+  }
+  function saveFiles(p, st, onlyMissing){
+    return caches.open(pkgCache(p)).then(function(cache){
+      var pick = onlyMissing ? cache.keys().then(function(reqs){
+        var have={}; reqs.forEach(function(r){ have[r.url.split("?")[0]]=1; });
+        return p.files.filter(function(f){ return !have[absURL(f)]; });
+      }) : Promise.resolve(p.files.slice());
+      return pick.then(function(todo){
+        st.total=todo.length; st.done=0; paintPkgProgress(p);
+        return pool(todo, 6, function(f){ return storeFile(cache, f); }, function(n){ st.done=n; paintPkgProgress(p); });
+      }).then(function(){
+        // Check the whole package, file by file, before calling it saved
+        return Promise.all(p.files.map(function(f){ return cache.match(absURL(f)).then(function(h){ return h ? 0 : 1; }); }));
+      }).then(function(miss){
+        return { missing: miss.reduce(function(a,b){ return a+b; }, 0) };
+      });
+    });
+  }
+
+  function presentOf(p){ return p.kind==="days" ? Promise.resolve(daysPresent()) : filesPresent(p); }
+  function runPackage(p, onlyMissing){
+    var st = PK.state[p.id] = { running:true, done:0, total:0, msg:"" };
+    paintPackages();
+    var work = p.kind==="days" ? saveDays(p, st, onlyMissing) : saveFiles(p, st, onlyMissing);
+    return work.then(function(res){
+      st.running=false;
+      var total=pkgTotal(p);
+      if(res.missing===0){
+        jset(pkgKey(p.id), p.kind==="days" ? {t:Date.now()} : {v:p.version, t:Date.now(), n:total});
+        st.failed=false; st.msg="";
+        askPersist();
+        toast("Saved on this device: "+(p.kind==="days" ? "the coming 30 days" : p.name+(p.sub ? " ("+p.sub.replace(/ \(.*\)$/,"")+")" : "")));
+      } else {
+        st.failed=true;
+        st.msg = "Saved "+(total-res.missing)+" of "+total+" "+p.unit+". "+res.missing+(res.missing===1?" was":" were")+
+          " not downloaded — check your connection, then tap Retry.";
+      }
+    }).catch(function(){
+      st.running=false; st.failed=true;
+      st.msg="Saving stopped before it finished. Check your connection, then tap Retry.";
+    }).then(function(){ paintPackages(); });
+  }
+  function enqueue(p, onlyMissing){
+    if(PK.running===p.id || PK.queue.some(function(j){ return j.p.id===p.id; })) return;
+    PK.queue.push({p:p, only:!!onlyMissing});
+    PK.state[p.id] = { queued:true };
+    paintPackages(); pumpQueue();
+  }
+  function pumpQueue(){
+    if(PK.running || !PK.queue.length) return;
+    var job=PK.queue.shift(); PK.running=job.p.id;
+    runPackage(job.p, job.only).then(function(){ PK.running=null; pumpQueue(); });
+  }
+  function removePackage(p){
+    var done;
+    if(p.kind==="days"){
+      comingDays(p.days).slice(1).forEach(function(d){ store.removeItem(keyOf(state.cal,d)); });   // today stays
+      done=Promise.resolve();
+    } else {
+      done=caches.open(pkgCache(p)).then(function(c){
+        return Promise.all(p.files.map(function(f){ return c.delete(absURL(f)); }));
+      }).catch(function(){});
+    }
+    store.removeItem(pkgKey(p.id)); PK.state[p.id]={};
+    return done.then(function(){ paintPackages(); toast("Removed from this device"); });
+  }
+
+  // ----- keeping the 30 days topped up once the reader has asked for them -----
+  function topUpDays(){
+    if(!pkgRecord(DAYS_PKG.id) || PK.running || navigator.onLine===false) return;
+    var want=comingDays(DAYS_PKG.days).filter(function(d){
+      var c=readCache(state.cal,d); return !(c && c.data) || (Date.now()-(c.t||0)) > 14*86400000;
+    });
+    pool(want, 2, function(d){
+      return fetchDay(state.cal,d).then(function(data){ if(isDayData(data)) writeCache(state.cal,d,data); });
+    }).then(function(){ if(state.tab==="settings") paintPackages(); });
+  }
+
+  // ----- storage -----
+  function askPersist(){
+    try{
+      if(navigator.storage && navigator.storage.persist && navigator.storage.persisted){
+        navigator.storage.persisted().then(function(p){ return p || navigator.storage.persist(); }).then(paintStorage, paintStorage);
+      }
+    }catch(e){}
+  }
+  function paintStorage(){
+    var lbl=el("storageLbl");
+    if(!(navigator.storage && navigator.storage.estimate)){ lbl.textContent=""; return; }
+    Promise.all([
+      navigator.storage.estimate(),
+      navigator.storage.persisted ? navigator.storage.persisted() : Promise.resolve(false)
+    ]).then(function(r){
+      var used=r[0] && r[0].usage || 0;
+      lbl.textContent = "Offline data for this website: about "+fmtBytes(used)+". "+
+        (r[1] ? "Your browser keeps it safe from automatic clean-up." :
+                "If your phone runs short of space, the browser may clear saved texts; they can simply be saved again.");
+    }).catch(function(){ lbl.textContent=""; });
+  }
+
+  // ----- the Settings card -----
+  function pkgSize(p){
+    if(p.kind==="days"){
+      var b=daysBytes();
+      return b.days ? "about "+fmtBytes(Math.round(b.bytes/b.days*p.days)) : "about 1 MB";
+    }
+    return fmtBytes(p.bytes||0);
+  }
+  function pkgStatus(p, have){
+    var st=PK.state[p.id]||{}, total=pkgTotal(p), rec=pkgRecord(p.id);
+    if(st.running) return { text:"Saving… "+(st.done||0)+" of "+(st.total||total)+" "+p.unit, btn:"Saving…", busy:true, bar:true };
+    if(st.queued) return { text:"Waiting for the download before it to finish", btn:"Waiting…", busy:true };
+    if(st.failed) return { text:st.msg, btn:"Retry", act:"retry", rm:have>0 };
+    if(p.kind==="days"){
+      var last=comingDays(p.days)[p.days-1];
+      if(have===total) return { text:"Saved: every day to "+last.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long"})+
+        (rec ? ". Kept up to date whenever you are online." : "."), btn: "Refresh", act:"all", rm:true, ok:true };
+      if(have>0) return { text: have+" of the coming "+total+" days "+(have===1 ? "is" : "are")+" on this device", btn:"Save all 30", act:"all", rm:daysAhead()>0 };
+      return { text:"Not saved", btn:"Save", act:"all" };
+    }
+    if(!textsOK()) return { text:"This browser cannot keep texts for offline reading.", none:true };
+    if(have===total){
+      if(rec && rec.v && rec.v!==p.version) return { text:"An updated text is available", btn:"Update", act:"all", rm:true };
+      return { text: rec && rec.t ? "Saved on this device ("+new Date(rec.t).toLocaleDateString("en-AU",{day:"numeric",month:"short",year:"numeric"})+")" :
+        "On this device", rm:true, ok:true };
+    }
+    if(have>0) return { text:"Partly on this device: "+have+" of "+total+" "+p.unit, btn:"Save all", act:"all", rm:true };
+    return { text:"Not saved", btn:"Save", act:"all" };
+  }
+  function pkgRow(p){
+    var row=el("pkg-"+p.id);
+    if(row) return row;
+    row=mk("div","pkg"); row.id="pkg-"+p.id;
+    var top=mk("div","pkrow"), lab=mk("span","sl");
+    lab.appendChild(mk("b","",p.name));
+    lab.appendChild(mk("small","pksub",""));
+    var stat=mk("small","pkstat",""); stat.setAttribute("aria-live","polite"); lab.appendChild(stat);
+    var btn=mk("button","btn soft pkbtn","Save");
+    top.appendChild(lab); top.appendChild(btn); row.appendChild(top);
+    var bar=mk("div","pkbar hidden"); bar.setAttribute("role","progressbar"); bar.setAttribute("aria-label", "Saving "+p.name);
+    bar.setAttribute("aria-valuemin","0"); bar.appendChild(mk("i")); row.appendChild(bar);
+    var rm=mk("button","linkbtn pkrm hidden","Remove from this device"); row.appendChild(rm);
+    var cf=mk("div","pkconfirm hidden");
+    cf.appendChild(mk("span","","Remove “"+p.name+(p.sub ? " — "+p.sub : "")+"” from this device? You can save it again at any time."));
+    var yes=mk("button","btn soft","Remove"), no=mk("button","btn ghost","Keep");
+    cf.appendChild(yes); cf.appendChild(no); row.appendChild(cf);
+    btn.addEventListener("click", function(){
+      var a=btn.getAttribute("data-act"); if(!a) return;
+      if(p.kind!=="days" && !textsOK()) return;
+      enqueue(p, a==="retry");
+    });
+    rm.addEventListener("click", function(){ show(cf,true); show(rm,false); });
+    no.addEventListener("click", function(){ show(cf,false); show(rm,true); });
+    yes.addEventListener("click", function(){ show(cf,false); removePackage(p); });
+    el("pkgList").appendChild(row);
+    return row;
+  }
+  function paintRow(p, have){
+    var row=pkgRow(p), s=pkgStatus(p, have);
+    row.querySelector(".pksub").textContent = [p.sub, pkgTotal(p)+" "+p.unit, pkgSize(p)].filter(Boolean).join(" · ");
+    row.querySelector(".pkstat").textContent = s.text;
+    row.classList.toggle("ok", !!s.ok);
+    var btn=row.querySelector(".pkbtn");
+    show(btn, !!s.btn); btn.textContent=s.btn||""; btn.disabled=!!s.busy;
+    if(s.act) btn.setAttribute("data-act", s.act); else btn.removeAttribute("data-act");
+    var cfOpen=!row.querySelector(".pkconfirm").classList.contains("hidden");
+    show(row.querySelector(".pkrm"), !!s.rm && !s.busy && !cfOpen);
+    if(s.busy || !s.rm) show(row.querySelector(".pkconfirm"), false);
+    show(row.querySelector(".pkbar"), !!s.bar);
+  }
+  function paintPkgProgress(p){
+    var row=el("pkg-"+p.id), st=PK.state[p.id]; if(!row || !st) return;
+    var bar=row.querySelector(".pkbar"), tot=st.total||pkgTotal(p);
+    bar.setAttribute("aria-valuemax", String(tot)); bar.setAttribute("aria-valuenow", String(st.done||0));
+    bar.querySelector("i").style.width = (tot ? Math.round((st.done||0)/tot*100) : 0)+"%";
+    if(st.running) row.querySelector(".pkstat").textContent = "Saving… "+(st.done||0)+" of "+tot+" "+p.unit;
+  }
+  var pkPaintSeq=0;
+  function paintPackages(){
+    var seq=++pkPaintSeq;
+    return loadPackages().catch(function(){ return []; }).then(function(){
+      return Promise.all(allPackages().map(presentOf));
+    }).then(function(counts){
+      if(seq!==pkPaintSeq) return;                    // a newer paint is on its way
+      allPackages().forEach(function(p,i){ PK.present[p.id]=counts[i]; paintRow(p, counts[i]); paintPkgProgress(p); });
+      paintStorage();
+    });
+  }
+  function renderPackages(){
+    paintPackages();
+  }
+  // ---------- Backup and restore ----------
+  // The file format is documented in docs/BACKUP-FORMAT.md. A backup holds only the reader's own records and
+  // settings — never saved days, offline texts or anything about the device — and the app never sends it
+  // anywhere: the reader chooses where the file goes.
+  var BK_FORMAT = "daily-readings-backup", BK_VERSION = 1;
+  var BK_CHOICES = {
+    "pref:lang":["en","par","grc"], "pref:greek":["0","1"], "pref:theme":["auto","light","dark"],
+    "pref:gkEd":["rp","pt"], "pref:txt":["kjv","nkjv"], "pref:reviewQuotes":["0","1"]
+  };
+  // Every storage key a restore may change (and the undo snapshot keeps)
+  var BK_KEYS = ["pref:lang","pref:greek","pref:theme","pref:scale","pref:gkEd","pref:txt","pref:todayHide","pref:reviewQuotes",
+                 "reader:pos","user:bookmarks","user:highlights","user:fastlog","user:fastnotes","user:favQuotes"];
+  var ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+  function isInt(n, lo, hi){ return typeof n==="number" && isFinite(n) && Math.floor(n)===n && n>=lo && n<=hi; }
+  function okVerse(x){ return !!x && typeof x==="object" && isInt(x.b,40,66) && isInt(x.c,1,ntInfo(x.b)[2]) && isInt(x.v,1,200); }
+  function cleanVerse(x){
+    var o={b:x.b, c:x.c, v:x.v};
+    if(typeof x.s==="string") o.s=x.s.slice(0,200);
+    if(typeof x.t==="number" && isFinite(x.t)) o.t=x.t;
+    return o;
+  }
+  function isMap(o){ return !!o && typeof o==="object" && !Array.isArray(o); }
+  function plural(n, w){ return n+" "+w+(n===1 ? "" : "s"); }
+
+  // What is on this device now, in the backup's shape
+  function deviceData(){
+    var settings={};
+    Object.keys(BK_CHOICES).concat(["pref:scale"]).forEach(function(k){ var v=store.getItem(k); if(v!=null) settings[k]=v; });
+    var th=jget("pref:todayHide", null); if(Array.isArray(th)) settings["pref:todayHide"]=th;
+    var rp=jget("reader:pos", null), fl=jget("user:fastlog", {}), fn=jget("user:fastnotes", {}), fq=jget("user:favQuotes", []);
+    return {
+      settings: settings,
+      reader: okVerse(rp) ? {b:rp.b, c:rp.c, v:rp.v||1} : null,
+      bookmarks: savedList("user:bookmarks"), highlights: savedList("user:highlights"),
+      fastlog: isMap(fl) ? fl : {}, fastnotes: isMap(fn) ? fn : {}, savedSayings: Array.isArray(fq) ? fq : []
+    };
+  }
+  function countsText(d){
+    var parts=[plural(d.bookmarks.length,"bookmark"), plural(d.highlights.length,"highlight"),
+               plural(Object.keys(d.fastlog).length,"fasting note"), plural(Object.keys(d.fastnotes).length,"written note"),
+               plural(d.savedSayings.length,"saved saying")];
+    return parts.join(" · ");
+  }
+
+  // Reads a parsed file; anything that is not exactly what the app writes is left out and counted.
+  function readBackup(obj){
+    if(!isMap(obj) || obj.format!==BK_FORMAT) return {error:"This file is not a Daily Readings backup."};
+    if(typeof obj.version!=="number" || obj.version<1) return {error:"This backup file is damaged: it has no version number."};
+    if(obj.version>BK_VERSION) return {error:"This backup was made by a newer version of Daily Readings. Update the app, then try again."};
+    var d=obj.data; if(!isMap(d)) return {error:"This backup file is damaged: it holds no data."};
+    var out={settings:{}, reader:null, bookmarks:[], highlights:[], fastlog:{}, fastnotes:{}, savedSayings:[]}, bad=0;
+    if(d.settings!=null){
+      if(isMap(d.settings)) Object.keys(d.settings).forEach(function(k){
+        var v=d.settings[k];
+        if(BK_CHOICES[k]){ if(BK_CHOICES[k].indexOf(v)>-1) out.settings[k]=v; else bad++; }
+        else if(k==="pref:scale"){ var n=parseInt(v,10); if(SCALES.indexOf(n)>-1) out.settings[k]=String(n); else bad++; }
+        else if(k==="pref:todayHide"){
+          if(Array.isArray(v)) out.settings[k]=v.filter(function(x){ return TODAY_SECTIONS.some(function(t){ return t.id===x; }); });
+          else bad++;
+        } else bad++;
+      }); else bad++;
+    }
+    if(d.reader!=null){ if(okVerse(d.reader)) out.reader={b:d.reader.b, c:d.reader.c, v:d.reader.v}; else bad++; }
+    ["bookmarks","highlights"].forEach(function(k){
+      if(d[k]==null) return;
+      if(!Array.isArray(d[k])){ bad++; return; }
+      var seen={};
+      d[k].forEach(function(x){
+        if(!okVerse(x)){ bad++; return; }
+        var id=x.b+":"+x.c+":"+x.v; if(seen[id]) return; seen[id]=1; out[k].push(cleanVerse(x));
+      });
+    });
+    if(d.fastlog!=null){
+      if(isMap(d.fastlog)) Object.keys(d.fastlog).forEach(function(k){ var v=d.fastlog[k]; if(ISO_DAY.test(k) && (v==="k"||v==="p")) out.fastlog[k]=v; else bad++; });
+      else bad++;
+    }
+    if(d.fastnotes!=null){
+      if(isMap(d.fastnotes)) Object.keys(d.fastnotes).forEach(function(k){
+        var v=d.fastnotes[k];
+        if(ISO_DAY.test(k) && typeof v==="string" && v.trim()) out.fastnotes[k]=v.slice(0,500); else bad++;
+      }); else bad++;
+    }
+    if(d.savedSayings!=null){
+      if(Array.isArray(d.savedSayings)) d.savedSayings.forEach(function(x){
+        if(typeof x==="string" && /^q\d{3,4}$/.test(x)){ if(out.savedSayings.indexOf(x)<0) out.savedSayings.push(x); } else bad++;
+      }); else bad++;
+    }
+    var made = (typeof obj.created==="string" && !isNaN(Date.parse(obj.created))) ? new Date(obj.created) : null;
+    return {data:out, bad:bad, created:made, app:(typeof obj.app==="string" ? obj.app.slice(0,12) : "")};
+  }
+
+  function writeData(d){
+    Object.keys(BK_CHOICES).concat(["pref:scale"]).forEach(function(k){
+      if(d.settings[k]!=null) store.setItem(k, d.settings[k]); else store.removeItem(k);
+    });
+    if(Array.isArray(d.settings["pref:todayHide"])) jset("pref:todayHide", d.settings["pref:todayHide"]); else store.removeItem("pref:todayHide");
+    if(d.reader) jset("reader:pos", d.reader); else store.removeItem("reader:pos");
+    jset("user:bookmarks", d.bookmarks); jset("user:highlights", d.highlights);
+    jset("user:fastlog", d.fastlog); jset("user:fastnotes", d.fastnotes); jset("user:favQuotes", d.savedSayings);
+  }
+  // Merge: the backup fills in what this device lacks. Where both hold something for the same verse or day,
+  // this device's entry is kept. Settings and reading position on this device stay as they are.
+  function mergeData(dev, bk){
+    function verses(a, b){
+      var seen={}, out=[];
+      a.concat(b).forEach(function(x){ var id=x.b+":"+x.c+":"+x.v; if(!seen[id]){ seen[id]=1; out.push(x); } });
+      return out;
+    }
+    function fill(a, b){ var o={}; Object.keys(b).forEach(function(k){ o[k]=b[k]; }); Object.keys(a).forEach(function(k){ o[k]=a[k]; }); return o; }
+    return {
+      settings: dev.settings, reader: dev.reader || bk.reader,
+      bookmarks: verses(dev.bookmarks, bk.bookmarks), highlights: verses(dev.highlights, bk.highlights),
+      fastlog: fill(dev.fastlog, bk.fastlog), fastnotes: fill(dev.fastnotes, bk.fastnotes),
+      savedSayings: dev.savedSayings.concat(bk.savedSayings.filter(function(x){ return dev.savedSayings.indexOf(x)<0; }))
+    };
+  }
+  // Before any restore, what was here is kept so the restore can be undone
+  function snapshot(){
+    var items={}; BK_KEYS.forEach(function(k){ items[k]=store.getItem(k); });
+    jset("backup:undo", {t:Date.now(), items:items});
+  }
+  function reloadWith(msg){
+    try{ sessionStorage.setItem("dr:toast", msg); }catch(e){}
+    setTimeout(function(){ location.reload(); }, 300);
+  }
+  function undoRestore(){
+    var u=jget("backup:undo", null); if(!u || !isMap(u.items)) return;
+    BK_KEYS.forEach(function(k){ var v=u.items[k]; if(v==null) store.removeItem(k); else store.setItem(k, String(v)); });
+    store.removeItem("backup:undo");
+    reloadWith("What was on this device before the restore is back");
+  }
+
+  // ----- saving a backup -----
+  function backupFileName(){ return "daily-readings-backup-"+isoKey(new Date())+".json"; }
+  function backupText(){
+    return JSON.stringify({
+      format: BK_FORMAT, version: BK_VERSION, created: new Date().toISOString(), app: APP_VERSION,
+      about: "Personal data from the Daily Readings app: bookmarks, highlights, fasting notes, saved sayings, reading position and settings. "+
+             "Restore it in Settings → Backup and restore. The format is described in docs/BACKUP-FORMAT.md in the app's source.",
+      data: deviceData()
+    }, null, 1);
+  }
+  function canShareFiles(){
+    try{ return !!(navigator.canShare && navigator.share && navigator.canShare({files:[new File(["{}"], "t.json", {type:"application/json"})]})); }
+    catch(e){ return false; }
+  }
+  function markBackedUp(){ store.setItem("backup:last", String(Date.now())); paintBackupCard(); }
+  function downloadBackup(){
+    var blob=new Blob([backupText()], {type:"application/json"}), url=URL.createObjectURL(blob);
+    var a=document.createElement("a"); a.href=url; a.download=backupFileName(); a.style.display="none";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 10000);
+    markBackedUp(); closeLayer();
+    toast("Backup file ready — look in your downloads");
+  }
+  function shareBackup(){
+    var f=new File([backupText()], backupFileName(), {type:"application/json"});
+    navigator.share({files:[f], title:"Daily Readings backup"}).then(function(){ markBackedUp(); closeLayer(); }).catch(function(){});
+  }
+  function openBackup(){
+    var body=el("backupBody"); body.innerHTML="";
+    var d=deviceData();
+    body.appendChild(mk("p","bkcount", countsText(d)+" · your reading position and settings"));
+    body.appendChild(mk("p","warn","This file holds your private fasting notes, bookmarks and highlights. Anyone who has the file can read them. "+
+      "Daily Readings does not send it anywhere — you choose where it goes."));
+    var dl=mk("button","btn","Download the file"); dl.id="bkDownload";
+    dl.addEventListener("click", downloadBackup); body.appendChild(dl);
+    if(canShareFiles()){
+      var sh=mk("button","btn ghost","Share or save to…"); sh.id="bkShare";
+      sh.addEventListener("click", shareBackup); body.appendChild(sh);
+    }
+    body.appendChild(mk("p","note","File name: "+backupFileName()));
+    openSheet("backupSheet");
+  }
+
+  // ----- restoring -----
+  var pendingRestore=null;
+  function restoreMessage(text){
+    var body=el("restoreBody"); body.innerHTML="";
+    body.appendChild(mk("p","warn",text));
+    var ok=mk("button","btn ghost","Close"); ok.addEventListener("click", closeLayer); body.appendChild(ok);
+    if(topKind()!=="sheet") openSheet("restoreSheet");
+  }
+  function showRestore(res){
+    if(res.error){ restoreMessage(res.error); return; }
+    pendingRestore=res;
+    var body=el("restoreBody"); body.innerHTML="";
+    body.appendChild(mk("p","bkmade","Backup made "+(res.created ? fmtDate(res.created) : "on an unknown date")+(res.app ? " · version "+res.app : "")));
+    body.appendChild(mk("p","bkcount","In the backup: "+countsText(res.data)));
+    if(res.bad) body.appendChild(mk("p","note", (res.bad===1 ? "1 entry" : res.bad+" entries")+" could not be read and will be left out."));
+    var opts=mk("div","bkopts"), mode="merge";
+    function opt(id, title, sub){
+      var b=mk("button","opt"+(id===mode ? " active" : "")); b.setAttribute("data-mode", id);
+      b.appendChild(mk("span","rd"));
+      var t=mk("span"); t.appendChild(mk("b","",title)); t.appendChild(mk("small","",sub)); b.appendChild(t);
+      b.addEventListener("click", function(){
+        mode=id; each("#restoreBody .bkopts .opt", function(o){ o.classList.toggle("active", o.getAttribute("data-mode")===id); });
+        show(cf, false); show(go, true);
+      });
+      opts.appendChild(b);
+    }
+    opt("merge", "Merge with this device", "Adds the backup’s bookmarks, highlights, fasting notes and saved sayings to what is here. "+
+      "Where both hold something for the same verse or day, this device’s is kept. Settings here stay as they are.");
+    opt("replace", "Replace what is on this device", "Makes this device match the backup exactly — records, reading position and settings. "+
+      "Anything here that is not in the backup is removed.");
+    body.appendChild(opts);
+    var go=mk("button","btn","Restore"); go.id="bkRestoreGo"; body.appendChild(go);
+    var cf=mk("div","bkconfirm hidden");
+    cf.appendChild(mk("p","warn","On this device now: "+countsText(deviceData())+". All of it will be replaced by the backup. "+
+      "You can undo this afterwards in Settings → Backup and restore."));
+    var yes=mk("button","btn","Replace"), no=mk("button","btn ghost","Cancel");
+    yes.id="bkReplaceYes"; cf.appendChild(yes); cf.appendChild(no); body.appendChild(cf);
+    go.addEventListener("click", function(){
+      if(mode==="replace"){ show(cf, true); show(go, false); return; }
+      applyRestore("merge");
+    });
+    no.addEventListener("click", function(){ show(cf, false); show(go, true); });
+    yes.addEventListener("click", function(){ applyRestore("replace"); });
+    if(topKind()!=="sheet") openSheet("restoreSheet");
+  }
+  function applyRestore(mode){
+    var res=pendingRestore; if(!res) return;
+    snapshot();
+    writeData(mode==="replace" ? res.data : mergeData(deviceData(), res.data));
+    pendingRestore=null;
+    reloadWith(mode==="replace" ? "Restored — this device now matches the backup" : "Restored — the backup is merged with this device");
+  }
+  el("restoreBtn").addEventListener("click", function(){ var f=el("restoreFile"); f.value=""; f.click(); });
+  el("restoreFile").addEventListener("change", function(){
+    var file=this.files && this.files[0]; if(!file) return;
+    if(file.size > 2*1048576){ restoreMessage("This file is too large to be a Daily Readings backup."); return; }
+    var fr=new FileReader();
+    fr.onload=function(){
+      var obj; try{ obj=JSON.parse(String(fr.result)); }
+      catch(e){ restoreMessage("This file could not be read. Choose a backup saved by Daily Readings — its name ends in .json."); return; }
+      showRestore(readBackup(obj));
+    };
+    fr.onerror=function(){ restoreMessage("This file could not be opened."); };
+    fr.readAsText(file);
+  });
+  el("backupBtn").addEventListener("click", openBackup);
+  el("undoBtn").addEventListener("click", undoRestore);
+  function paintBackupCard(){
+    var last=parseInt(store.getItem("backup:last")||"0",10);
+    el("backupSub").textContent = "The file holds your private notes and records. Keep it somewhere safe."+
+      (last ? " Last saved "+new Date(last).toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"})+"." : "");
+    var u=jget("backup:undo", null);
+    show(el("undoRow"), !!(u && u.t));
+    if(u && u.t) el("undoLbl").textContent = "Puts back what was on this device before the restore of "+
+      new Date(u.t).toLocaleDateString("en-AU",{day:"numeric",month:"long"})+" at "+new Date(u.t).toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"})+".";
+  }
+  function bootToast(){
+    try{ var m=sessionStorage.getItem("dr:toast"); if(m){ sessionStorage.removeItem("dr:toast"); setTimeout(function(){ toast(m); }, 500); } }catch(e){}
+  }
   // ---------- data ----------
   function readCache(cal,d){
     try{ var raw=store.getItem(keyOf(cal,d)); return raw?JSON.parse(raw):null; }catch(e){ return null; }
@@ -2444,10 +3415,14 @@
     try{ store.setItem(keyOf(cal,d), JSON.stringify({t:Date.now(), data:data})); }catch(e){}
   }
 
-  function fetchJSON(url){
-    return fetch(url, {headers:{Accept:"application/json"}}).then(function(r){
+  // A request that hears nothing for 15 seconds is given up, so a poor connection never leaves the day spinning.
+  function fetchJSON(url, ms){
+    var ctl = (typeof AbortController!=="undefined") ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function(){ ctl.abort(); }, ms||15000) : null;
+    var opts = {headers:{Accept:"application/json"}}; if(ctl) opts.signal=ctl.signal;
+    return fetch(url, opts).then(function(r){
       if(!r.ok) throw new Error("HTTP "+r.status); return r.json();
-    });
+    }).then(function(j){ clearTimeout(timer); return j; }, function(e){ clearTimeout(timer); throw e; });
   }
   function fetchDay(cal,d){
     var url=apiUrl(cal,d);
@@ -2456,6 +3431,54 @@
       return fetchJSON(PROXY+encodeURIComponent(url));
     });
   }
+
+  // ---------- the app's own files, with recovery from a damaged offline copy ----------
+  // If a stored file cannot be read (cut off mid-download, say), it is removed from the offline store and fetched
+  // afresh; the fresh copy is stored again only once it has been read successfully.
+  var APP_CACHE = CACHE_PREFIX + "v" + APP_VERSION + "-" + APP_BUILD;
+  var GREEK_CACHE = CACHE_PREFIX + "greek-1", TEXT_CACHE = CACHE_PREFIX + "texts-1";
+  function cachesOK(){ try{ return typeof caches!=="undefined" && !!caches.open; }catch(e){ return false; } }
+  function absURL(rel){ return new URL(rel, location.href).href; }
+  function cacheNameFor(rel){
+    if(/^greek\//.test(rel)) return GREEK_CACHE;
+    if(/^(kjv|greek-pt)\//.test(rel)) return TEXT_CACHE;
+    return APP_CACHE;
+  }
+  function dropCached(rel){
+    if(!cachesOK()) return Promise.resolve();
+    var u=absURL(rel);
+    return caches.keys().then(function(keys){
+      return Promise.all(keys.filter(function(k){ return k.indexOf(CACHE_PREFIX)===0; }).map(function(k){
+        return caches.open(k).then(function(c){ return c.delete(u); });
+      }));
+    }).catch(function(){});
+  }
+  // A fresh copy from the server: past the browser's own cache, and past the offline store (see sw.js)
+  var FRESH = {cache:"reload", headers:{"X-Daily-Readings":"fresh"}};
+  function readJSON(r){
+    if(!r || !r.ok) throw new Error("HTTP "+(r ? r.status : "?"));
+    return r.text().then(function(t){ return JSON.parse(t); });
+  }
+  function fetchJSONWithRepair(rel){
+    return fetch(rel).then(readJSON).catch(function(){
+      return dropCached(rel).then(function(){ return fetch(rel, FRESH); }).then(function(r){
+        var copy = (r && r.ok) ? r.clone() : null;
+        return readJSON(r).then(function(j){
+          if(copy && cachesOK()) caches.open(cacheNameFor(rel)).then(function(c){ return c.put(absURL(rel), copy); }).catch(function(){});
+          return j;
+        });
+      });
+    });
+  }
+
+  // ---------- connection notices ----------
+  function savedOn(t){
+    var d=new Date(t);
+    if(sameDay(d, new Date())) return "today at "+d.toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"});
+    return "on "+d.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  }
+  function whyNot(){ return navigator.onLine===false ? "You’re offline." : "The calendar service could not be reached."; }
+  function paintNet(){ show(el("netChip"), navigator.onLine===false); }
 
   function load(){
     el("offlineBanner").classList.remove("show");
@@ -2469,26 +3492,37 @@
       show(el("content"), false);
       el("loading").classList.remove("hidden");
     }
-    var asked = state.date.getTime();
-    fetchDay(state.cal, state.date).then(function(data){
-      writeCache(state.cal, new Date(asked), data);
+    var asked = state.date.getTime(), shown = new Date(asked);
+    fetchDay(state.cal, shown).then(function(data){
+      if(!data || typeof data!=="object") throw new Error("unexpected reply");
+      writeCache(state.cal, shown, data);
       if(asked!==state.date.getTime()) return;                 // the reader has moved to another day meanwhile
       render(data, {cached:false});
       prefetchWeek();
-    }).catch(function(err){
+    }).catch(function(){
       if(asked!==state.date.getTime()) return;
       if(cached && cached.data){
-        el("offlineBanner").classList.add("show");   // showing saved copy
-      } else {
-        // nothing saved for this day: show what the app can work out by itself, and say so plainly
-        render(null, {offline:true});
-        var b=el("errorBanner");
-        b.innerHTML = "Couldn’t load the readings for this day. Check your connection, or open "+
-          "<a href='https://orthocal.info/' target='_blank' rel='noopener'>orthocal.info</a>.";
+        // Say plainly that this is a saved copy, which day it is for, and when it was saved
+        var b=el("offlineBanner");
+        b.textContent = whyNot()+" Showing the copy of "+fmtDate(shown)+" saved "+savedOn(cached.t)+".";
         b.classList.add("show");
+      } else {
+        // Nothing saved for this day: show only what the app can work out exactly, and say so plainly
+        render(null, {offline:true});
+        var e=el("errorBanner"); e.textContent="";
+        e.appendChild(document.createTextNode(whyNot()+" The readings, saints and fast for "+fmtDate(shown)+
+          " are not on this device, so they are not shown. Try again when you are connected, or open "));
+        var a=mk("a","","orthocal.info"); a.href="https://orthocal.info/"; a.target="_blank"; a.rel="noopener";
+        e.appendChild(a); e.appendChild(document.createTextNode("."));
+        e.classList.add("show");
       }
     });
   }
+  window.addEventListener("online", function(){
+    paintNet();
+    if(el("offlineBanner").classList.contains("show") || el("errorBanner").classList.contains("show")) load();
+  });
+  window.addEventListener("offline", paintNet);
 
   // ---------- Quiet prefetch: keep the coming week readable offline ----------
   var prefetched=false;
@@ -2496,16 +3530,51 @@
     if(prefetched) return; prefetched=true;
     var base=startOfToday(), i=1;
     function next(){
-      if(i>7) return;
+      if(i>7){ topUpDays(); return; }                  // then the 30 days, if the reader saved them
       var d=new Date(base.getFullYear(), base.getMonth(), base.getDate()+i); i++;
       var c=readCache(state.cal,d);
       if(c && c.t && (Date.now()-c.t) < 3*86400000){ next(); return; }   // already fresh
-      fetchDay(state.cal,d).then(function(data){ writeCache(state.cal,d,data); })
+      fetchDay(state.cal,d).then(function(data){ if(data && typeof data==="object") writeCache(state.cal,d,data); })
         .catch(function(){})
         .then(function(){ setTimeout(next, 400); });
     }
     setTimeout(next, 3000);
   }
+
+  // ---------- Housekeeping: saved days are working copies, kept from two weeks back to six weeks ahead ----------
+  // (localStorage is small; v34 never cleared old days). Personal records (user:*) are never touched here.
+  // NKJV chapters saved by version 34 are cleared while the NKJV is paused — but not by the review copy, which
+  // shares this storage with the live app.
+  function pruneSaved(){
+    var t=startOfToday(), lo=new Date(t.getFullYear(), t.getMonth(), t.getDate()-14), hi=new Date(t.getFullYear(), t.getMonth(), t.getDate()+45);
+    var drop=[], keys=[];
+    try{ for(var i=0;i<localStorage.length;i++) keys.push(localStorage.key(i)||""); }catch(e){}
+    keys.forEach(function(k){
+      var m=/^day:\w+:(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(k);
+      if(m){ var d=new Date(+m[1], +m[2]-1, +m[3]); if(d<lo || d>hi) drop.push(k); }
+      else if(/^nkjv:/.test(k) && !NKJV_ENABLED && CACHE_PREFIX==="orthodox-readings-") drop.push(k);
+    });
+    drop.forEach(function(k){ store.removeItem(k); });
+    return drop.length;
+  }
+
+  // ---------- A new day: an app left open (or resumed) after midnight moves on to the new day ----------
+  var shownToday = startOfToday().getTime();
+  function checkNewDay(){
+    var t=startOfToday();
+    if(t.getTime()===shownToday) return false;
+    var wasToday = state.date.getTime()===shownToday;
+    shownToday=t.getTime(); prefetched=false;
+    if(wasToday){ state.date=t; load(); }
+    syncTodayBtn();
+    if(state.tab==="calendar") renderCalendar();
+    if(state.tab==="prayer") renderPrayersLink();
+    return true;
+  }
+  document.addEventListener("visibilitychange", function(){ if(document.visibilityState==="visible") checkNewDay(); });
+  window.addEventListener("focus", checkNewDay);
+  window.addEventListener("pageshow", checkNewDay);
+  setInterval(checkNewDay, 60000);
 
   // ---------- Install ----------
   var deferredInstall=null;
@@ -2517,7 +3586,7 @@
     if(deferredInstall){
       show(el("installGo"), true); show(el("installBanner"), true);
     } else if(/iphone|ipad|ipod/i.test(navigator.userAgent)){
-      el("installTxt").textContent = "Keep DailyReadings with you: tap Share, then “Add to Home Screen”.";
+      el("installTxt").textContent = "Keep Daily Readings with you: tap Share, then “Add to Home Screen”.";
       show(el("installGo"), false); show(el("installBanner"), true);
     }
   }
@@ -2550,7 +3619,6 @@
     deferredInstall.prompt();
     (deferredInstall.userChoice || Promise.resolve()).then(function(){ deferredInstall=null; renderInstallRow(); });
   });
-
   // ---------- day navigation ----------
   function goDays(n){ state.date=new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()+n); syncTodayBtn(); load(); }
   function goToday(){ state.date=startOfToday(); syncTodayBtn(); load(); }
@@ -2583,8 +3651,14 @@
   }
   el("commemHead").addEventListener("click", toggleCommem);
   el("commemHead").addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleCommem(); } });
+  function toggleOthers(){
+    var open=el("otherCard").classList.toggle("open");
+    el("otherHead").setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  el("otherHead").addEventListener("click", toggleOthers);
+  el("otherHead").addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleOthers(); } });
   el("openAllBtn").addEventListener("click", function(){
-    var rs=document.querySelectorAll(".reading");
+    var rs=document.querySelectorAll("#readings .reading");
     var anyClosed=Array.prototype.some.call(rs, function(r){ return !r.classList.contains("open"); });
     Array.prototype.forEach.call(rs, function(r){ r.classList.toggle("open", anyClosed); });
     syncOpenAll();
@@ -2611,8 +3685,8 @@
   // ---------- boot ----------
   if(SCALES.indexOf(state.scale)<0) state.scale=100;
   if(state.theme!=="auto") document.documentElement.setAttribute("data-theme", state.theme);
-  paintTheme(); applyScale(); paintPrefs();
-  loadFathers();
+  paintTheme(); applyScale(); paintPrefs(); paintNet();
+  loadFathers(); renderSavedQuotesSub(); bootToast();
   window.__parseRef = parseRef;       // exposed for automated tests
   window.__paschaCivil = paschaCivil;
   window.__litKey = liturgicalKey;
@@ -2632,9 +3706,21 @@
   window.__openReader = openReader;
   window.__state = state;
   window.__selectDay = selectDay;
+  window.__liturgicalSeason = liturgicalSeason;
+  window.__pool = pool;
+  window.__readBackup = readBackup;
+  window.__mergeData = mergeData;
+  window.__deviceData = deviceData;
+  window.__pruneSaved = pruneSaved;
+  window.__checkNewDay = checkNewDay;
+  window.__paintPackages = paintPackages;
+  window.__pkg = PK;
+  window.__backupText = backupText;
+  window.__quoteForDay = quoteForDay;
   maybeInstallBanner();
   load();              // first load (Old Calendar)
   syncTodayBtn();
+  setTimeout(pruneSaved, 5000);
 
   if("serviceWorker" in navigator){
     window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });

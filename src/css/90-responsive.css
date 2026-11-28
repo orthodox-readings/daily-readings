@@ -1,0 +1,24 @@
+  @media (max-width:360px){
+    .top{gap:8px} .top .ibtn{width:36px;height:36px} .brand .t{font-size:1.2rem} .brand .s{font-size:.72rem}
+  }
+  @media (max-width:340px){
+    .shell{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+    .card{padding:14px} .rows,.set{padding:4px 14px} .tab{font-size:.6rem}
+    .seg button{padding:7px 9px;font-size:.78rem} .brand .s{display:none} .rbody{padding:18px 14px}
+  }
+  @media (min-width:700px){
+    .card{padding:22px} .day{padding:20px 18px 18px} .rows,.set{padding:8px 22px} .rbody{padding:30px 34px}
+    .date{font-size:1.45rem}
+    .scrim{align-items:center;padding:24px} .sheet{border-radius:20px;padding-bottom:20px} .sheet .grab{display:none}
+  }
+  @media (min-width:960px){
+    :root{--rail:96px}
+    body{padding-bottom:40px}
+    .tabs{right:auto;top:0;width:var(--rail);border-top:0;border-right:1px solid var(--line);padding:0}
+    .tabs .in{flex-direction:column;height:100%;justify-content:center;gap:6px;max-width:none}
+    .tab{flex:none;height:72px;font-size:.7rem;gap:6px}
+    .tab.active::before{top:50%;left:0;margin:-14px 0 0;width:2.5px;height:28px;border-radius:0 3px 3px 0}
+    .shell{max-width:720px}
+    .toast{bottom:28px}
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }

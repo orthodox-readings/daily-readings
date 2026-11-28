@@ -1,0 +1,30 @@
+    <!-- ======================= SCRIPTURE ======================= -->
+    <section class="view" id="view-scripture" hidden>
+      <div class="rbar">
+        <button class="pick" id="rdPick" aria-label="Choose a book and chapter"><span id="rdPickTxt">Matthew 1</span><span class="chev">▼</span></button>
+        <span class="spacer"></span>
+        <button class="ibtn" id="rdSaved" aria-label="Bookmarks and highlights"><svg class="i"><use href="#i-mark"/></svg></button>
+        <button class="ibtn" id="rdFocus" aria-label="Distraction-free reading"><svg class="i"><use href="#i-focus"/></svg></button>
+      </div>
+      <div class="rctl" id="rdCtl">
+        <span class="seg" id="rdLangSeg" role="group" aria-label="Language">
+          <button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button>
+        </span>
+        <span class="spacer"></span>
+        <span class="seg" id="rdSizeSeg" role="group" aria-label="Reading size">
+          <button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button>
+        </span>
+      </div>
+      <article class="card rbody" id="rdCard">
+        <h2 id="rdTitle">—</h2>
+        <p class="rsub" id="rdSub"></p>
+        <div id="rdBody"><div class="loading"><div class="spin"></div>Opening…</div></div>
+      </article>
+      <div class="rnav">
+        <button class="btn soft" id="rdPrev">‹ Previous</button>
+        <button class="btn soft" id="rdNext">Next ›</button>
+      </div>
+      <p class="note" id="rdEdition"></p>
+    </section>
+    <button class="focusx" id="focusExit" aria-label="Leave distraction-free reading"><svg class="i"><use href="#i-x"/></svg></button>
+

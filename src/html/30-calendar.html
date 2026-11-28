@@ -1,0 +1,70 @@
+    <!-- ======================= CALENDAR ======================= -->
+    <section class="view" id="view-calendar" hidden>
+      <h2 class="vtitle">Calendar</h2>
+      <div class="seg wide" id="calSeg" role="group" aria-label="Calendar view">
+        <button data-pane="month" class="active">Month</button><button data-pane="week">Week</button><button data-pane="year">Year</button>
+      </div>
+
+      <section class="card" id="calMonthPane">
+        <div class="calhead">
+          <button id="calPrev" class="hbtn" aria-label="Previous month">‹</button>
+          <span class="mid"><button id="calTitle" class="caltitle" title="Pick a date">Month</button><button id="calYearBtn" class="calyear" title="Year at a glance">Year</button></span>
+          <button id="calNext" class="hbtn" aria-label="Next month">›</button>
+        </div>
+        <div class="calgrid" id="calGrid"></div>
+        <div class="callegend" id="calLegend">
+          <span><i class="lg cat-fast"></i>Fast</span>
+          <span><i class="lg cat-strict"></i>Strict fast</span>
+          <span><i class="lg cat-fish"></i>Fish allowed</span>
+          <span><i class="lg cat-wine"></i>Wine &amp; oil</span>
+          <span>✚ Great feast</span>
+        </div>
+      </section>
+
+      <section class="card hidden" id="calWeekPane">
+        <div class="calhead">
+          <button id="wkPrev" class="hbtn" aria-label="Previous week">‹</button>
+          <span class="mid"><span class="caltitle" id="wkTitle">Week</span></span>
+          <button id="wkNext" class="hbtn" aria-label="Next week">›</button>
+        </div>
+        <div id="wkRows"></div>
+      </section>
+
+      <section class="card hidden" id="calYearPane">
+        <div class="calhead">
+          <button id="yrPrev" class="hbtn" aria-label="Previous year">‹</button>
+          <span class="mid"><span class="caltitle" id="yrTitle">Year</span></span>
+          <button id="yrNext" class="hbtn" aria-label="Next year">›</button>
+        </div>
+        <div id="yrBody"></div>
+        <div style="margin-top:14px"><button class="btn ghost" id="yrShare"><svg class="i"><use href="#i-img"/></svg>Share this year as an image</button></div>
+      </section>
+
+      <section class="card dp" id="dayPanel">
+        <h3 id="dpDate">—</h3>
+        <p class="sub" id="dpSub"></p>
+        <p class="eyebrow k2">Fasting · general rule</p>
+        <span class="pill" id="dpPill">—</span>
+        <p class="feast hidden" id="dpFeast"></p>
+        <div class="acts"><button class="btn" id="dpOpen">Open this day’s readings</button></div>
+        <div class="journal hidden" id="dpJournal">
+          <p class="eyebrow">My fasting note</p>
+          <div class="seg" id="logSeg" role="group" aria-label="My fasting note for this day">
+            <button data-log="k">Kept</button><button data-log="p">In part</button><button data-log="">No note</button>
+          </div>
+          <label class="vh" for="fastNoteText">A private note for this day</label>
+          <textarea id="fastNoteText" class="fnote" maxlength="500" rows="2" placeholder="A private note for this day (optional)"></textarea>
+        </div>
+      </section>
+
+      <section class="card" id="fastCard">
+        <p class="eyebrow">Fasting</p>
+        <div id="seasonBox" class="hidden">
+          <p class="fsum" id="seasonText"></p>
+          <div class="prog" role="img" id="seasonProg" aria-label="How far through the fasting season"><i id="seasonBar" style="width:0%"></i></div>
+        </div>
+        <p class="fsum" id="logSum"></p>
+        <p class="note" style="margin:12px 0 0">The colours show the Church’s general rule, as kept in monasteries — open a day for its precise fast. It does not apply in the same way to everyone: personal fasting should be guided by your spiritual father, taking account of health and circumstances. Your notes stay on this device and are seen by no one else.</p>
+      </section>
+    </section>
+

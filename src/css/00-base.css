@@ -1,0 +1,61 @@
+  /* Literata (SIL Open Font License, bundled in fonts/): Latin, Greek and polytonic Greek, regular and medium */
+  @font-face{font-family:"Literata";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/literata-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/literata-greek-400-normal.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/literata-greek-ext-400-normal.woff2) format("woff2");unicode-range:U+1F00-1FFF}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/literata-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/literata-greek-500-normal.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/literata-greek-ext-500-normal.woff2) format("woff2");unicode-range:U+1F00-1FFF}
+  /* Layout: one centred reading column (max 680px) under a quiet header, five views switched by a fixed
+     bottom tab bar (a side rail from 960px). Cards carry content; everything else sits on the ivory ground. */
+  :root{
+    --bg:#FAF7EF; --card:#FFFFFF; --ink:#302B25; --muted:#79736A; --muted2:#6A645B; --line:#E5DFD4;
+    --burg:#641E28; --gold:#C5A46D; --gold-ink:#86672C;
+    --accent:#641E28; --accent-fill:#641E28; --on-accent:#FFF9EE; --tint:#F4EFE3; --tint2:#EFE8D8;
+    --hl:#F6E9C4; --scrim:rgba(38,30,24,.42);
+    --c-fast:#F4E6E6; --c-strict:#E2BEC4; --c-fish:#DCE7F1; --c-wine:#F1E4C6; --gk:#4E3A2E;
+    --k-fast:#B07A80; --k-strict:#641E28; --k-fish:#3D6A8E; --k-wine:#A88536; --k-free:#5C8A63;
+    --shadow:0 1px 2px rgba(48,43,37,.04), 0 6px 20px rgba(48,43,37,.05);
+    --serif:"Literata","Iowan Old Style","Palatino Linotype",Palatino,"Noto Serif",Georgia,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --rs:1; --navh:62px; --rail:0px;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15110F; --card:#1F1A17; --ink:#EEE7DB; --muted:#A69D90; --muted2:#A69D90; --line:#342C27;
+      --burg:#7C2B37; --gold:#C5A46D; --gold-ink:#CDAE7B;
+      --accent:#D9B98A; --accent-fill:#7C2B37; --on-accent:#FFF6E8; --tint:#29221E; --tint2:#322A25;
+      --hl:#4A3D1E; --scrim:rgba(0,0,0,.6);
+      --c-fast:#36231F; --c-strict:#4D2129; --c-fish:#1E3140; --c-wine:#3A2F1A; --gk:#D9CCB6;
+      --k-fast:#C99097; --k-strict:#E0A1A9; --k-fish:#8DB6D6; --k-wine:#D9B66B; --k-free:#8FBF97;
+      --shadow:0 1px 2px rgba(0,0,0,.3);
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15110F; --card:#1F1A17; --ink:#EEE7DB; --muted:#A69D90; --muted2:#A69D90; --line:#342C27;
+    --burg:#7C2B37; --gold:#C5A46D; --gold-ink:#CDAE7B;
+    --accent:#D9B98A; --accent-fill:#7C2B37; --on-accent:#FFF6E8; --tint:#29221E; --tint2:#322A25;
+    --hl:#4A3D1E; --scrim:rgba(0,0,0,.6);
+    --c-fast:#36231F; --c-strict:#4D2129; --c-fish:#1E3140; --c-wine:#3A2F1A; --gk:#D9CCB6;
+    --k-fast:#C99097; --k-strict:#E0A1A9; --k-fish:#8DB6D6; --k-wine:#D9B66B; --k-free:#8FBF97;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+    color-scheme:dark;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);
+    -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+    padding-bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 20px);padding-left:var(--rail)}
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+  a{color:var(--accent)}
+  [hidden]{display:none!important}
+  .hidden{display:none!important}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0;pointer-events:none}
+  svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+  .shell{max-width:680px;margin:0 auto;
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+

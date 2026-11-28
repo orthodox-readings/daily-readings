@@ -1,515 +1,802 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-AU">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Daily Orthodox Readings</title>
-<meta name="description" content="Daily Orthodox calendar, saints and Scripture readings (Old Calendar).">
-
-<!-- Home-screen app behaviour -->
-<meta name="theme-color" content="#5c161c">
+<title>Daily Readings</title>
+<meta name="description" content="Daily Orthodox readings on the Old Calendar — the day’s Epistle and Gospel, saints, fasting, the New Testament in Greek and English, and a word from the Fathers.">
+<meta name="theme-color" content="#FAF7EF">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Readings">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="manifest" href="manifest.webmanifest">
-
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
+  /* Literata (SIL Open Font License, bundled in fonts/): Latin, Greek and polytonic Greek, regular and medium */
+  @font-face{font-family:"Literata";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/literata-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/literata-greek-400-normal.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:400;font-display:swap;src:url(fonts/literata-greek-ext-400-normal.woff2) format("woff2");unicode-range:U+1F00-1FFF}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/literata-latin-500-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/literata-greek-500-normal.woff2) format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
+  @font-face{font-family:"Literata";font-style:normal;font-weight:500;font-display:swap;src:url(fonts/literata-greek-ext-500-normal.woff2) format("woff2");unicode-range:U+1F00-1FFF}
+  /* Layout: one centred reading column (max 680px) under a quiet header, five views switched by a fixed
+     bottom tab bar (a side rail from 960px). Cards carry content; everything else sits on the ivory ground. */
   :root{
-    /* base (parchment) */
-    --bg:#f4eddf; --card:#fffdf8; --ink:#2b2320; --muted:#7c7063;
-    --gold:#a9791f; --gold-soft:#c79a3a; --line:#e7dcc8; --pill:#efe6d4;
-    --shadow:0 1px 3px rgba(50,30,10,.12), 0 8px 24px rgba(50,30,10,.06);
-    /* liturgical set — BURGUNDY default (ordinary days) */
-    --accent:#6b1414; --accent-2:#8a2b2b;
-    --bar1:#5c161c; --bar2:#3f0d12;
-    --btn1:#6b1414; --btn2:#8a2b2b;
+    --bg:#FAF7EF; --card:#FFFFFF; --ink:#302B25; --muted:#79736A; --muted2:#6A645B; --line:#E5DFD4;
+    --burg:#641E28; --gold:#C5A46D; --gold-ink:#86672C;
+    --accent:#641E28; --accent-fill:#641E28; --on-accent:#FFF9EE; --tint:#F4EFE3; --tint2:#EFE8D8;
+    --hl:#F6E9C4; --scrim:rgba(38,30,24,.42);
+    --c-fast:#F4E6E6; --c-strict:#E2BEC4; --c-fish:#DCE7F1; --c-wine:#F1E4C6; --gk:#4E3A2E;
+    --k-fast:#B07A80; --k-strict:#641E28; --k-fish:#3D6A8E; --k-wine:#A88536; --k-free:#5C8A63;
+    --shadow:0 1px 2px rgba(48,43,37,.04), 0 6px 20px rgba(48,43,37,.05);
+    --serif:"Literata","Iowan Old Style","Palatino Linotype",Palatino,"Noto Serif",Georgia,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --rs:1; --navh:62px; --rail:0px;
+    color-scheme:light;
   }
-  /* Liturgical overrides — Russian (ROCOR) practice; adjust freely */
-  [data-lit="blue"]{   --accent:#1e3a76; --accent-2:#2c4d92; --bar1:#1e3357; --bar2:#10203e; --btn1:#24427c; --btn2:#31569e}
-  [data-lit="red"]{    --accent:#9e1f1f; --accent-2:#bb3030; --bar1:#7d1518; --bar2:#4d0b0e; --btn1:#9e1f1f; --btn2:#bb3030}
-  [data-lit="green"]{  --accent:#1f5c31; --accent-2:#2d7a44; --bar1:#1e4d2b; --bar2:#11311b; --btn1:#25603a; --btn2:#337a4b}
-  [data-lit="violet"]{ --accent:#4d2a78; --accent-2:#65409a; --bar1:#46246b; --bar2:#2c1546; --btn1:#53307f; --btn2:#6a459e}
-  [data-lit="white"]{  --accent:#8a6a14; --accent-2:#a8842e; --bar1:#9a8a5c; --bar2:#6f6340; --btn1:#8a6a14; --btn2:#a8842e}
-  [data-lit="gold"]{   --accent:#7c5c10; --accent-2:#9a7418; --bar1:#8a6a14; --bar2:#5f470c; --btn1:#8a6a14; --btn2:#a9831f}
   @media (prefers-color-scheme: dark){
-    :root{
-      --bg:#151010; --card:#211917; --ink:#ece3d5; --muted:#a89a8c;
-      --gold:#e2be6c; --gold-soft:#d4ab52; --line:#352a25; --pill:#2c2320;
-      --shadow:0 1px 3px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.35);
-      --accent:#d98f8f; --accent-2:#e0a0a0;
+    :root:not([data-theme="light"]){
+      --bg:#15110F; --card:#1F1A17; --ink:#EEE7DB; --muted:#A69D90; --muted2:#A69D90; --line:#342C27;
+      --burg:#7C2B37; --gold:#C5A46D; --gold-ink:#CDAE7B;
+      --accent:#D9B98A; --accent-fill:#7C2B37; --on-accent:#FFF6E8; --tint:#29221E; --tint2:#322A25;
+      --hl:#4A3D1E; --scrim:rgba(0,0,0,.6);
+      --c-fast:#36231F; --c-strict:#4D2129; --c-fish:#1E3140; --c-wine:#3A2F1A; --gk:#D9CCB6;
+      --k-fast:#C99097; --k-strict:#E0A1A9; --k-fish:#8DB6D6; --k-wine:#D9B66B; --k-free:#8FBF97;
+      --shadow:0 1px 2px rgba(0,0,0,.3);
+      color-scheme:dark;
     }
-    [data-lit="blue"]{   --accent:#9db8e8; --accent-2:#b3c8ee}
-    [data-lit="red"]{    --accent:#e08a8a; --accent-2:#e8a0a0}
-    [data-lit="green"]{  --accent:#8fce9f; --accent-2:#a5dcb3}
-    [data-lit="violet"]{ --accent:#b79ade; --accent-2:#c8b0e8}
-    [data-lit="white"]{  --accent:#e2be6c; --accent-2:#ecc96a}
-    [data-lit="gold"]{   --accent:#e2be6c; --accent-2:#ecc96a}
-    /* The date-card crown keeps deep liturgical colour in the dark
-       (light text accents above would render it pastel) */
-    :root{               --crown:#7d2b2b}
-    [data-lit="blue"]{   --crown:#2e4a86}
-    [data-lit="red"]{    --crown:#8a2525}
-    [data-lit="green"]{  --crown:#2b6a3e}
-    [data-lit="violet"]{ --crown:#5b3790}
-    [data-lit="white"]{  --crown:#a5822a}
-    [data-lit="gold"]{   --crown:#a5822a}
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{
-    background:var(--bg); color:var(--ink);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    line-height:1.55; -webkit-text-size-adjust:100%;
-    padding-bottom:env(safe-area-inset-bottom);
+  :root[data-theme="dark"]{
+    --bg:#15110F; --card:#1F1A17; --ink:#EEE7DB; --muted:#A69D90; --muted2:#A69D90; --line:#342C27;
+    --burg:#7C2B37; --gold:#C5A46D; --gold-ink:#CDAE7B;
+    --accent:#D9B98A; --accent-fill:#7C2B37; --on-accent:#FFF6E8; --tint:#29221E; --tint2:#322A25;
+    --hl:#4A3D1E; --scrim:rgba(0,0,0,.6);
+    --c-fast:#36231F; --c-strict:#4D2129; --c-fish:#1E3140; --c-wine:#3A2F1A; --gk:#D9CCB6;
+    --k-fast:#C99097; --k-strict:#E0A1A9; --k-fish:#8DB6D6; --k-wine:#D9B66B; --k-free:#8FBF97;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+    color-scheme:dark;
   }
-  .wrap{max-width:680px;margin:0 auto}
-  .hidden{display:none !important}
-  .vh{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 
-  /* App bar — liturgical colour */
-  .appbar{position:sticky;top:0;z-index:20;
-    background:linear-gradient(135deg,var(--bar1) 0%,var(--bar2) 100%);
-    color:#f3e4c4; box-shadow:0 2px 10px rgba(0,0,0,.25);
-    padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;
-    transition:background .6s ease}
-  .appbar .row{display:flex;align-items:center;gap:10px;max-width:680px;margin:0 auto;position:relative}
-  .brand{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.2px;font-size:17px}
-  .brand .cross{color:#e6c56e;font-size:19px;line-height:1}
-  .brand b{color:#e6c56e;font-weight:800}
-  .spacer{flex:1}
-  .iconbtn,.gearbtn{border:0;background:rgba(255,255,255,.14);color:#f0e2c2;border-radius:12px;
-    width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
-  .iconbtn:active,.gearbtn:active{transform:translateY(1px)}
-  .iconbtn.done{background:#2e8b4f;color:#fff}
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--sans);
+    -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+    padding-bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 20px);padding-left:var(--rail)}
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+  a{color:var(--accent)}
+  [hidden]{display:none!important}
+  .hidden{display:none!important}
+  :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);opacity:0;pointer-events:none}
+  svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
-  /* Settings sheet */
-  .sheet{position:absolute;right:0;top:calc(100% + 10px);background:var(--card);border:1px solid var(--line);
-    border-radius:16px;box-shadow:0 12px 44px rgba(30,15,5,.35);padding:6px 14px;z-index:60;min-width:242px;color:var(--ink)}
-  .sheet .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
-  .sheet .srow:last-child{border-bottom:0}
-  .sheet .lbl{font-size:12.5px;color:var(--muted);font-weight:700}
-  .sheet .mrow{display:block;width:100%;text-align:left;border:0;background:transparent;cursor:pointer;
-    padding:11px 0;border-bottom:1px solid var(--line);font:inherit;-webkit-tap-highlight-color:transparent}
-  .sheet .mrow:last-child{border-bottom:0}
-  .mrow .mtit{display:block;color:var(--ink);font-weight:700;font-size:14px}
-  .mrow .msub{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
-  .seg,.seg2{display:inline-flex;background:var(--pill);border-radius:11px;padding:2px}
-  .seg button,.seg2 button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:700;
-    padding:5px 11px;border-radius:9px;cursor:pointer}
-  .seg button.active,.seg2 button.active{background:var(--card);color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+  .shell{max-width:680px;margin:0 auto;
+    padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
-  /* Headpiece ornament */
-  .headpiece{display:flex;align-items:center;gap:10px;margin:8px 22px 0;color:var(--gold)}
-  .headpiece::before,.headpiece::after{content:"";flex:1;height:1px;
-    background:linear-gradient(90deg,transparent,var(--gold-soft) 25%,var(--gold-soft) 75%,transparent);opacity:.6}
-  .headpiece span{font-size:11px;opacity:.95;line-height:1}
+  /* ---------- header ---------- */
+  .top{display:flex;align-items:center;gap:12px;padding-block:calc(env(safe-area-inset-top,0px) + 16px) 14px}
+  .top .cross{width:26px;height:30px;color:var(--gold);flex:none}
+  .top .cross svg{width:100%;height:100%;stroke-width:1.5}
+  .brand{min-width:0;flex:1}
+  .brand .t{font:500 1.3rem/1.15 var(--serif);letter-spacing:.005em;margin:0;color:var(--ink)}
+  .brand .s{font-size:.8rem;color:var(--muted2);margin:1px 0 0}
+  .preview{font:600 .62rem/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--on-accent);background:var(--accent-fill);border-radius:999px;padding:5px 9px;flex:none}
+  .ibtn{width:42px;height:42px;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:var(--muted2);flex:none}
+  .ibtn:hover{background:var(--tint)} .ibtn:active{background:var(--tint2)}
 
-  /* Hero — the day card, crowned with the liturgical colour */
-  .hero{padding:12px 16px 2px}
-  .datecard{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--crown, var(--accent));
-    border-radius:18px;box-shadow:var(--shadow);padding:12px 12px 13px;text-align:center;
-    transition:border-color .6s ease}
-  .herobar{display:flex;align-items:center;gap:8px}
-  .hbtn{background:var(--pill);border:1px solid var(--line);color:var(--accent);border-radius:12px;
-    width:42px;height:42px;font-size:20px;display:inline-flex;align-items:center;justify-content:center;
-    padding:0;cursor:pointer;flex:0 0 auto}
-  .hbtn:active{transform:translateY(1px)}
-  .date{font-size:23px;font-weight:800;letter-spacing:.2px;margin:0;color:var(--ink);padding:0 2px;flex:1;
-    cursor:pointer;-webkit-tap-highlight-color:transparent;line-height:1.25;text-align:center}
-  .altdate{color:var(--muted);font-size:12.5px;margin:8px 0 0}
-  .summary{color:var(--accent);font-size:15.5px;font-weight:700;margin:9px 0 0;line-height:1.5}
-  .todaybtn{border:0;background:none;color:var(--gold);font:inherit;font-size:12.5px;font-weight:700;
-    cursor:pointer;padding:9px 2px 0;display:inline-block}
+  /* ---------- shared pieces ---------- */
+  .view{display:flex;flex-direction:column;gap:14px}
+  .vtitle{font:500 1.45rem/1.2 var(--serif);margin:2px 0 0}
+  .vsub{font-size:.86rem;color:var(--muted2);margin:-8px 0 0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-width:0}
+  .eyebrow{font:600 .7rem/1.3 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--gold-ink);margin:0}
+  .sechead{display:flex;align-items:center;gap:10px;margin:8px 2px -4px}
+  .sechead .eyebrow{flex:1}
+  .note{font-size:.8rem;line-height:1.5;color:var(--muted2);margin:0 2px}
+  .note a{color:inherit}
+  .seg{display:inline-flex;background:var(--tint);border-radius:11px;padding:3px;gap:2px;max-width:100%}
+  .seg button{padding:7px 12px;border-radius:9px;font-size:.82rem;font-weight:500;color:var(--muted2);white-space:nowrap;min-height:34px}
+  .seg button.active{background:var(--card);color:var(--accent);font-weight:600;box-shadow:0 1px 2px rgba(48,43,37,.12)}
+  .seg.wide{display:flex} .seg.wide button{flex:1}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 16px;border-radius:12px;
+    font-weight:600;font-size:.9rem;background:var(--accent-fill);color:var(--on-accent);text-decoration:none}
+  .btn.ghost{background:transparent;color:var(--accent);border:1px solid var(--line)}
+  .btn.soft{background:var(--tint);color:var(--ink)}
+  .btn:active{transform:translateY(1px)}
+  .linkbtn{color:var(--accent);font-weight:600;font-size:.86rem;padding:8px 2px;min-height:36px}
+  .chev{color:var(--muted);transition:transform .2s;flex:none;font-size:.7rem}
 
-  /* Fast + tracker */
-  .fast{display:flex;align-items:center;gap:10px;margin:14px 20px 0;flex-wrap:wrap}
-  .pill{display:inline-flex;align-items:center;gap:9px;padding:9px 14px;border-radius:999px;
-    background:var(--pill);border:1px solid var(--line);font-weight:600;font-size:14px;box-shadow:var(--shadow);color:var(--ink)}
-  .dot{width:11px;height:11px;border-radius:50%;background:var(--gold);flex:0 0 auto}
-  .fast .exc{color:var(--muted);font-size:13px}
-  .tracker{margin:10px 24px 0;color:var(--muted);font-size:11.5px;line-height:1.8;text-align:center}
-  .tracker .chip{display:inline;color:var(--muted);font-size:11.5px}
-  .tracker .chip b{color:var(--accent)}
-  .tracker .chip+.chip::before{content:"   ·   "}
-  .tracker .chip.today{color:var(--accent);font-weight:700}
-  .tracker .chip.today b{color:var(--accent)}
+  /* ---------- Today: day card ---------- */
+  .day{padding:16px 14px 14px}
+  .dayNav{display:flex;align-items:center;gap:6px}
+  .dayNav .hbtn{width:42px;height:42px;border-radius:12px;font-size:1.5rem;line-height:1;color:var(--muted2);flex:none}
+  .dayNav .hbtn:hover{background:var(--tint)}
+  .dayHead{flex:1;min-width:0;text-align:center}
+  .date{font:500 1.3rem/1.25 var(--serif);margin:2px 0 3px;cursor:pointer;text-wrap:balance}
+  .date .wd{display:block;font:600 .7rem/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:5px}
+  .date .dmy{display:block}
+  .altdate{font-size:.82rem;color:var(--muted2);margin:0}
+  .summary{font:500 1.04rem/1.4 var(--serif);text-align:center;margin:12px 8px 0;text-wrap:balance}
+  .summary:empty{display:none}
+  .dayMeta{margin-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column}
+  .mrow{display:flex;align-items:flex-start;gap:10px;padding:10px 6px;border-bottom:1px solid var(--line);font-size:.9rem;line-height:1.4}
+  .mrow:last-child{border-bottom:0}
+  .mrow .dot{width:10px;height:10px;border-radius:50%;margin-top:.33em;flex:none;background:var(--gold)}
+  .mrow .k{font:600 .68rem/1.3 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);display:block;margin-bottom:1px}
+  .mrow .x{min-width:0;flex:1}
+  #fastText{font-weight:600}
+  #fastDay,#fastExc{color:var(--muted2)}
+  .faststrip.strict #fastExc{font-style:italic}
+  .litdot{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .tracker{display:flex;flex-wrap:wrap;gap:4px 14px;color:var(--muted2);font-size:.84rem}
+  .tracker b{color:var(--ink);font-weight:600}
+  .tracker .chip.today{color:var(--accent)}
+  .dayActs{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+  .dayActs .btn{flex:1;min-width:0;font-size:.84rem;padding:8px 10px;min-height:42px}
+  .dayActs #today{flex-basis:100%}
 
-  /* Cards */
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;margin:12px 16px;padding:16px;box-shadow:var(--shadow)}
-  .label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:0 0 8px}
-
-  /* Collapsible commemorations */
-  .commem .label{cursor:pointer;position:relative;margin-bottom:0;padding-right:30px;-webkit-tap-highlight-color:transparent}
-  .cchev{position:absolute;right:2px;top:-1px;color:var(--gold);font-size:12px;transition:transform .15s}
-  .commem.collapsible #commemList,.commem.collapsible .clink,.commem.collapsible #commemSuppNote{display:none}
-  .commem.collapsible.open #commemList{display:block;margin-top:10px}
-  .commem.collapsible.open .clink{display:inline-block}
-  .commem.collapsible.open #commemSuppNote:not(.hidden){display:block}
-  .commem.collapsible.open .cchev{transform:rotate(180deg)}
-  .commem ul{margin:0;padding:0;list-style:none}
-  .commem li{padding:7px 0;border-bottom:1px solid var(--line);font-size:15.5px}
-  .commem li:last-child{border-bottom:0}
-  .commem li::before{content:"☦";color:var(--gold);margin-right:9px;font-size:13px;vertical-align:1px}
-  .commem li.supp::before{content:"✦";color:var(--accent)}
-  .commem .clink{margin-top:11px;color:var(--gold);font-size:12.5px;font-weight:700;text-decoration:none}
-
-  /* Lives */
-  .lives details{border-bottom:1px solid var(--line);padding:4px 0}
-  .lives details:last-of-type{border-bottom:0}
-  .lives summary{cursor:pointer;font-size:15px;font-weight:650;padding:7px 0;color:var(--ink);list-style-position:outside}
-  .lives summary::marker{color:var(--gold)}
-  .lives .ltext{font-family:Georgia,"Times New Roman",serif;font-size:15.5px;line-height:1.65;padding:2px 0 10px}
-  .lives .ltext p{margin:0 0 9px}
-
-  /* Readings */
-  .reading{margin:12px 16px;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-  .reading .head{padding:14px 44px 12px 16px;border-bottom:1px solid var(--line);cursor:pointer;
-    position:relative;-webkit-tap-highlight-color:transparent;
-    background:linear-gradient(0deg,transparent,rgba(169,121,31,.05))}
-  .reading .chev{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--gold);
-    font-size:13px;transition:transform .15s}
-  .reading.open .chev{transform:translateY(-50%) rotate(180deg)}
-  .reading .body{display:none}
-  .reading.open .body{display:block}
-  .reading .src{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
-  .reading .ref{font-size:17px;font-weight:700;margin-top:2px;color:var(--ink)}
-  .reading .ver{font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:700;margin-left:8px;vertical-align:2px}
-  .reading .body{padding:12px 16px 16px;font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.7;color:var(--ink)}
-  .reading .body .v{margin:0 0 2px}
-  /* Greek New Testament line under a verse (optional) */
-  .reading .body .gk{margin:0 0 12px;font-family:"Gentium Plus","GFS Didot","Noto Serif","Times New Roman",serif;
-    font-size:16px;line-height:1.65;color:color-mix(in srgb, var(--ink) 72%, var(--accent))}
-  .reading .body .gknote{margin:10px 0 0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:12px;color:var(--muted)}
-  .reading .body sup{color:var(--gold);font-weight:700;font-size:11px;font-family:-apple-system,sans-serif;margin-right:3px;vertical-align:6px}
-  .reading .body .v:first-child::first-letter{font-family:Georgia,"Times New Roman",serif;font-size:44px;
-    line-height:.8;float:left;color:var(--accent);padding:3px 7px 0 0;font-weight:700}
-  .reading .none{color:var(--muted);font-style:italic;font-family:inherit;font-size:14px}
-
-  /* Link-out cards */
-  .theophan .tsub{color:var(--ink);font-size:15.5px;line-height:1.55;margin:0 0 14px}
-  .theophan .tsub b{color:var(--accent);font-weight:700}
-  .tbtn{display:inline-block;background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#f3e4c4;
-    text-decoration:none;font-weight:700;font-size:15px;padding:12px 18px;border-radius:12px;box-shadow:var(--shadow);
-    transition:background .6s ease}
-  .tbtn:active{transform:translateY(1px)}
-  .tattr{color:var(--muted);font-size:11.5px;line-height:1.5;margin:13px 0 0;border-top:1px solid var(--line);padding-top:10px}
-
-  /* Wisdom of the Fathers */
-  .quote .qtext{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.65;color:var(--ink);margin:0 0 10px}
-  .quote .qtext.clamped{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-  .quote .qmore{border:0;background:transparent;color:var(--accent);font:inherit;font-size:12.5px;font-weight:700;
-    padding:0;cursor:pointer;margin:-2px 0 10px;-webkit-tap-highlight-color:transparent}
-  .quote .qby{color:var(--gold);font-size:13px;font-weight:700;margin:0}
-
-  /* Install banner */
-  .install{display:flex;align-items:center;gap:10px;margin:12px 16px 0;padding:11px 14px;
-    background:color-mix(in srgb, var(--gold) 10%, var(--card));border:1px solid color-mix(in srgb, var(--gold) 35%, transparent);
-    border-radius:14px;box-shadow:var(--shadow)}
-  .install .itxt{flex:1;color:var(--ink);font-size:12.5px;line-height:1.45}
-  .install .ibtn{border:0;background:linear-gradient(135deg,var(--btn1),var(--btn2));color:#f3e4c4;
-    font:inherit;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;flex:0 0 auto}
-  .install .ix{border:0;background:transparent;color:var(--muted);font-size:14px;cursor:pointer;padding:4px;flex:0 0 auto}
-
-  /* Settings hints */
-  .sheet .lbl small{display:block;font-weight:400;font-size:10.5px;color:var(--muted);margin-top:2px;max-width:120px;line-height:1.35}
-
-  /* Year picker affordance */
-  .caltitle::after{content:" ▾";font-size:12px;opacity:.65}
-
-  /* Open-all readings control */
-  .rctl{display:flex;align-items:center;gap:8px;margin:10px 16px -6px}
-  .rctl #openAllBtn{margin-left:auto;border:0;background:transparent;color:var(--accent);font:inherit;font-size:12px;font-weight:700;
-    cursor:pointer;padding:4px 2px;-webkit-tap-highlight-color:transparent}
-
-  /* Fast strip inside the date card */
-  .faststrip{display:flex;align-items:center;justify-content:center;gap:4px 12px;flex-wrap:wrap;
-    margin:14px -18px -16px;padding:11px 16px;border-top:1px solid var(--line);
-    background:color-mix(in srgb, var(--gold) 9%, transparent);
-    border-radius:0 0 16px 16px;font-size:12.5px;color:var(--ink);font-weight:600}
-  .faststrip.strict{background:color-mix(in srgb, #8a2b2b 10%, transparent)}
-  .faststrip .dot{width:10px;height:10px;border-radius:50%;background:var(--gold);flex:0 0 auto}
-  /* Two groups — [dot · name · day] and [allowance + icon] — each stays together; the second
-     drops to its own centred line when the strip is too narrow for both. */
-  .faststrip .fgrp{display:inline-flex;align-items:center;gap:7px;max-width:100%}
-  .faststrip .fsep{color:var(--muted);font-weight:400;text-align:center}
-  .faststrip .fday{color:var(--muted);font-weight:400;margin-left:-3px}
-  .faststrip .fico{font-size:15px}
-  .faststrip .fico:empty{display:none}
-
-  /* Sleek link rows */
-  .linksCard{padding:4px 16px 2px}
-  .linksCard .label{margin:12px 0 2px}
-  .lrow{display:flex;align-items:center;gap:12px;padding:13px 0;text-decoration:none;border-bottom:1px solid var(--line);-webkit-tap-highlight-color:transparent}
-  .lrow:last-child{border-bottom:0}
-  #azbykaCard .lrow{border-bottom:1px solid var(--line)}
-  .licon{color:var(--accent);flex:0 0 auto;display:inline-flex;opacity:.85}
-  .ltxt{flex:1;color:var(--ink);font-weight:700;font-size:14.5px}
-  .ltxt small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;margin-top:3px;line-height:1.45}
-  .ltxt small b{color:var(--accent);font-weight:700}
-  .larr{color:var(--accent);font-size:22px;line-height:1;font-weight:400}
-
-  /* Month calendar overlay */
-  .calov{position:fixed;inset:0;z-index:100;background:rgba(20,10,8,.45);display:flex;align-items:flex-start;justify-content:center;padding:14px}
-  .calpanel{background:var(--bg);border:1px solid var(--line);border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.4);
-    max-width:420px;width:100%;margin-top:calc(env(safe-area-inset-top) + 40px);padding:14px 14px 10px}
-  .calhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-  .caltitle{flex:1;border:0;background:none;font:inherit;font-size:17px;font-weight:800;color:var(--ink);cursor:pointer;text-align:right}
-  .calyear{flex:1;border:0;background:none;font:inherit;font-size:17px;font-weight:800;color:var(--accent);cursor:pointer;text-align:left;padding-left:4px;-webkit-tap-highlight-color:transparent}
-
-  /* Year at a glance */
-  .yearpanel{max-height:86vh;overflow-y:auto}
-  .yrtitle{flex:1;font-size:17px;font-weight:800;color:var(--ink);text-align:center}
-  #yrBody .label{margin:12px 0 4px}
-  .yrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:transparent;font:inherit;
-    cursor:pointer;padding:9px 2px;border-bottom:1px solid var(--line);-webkit-tap-highlight-color:transparent}
-  .yrow .ynm{flex:1;color:var(--ink);font-size:13.5px;font-weight:600}
-  .yrow.pascha .ynm{color:#9e1f1f;font-weight:800}
-  .yrow .ydt{color:var(--muted);font-size:12.5px;white-space:nowrap}
-  .ydot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
-  .ydot-blue{background:#1e3a76}.ydot-red{background:#9e1f1f}.ydot-green{background:#1f5c31}
-  .ydot-violet{background:#4d2a78}.ydot-white{background:#efe6cf;border:1px solid #a8842e}
-  .yfast{display:flex;flex-direction:column;gap:2px;padding:8px 2px;border-bottom:1px solid var(--line)}
-  .yfast .ynm{color:var(--ink);font-size:13.5px;font-weight:700}
-  .yfast .ydt2{color:var(--muted);font-size:12px}
-  .yrfoot{margin:14px 0 4px;text-align:center}
-
-  /* Support sheet */
-  .supPanel{max-width:400px}
-  .supName{font-family:Georgia,serif;font-size:17px;font-weight:700;color:var(--ink);text-align:center;margin:6px 0 2px;line-height:1.4}
-  .supSub{color:var(--muted);font-size:12px;text-align:center;margin:0 0 14px}
-  .suprow{display:flex;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid var(--line)}
-  .suplbl{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;width:76px}
-  .supval{flex:1;color:var(--ink);font-size:16px;font-weight:700;font-variant-numeric:tabular-nums}
-  .supcopy{border:1px solid var(--line);background:var(--pill);color:var(--accent);font:inherit;font-size:12px;font-weight:700;
-    padding:6px 14px;border-radius:999px;cursor:pointer;min-width:74px;-webkit-tap-highlight-color:transparent}
-  .supcopy:empty{border:0;background:none;min-width:74px}
-  .supcopy.done{background:#2e8b4f;color:#fff;border-color:#2e8b4f}
-  .supnote{color:var(--muted);font-size:11.5px;line-height:1.5;margin:12px 0 0;text-align:center}
-  .supnote a{color:var(--gold);text-decoration:none}
-  @media (prefers-color-scheme: dark){
-    .yrow.pascha .ynm{color:#e08a8a}
-    .ydot{box-shadow:0 0 0 1px rgba(255,255,255,.18)}
-    .ydot-white{background:#3a332a;border-color:#e2be6c}
-  }
-  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-  .cwd{text-align:center;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:var(--muted);padding:2px 0 6px}
-  .cd{position:relative;aspect-ratio:1;border:1px solid var(--line);border-radius:10px;background:var(--card);
-    font:inherit;cursor:pointer;padding:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
-  .cd .n{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1}
-  .cd .mk{font-size:12px;line-height:1;min-height:13px}
-  .cd .ld{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%}
-  .cd.f1{background:color-mix(in srgb, var(--accent) 20%, var(--card));border-color:color-mix(in srgb, var(--accent) 35%, var(--line))}
-  .cd.f2{background:color-mix(in srgb, var(--accent) 38%, var(--card));border-color:color-mix(in srgb, var(--accent) 55%, var(--line))}
-  .cd.om{opacity:.35}
-  .cd.tod{outline:2px solid var(--gold);outline-offset:1px}
-  .cd.sel .n{color:var(--accent)}
-  .cd:active{transform:translateY(1px)}
-  .callegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:12px 4px 0;color:var(--muted);font-size:11.5px;font-weight:600}
-  .lg{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid var(--line);vertical-align:-1px}
-  .lg1{background:color-mix(in srgb, var(--accent) 20%, var(--card))}
-  .lg2{background:color-mix(in srgb, var(--accent) 38%, var(--card))}
-  .calnote{color:var(--muted);font-size:10.5px;margin:8px 4px 4px;line-height:1.5}
-
-  /* States */
-  .banner{margin:12px 16px 0;padding:10px 14px;border-radius:12px;font-size:13.5px;display:none}
+  .install{display:flex;align-items:center;gap:10px;background:var(--tint);border-radius:14px;padding:10px 12px;font-size:.86rem}
+  .install .itxt{flex:1;min-width:0}
+  .install .ibtn2{background:var(--accent-fill);color:var(--on-accent);border-radius:10px;padding:8px 14px;font-weight:600;font-size:.82rem}
+  .install .ix{width:34px;height:34px;color:var(--muted2)}
+  .banner{display:none;border-radius:12px;padding:10px 14px;font-size:.86rem;background:var(--tint);color:var(--ink)}
   .banner.show{display:block}
-  .banner.offline{background:#fcefcf;color:#6b4d00;border:1px solid #e2cf8f}
-  @media (prefers-color-scheme: dark){.banner.offline{background:#3a2f12;color:#f0d78a;border-color:#5a4a1e}}
-  .banner.error{background:#f7dcdc;color:#7a1a1a;border:1px solid #e6b3b3}
-  @media (prefers-color-scheme: dark){.banner.error{background:#3a1c1c;color:#f0b3b3;border-color:#5a2a2a}}
-  .banner a{color:inherit;font-weight:700}
-  .loading{padding:40px 16px;text-align:center;color:var(--muted)}
-  .spin{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--gold);border-radius:50%;margin:0 auto 12px;animation:spin .9s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
+  .banner.error{background:var(--c-fast)}
+  .loading{text-align:center;color:var(--muted2);padding:40px 0;font-size:.9rem}
+  .spin{width:26px;height:26px;border:2px solid var(--line);border-top-color:var(--gold);border-radius:50%;margin:0 auto 12px;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  #content{display:flex;flex-direction:column;gap:14px}
 
-  /* Footer + support */
-  .footer{padding:18px 20px 30px;text-align:center;color:var(--muted);font-size:12px;line-height:1.6}
-  .about summary{cursor:pointer;color:var(--muted);font-weight:700;list-style:none;display:inline-block;letter-spacing:.04em;-webkit-tap-highlight-color:transparent}
+  /* ---------- Wisdom ---------- */
+  .quote{position:relative;padding:20px 20px 18px}
+  .quote .qhead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .quote .qhead .eyebrow{flex:1}
+  .quote .ibtn{margin:-10px -10px -10px 0}
+  .qtext{font:400 calc(1.12rem * var(--rs))/1.6 var(--serif);margin:0;text-wrap:pretty}
+  .qtext.clamped{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .qby{margin:12px 0 0;font-size:.88rem;color:var(--ink);font-weight:600}
+  .qby small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem;margin-top:1px}
+  .qrule{width:36px;height:1px;background:var(--gold);margin:14px 0 0}
+
+  /* ---------- Scripture (daily readings + reader) ---------- */
+  .rctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .seg.sm button{padding:5px 10px;min-height:30px}
+  .rctl .spacer{flex:1}
+  .reading{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  #readings{display:flex;flex-direction:column;gap:10px}
+  .reading .head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer}
+  .reading .head .h{flex:1;min-width:0}
+  .reading .src{font:600 .68rem/1.3 var(--sans);letter-spacing:.11em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:2px}
+  .reading .ref{font:500 1.06rem/1.3 var(--serif)}
+  .ver{font:600 .62rem/1 var(--sans);letter-spacing:.06em;color:var(--muted2);border:1px solid var(--line);border-radius:6px;padding:3px 5px;margin-left:8px;vertical-align:middle;white-space:nowrap}
+  .reading.open .chev{transform:rotate(180deg)}
+  .reading .body{display:none;padding:2px 18px 16px;border-top:1px solid var(--line)}
+  .reading.open .body{display:block}
+  .v,.gk{font-family:var(--serif);font-size:calc(1.06rem * var(--rs));line-height:1.72;margin:.55em 0}
+  .gk{color:var(--gk);line-height:1.78}
+  .lang-par .v + .gk{margin-top:-.3em}
+  .v sup,.gk sup{font:600 .62em/1 var(--sans);color:var(--gold-ink);margin-right:.45em;vertical-align:.5em}
+  .lang-par .gk sup{display:none}
+  .lang-grc .v.haspair{display:none}
+  .lang-grc .gk{color:var(--ink)}
+  .rbody .v,.rbody .gk{font-size:calc(1.14rem * var(--rs))}
+  @media (min-width:680px){
+    .lang-par .txt.has-gk{display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start}
+    .lang-par .txt.has-gk .v{grid-column:1}
+    .lang-par .txt.has-gk .gk{grid-column:2;margin-top:.55em}
+    .lang-par .txt.has-gk .gknote,.lang-par .txt.has-gk .none{grid-column:1/-1}
+    .lang-par .vs.pair{display:grid;grid-template-columns:1fr 1fr;column-gap:26px;align-items:start}
+    .lang-par .vs.pair .gk{margin-top:.55em}
+    body.tab-scripture.par .shell{max-width:980px}
+  }
+  .gknote,.none{font-size:.82rem;color:var(--muted2);font-style:italic;margin:.8em 0 0}
+  .reading .more{display:inline-block;margin-top:10px}
+
+  /* ---------- Saints ---------- */
+  .commem .chead{display:flex;align-items:center;gap:10px;cursor:pointer;margin:-4px 0}
+  .commem .chead .eyebrow{flex:1}
+  .commem .count{font-size:.8rem;color:var(--muted2)}
+  .commem.open .chev{transform:rotate(180deg)}
+  .commem .cbody{display:none;margin-top:12px}
+  .commem.open .cbody{display:block}
+  .commem ul{list-style:none;margin:0;padding:0}
+  .commem li{padding:8px 0;border-top:1px solid var(--line);font-size:.93rem;line-height:1.45}
+  .commem li:first-child{border-top:0;padding-top:0}
+  .commem li.supp::after{content:" ✦";color:var(--gold-ink)}
+  .tattr{font-size:.76rem;color:var(--muted2);margin:10px 0 0}
+  .clink{display:inline-block;margin-top:10px;font-size:.85rem;font-weight:600;text-decoration:none}
+  .life{border-top:1px solid var(--line)}
+  .life:first-child{border-top:0}
+  .life summary{list-style:none;cursor:pointer;padding:12px 22px 12px 0;font:500 1rem/1.35 var(--serif);position:relative}
+  .life summary::-webkit-details-marker{display:none}
+  .life summary::after{content:"+";position:absolute;right:2px;top:10px;color:var(--muted);font:400 1.1rem var(--sans)}
+  .life[open] summary::after{content:"–"}
+  .ltext p{font:400 calc(1rem * var(--rs))/1.7 var(--serif);margin:0 0 .8em}
+  #livesList{margin-top:6px}
+  #notesText{font-size:.92rem;margin-top:8px}
+
+  /* ---------- link rows (Prayer, Settings) ---------- */
+  .rows{padding:6px 18px}
+  .rows .eyebrow{padding:12px 0 6px}
+  .lrow{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--line);text-decoration:none;color:var(--ink);width:100%;text-align:left}
+  .rows .eyebrow + .lrow,.lrow.first{border-top:0}
+  .licon{width:38px;height:38px;border-radius:11px;background:var(--tint);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+  .ltxt{flex:1;min-width:0;font-weight:600;font-size:.95rem;line-height:1.3}
+  .ltxt small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem;margin-top:2px}
+  .larr{color:var(--muted);font-size:1.2rem;flex:none}
+  .tag{font:600 .62rem/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);border:1px solid var(--line);border-radius:999px;padding:3px 7px;margin-left:6px;vertical-align:middle}
+
+  /* ---------- Calendar ---------- */
+  .calhead{display:flex;align-items:center;gap:4px;margin:-6px -6px 8px}
+  .calhead .hbtn{width:42px;height:42px;border-radius:12px;font-size:1.4rem;color:var(--muted2);flex:none}
+  .calhead .mid{flex:1;display:flex;justify-content:center;align-items:baseline;gap:8px;min-width:0}
+  .caltitle{font:500 1.12rem var(--serif);padding:8px 4px}
+  .calyear{font-size:.9rem;color:var(--muted2);padding:8px 4px}
+  .calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .cwd{text-align:center;font:600 .64rem var(--sans);letter-spacing:.08em;color:var(--muted2);padding:4px 0 6px}
+  .cd{position:relative;aspect-ratio:1/1;min-height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.92rem;font-variant-numeric:tabular-nums}
+  .cd.om{opacity:.38}
+  .cd.cat-fast{background:var(--c-fast)} .cd.cat-strict{background:var(--c-strict)}
+  .cd.cat-fish{background:var(--c-fish)} .cd.cat-wine{background:var(--c-wine)}
+  .cd.tod .n{font-weight:700;color:var(--accent)}
+  .cd.tod::after{content:"";position:absolute;left:50%;bottom:5px;width:14px;height:2px;margin-left:-7px;border-radius:2px;background:var(--accent)}
+  .cd.sel{box-shadow:inset 0 0 0 2px var(--accent)}
+  .cd .mk{position:absolute;top:2px;right:4px;font-size:.6rem;color:var(--accent);line-height:1.2}
+  .cd .ld{position:absolute;top:5px;left:5px;width:6px;height:6px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .cd .kept{position:absolute;bottom:2px;right:4px;font-size:.58rem;color:var(--muted2);line-height:1.2}
+  .callegend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:14px;font-size:.76rem;color:var(--muted2)}
+  .callegend span{display:inline-flex;align-items:center;gap:6px}
+  .lg{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid var(--line)}
+  .lg.cat-fast{background:var(--c-fast)} .lg.cat-strict{background:var(--c-strict)} .lg.cat-fish{background:var(--c-fish)} .lg.cat-wine{background:var(--c-wine)}
+  .wrow{display:flex;align-items:center;gap:12px;padding:11px 2px;border-top:1px solid var(--line);width:100%;text-align:left}
+  .wrow:first-of-type{border-top:0}
+  .wrow .wd{width:44px;flex:none;text-align:center}
+  .wrow .wd b{display:block;font:500 1.15rem/1.1 var(--serif)}
+  .wrow .wd small{font:600 .62rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+  .wrow.tod .wd b{color:var(--accent)}
+  .wrow .wx{flex:1;min-width:0;font-size:.9rem;line-height:1.35}
+  .wrow .wx small{display:block;color:var(--muted2);font-size:.8rem}
+  .wrow .sw{width:10px;height:10px;border-radius:50%;flex:none;background:transparent;box-shadow:inset 0 0 0 1.5px var(--line)}
+  .wrow .sw.cat-fast{background:var(--k-fast);box-shadow:none} .wrow .sw.cat-strict{background:var(--k-strict);box-shadow:none} .wrow .sw.cat-fish{background:var(--k-fish);box-shadow:none} .wrow .sw.cat-wine{background:var(--k-wine);box-shadow:none}
+  .wrow.sel{background:var(--tint);border-radius:12px;border-top-color:transparent;padding-inline:8px;margin-inline:-6px;width:calc(100% + 12px)}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:.76rem;font-weight:600;white-space:nowrap;background:var(--tint);color:var(--ink)}
+  .pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--k-free)}
+  .pill.cat-fast{background:var(--c-fast)} .pill.cat-fast::before{background:var(--k-fast)}
+  .pill.cat-strict{background:var(--c-strict)} .pill.cat-strict::before{background:var(--k-strict)}
+  .pill.cat-fish{background:var(--c-fish)} .pill.cat-fish::before{background:var(--k-fish)}
+  .pill.cat-wine{background:var(--c-wine)} .pill.cat-wine::before{background:var(--k-wine)}
+  .dp{scroll-margin-bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 12px)}
+  .dp .k2{margin:0 0 6px}
+  .dp h3{font:500 1.1rem/1.3 var(--serif);margin:0}
+  .dp .sub{font-size:.82rem;color:var(--muted2);margin:2px 0 10px}
+  .dp .feast{font:500 .98rem var(--serif);margin:10px 0 0}
+  .dp .acts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .journal{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .journal .seg{margin-top:8px}
+  .prog{height:6px;border-radius:6px;background:var(--tint2);overflow:hidden;margin:10px 0 6px}
+  .prog i{display:block;height:100%;background:var(--gold);border-radius:6px}
+  .fsum{font-size:.88rem;margin:10px 0 0}
+  .yrow{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:11px 0;border-top:1px solid var(--line)}
+  .yrow .ydot{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .ynm{flex:1;min-width:0;font-size:.93rem;line-height:1.3}
+  .yrow.pascha .ynm{font-weight:700;color:var(--accent)}
+  .ydt,.ydt2{font-size:.82rem;color:var(--muted2);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .yfast{display:flex;flex-wrap:wrap;gap:2px 12px;padding:11px 0;border-top:1px solid var(--line)}
+  .yfast .ynm{font-weight:600}
+  #yrBody .eyebrow{margin:14px 0 4px} #yrBody .eyebrow:first-child{margin-top:0}
+  #yrBody .eyebrow + .yrow,#yrBody .eyebrow + .yfast{border-top:0}
+
+  /* ---------- Scripture reader ---------- */
+  .rbar{display:flex;align-items:center;gap:6px}
+  .pick{display:inline-flex;align-items:center;gap:8px;font:600 1.3rem/1.2 var(--serif);padding:8px 4px;min-width:0;text-align:left}
+  .pick .chev{font-size:.72rem}
+  .rbar .spacer{flex:1}
+  .rbody{padding:22px 20px}
+  .rbody h2{font:500 1.4rem/1.25 var(--serif);margin:0;text-align:center;text-wrap:balance}
+  .rbody .rsub{text-align:center;font:600 .68rem var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--gold-ink);margin:6px 0 16px}
+  .vs{border-radius:8px;margin:0 -8px;padding:1px 8px;cursor:pointer;position:relative}
+  .vs.hl{background:var(--hl)}
+  .vs.bm::after{content:"";position:absolute;right:2px;top:.75em;width:7px;height:11px;background:var(--gold);clip-path:polygon(0 0,100% 0,100% 100%,50% 72%,0 100%)}
+  .vs.flash{animation:fl 1.6s ease-out}
+  @keyframes fl{0%{background:var(--tint2)}100%{background:transparent}}
+  .rnav{display:flex;gap:10px}
+  .rnav .btn{flex:1;min-width:0}
+  .rnav .btn[disabled]{opacity:.35;pointer-events:none}
+  .focusx{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:max(12px,env(safe-area-inset-right,0px));z-index:30;
+    width:40px;height:40px;border-radius:50%;background:var(--card);border:1px solid var(--line);color:var(--muted2);box-shadow:var(--shadow)}
+  html.focus .top,html.focus .tabs,html.focus .rbar,html.focus #rdCtl,html.focus #rdEdition,html.focus .preview{display:none}
+  html.focus body{padding-bottom:40px;padding-left:0}
+  html.focus .rbody{border:0;box-shadow:none;background:transparent;padding:calc(env(safe-area-inset-top,0px) + 28px) 6px 20px}
+  html:not(.focus) .focusx{display:none}
+
+  /* ---------- Settings ---------- */
+  .set{padding:6px 18px}
+  .set .eyebrow{padding:12px 0 2px}
+  .srow{display:flex;align-items:center;gap:12px;padding:13px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+  .set .eyebrow + .srow{border-top:0}
+  .srow .sl{flex:1;min-width:150px;font-weight:600;font-size:.94rem;line-height:1.3}
+  .srow .sl small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem;margin-top:2px;line-height:1.45}
+  .srow.col{flex-direction:column;align-items:stretch}
+  .srow.col .sl{min-width:0}
+  .sample{font:calc(1.08rem * var(--rs))/1.6 var(--serif);margin:4px 0 0;color:var(--ink)}
+  .opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px}
+  .opt + .opt{margin-top:8px}
+  .opt.active{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+  .opt[disabled]{opacity:.55;cursor:default}
+  .opt .rd{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--muted);margin-top:2px;flex:none;position:relative}
+  .opt.active .rd{border-color:var(--accent)}
+  .opt.active .rd::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--accent)}
+  .opt b{display:block;font-size:.93rem} .opt small{display:block;color:var(--muted2);font-size:.8rem;line-height:1.45;margin-top:2px}
+  .about p{font-size:.84rem;line-height:1.55;color:var(--muted2);margin:0 0 10px}
+  .about summary{cursor:pointer;font-weight:600;font-size:.94rem;padding:13px 0;list-style:none}
   .about summary::-webkit-details-marker{display:none}
-  .about summary::after{content:" ▾";opacity:.7}
-  .about[open] summary::after{content:" ▴"}
-  .about p{margin:8px 0 0}
-  .footer a{color:var(--gold);text-decoration:none}
-  .support{display:block;width:-moz-fit-content;width:fit-content;margin:0 auto 16px;padding:9px 16px;
-    border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--gold);
-    text-decoration:none;font-size:12.5px;font-weight:700;box-shadow:var(--shadow)}
-  .support:active{transform:translateY(1px)}
+  .about summary::after{content:"+";float:right;color:var(--muted);font-weight:400}
+  .about[open] summary::after{content:"–"}
+
+  /* ---------- sheets ---------- */
+  .scrim{position:fixed;inset:0;z-index:40;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+  .sheet{background:var(--card);width:100%;max-width:560px;max-height:86vh;overflow:auto;border-radius:20px 20px 0 0;
+    padding:8px max(18px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));
+    box-shadow:0 -8px 30px rgba(0,0,0,.18)}
+  .sheet .grab{width:38px;height:4px;border-radius:4px;background:var(--line);margin:4px auto 8px}
+  .shead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .shead h3{flex:1;font:500 1.12rem/1.3 var(--serif);margin:0;min-width:0}
+  .shead .ibtn{margin-right:-10px}
+  .arow{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:13px 2px;border-top:1px solid var(--line);font-weight:600;font-size:.95rem}
+  .arow small{display:block;font-weight:400;color:var(--muted2);font-size:.8rem}
+  .arow .i{color:var(--accent)}
+  .shead + .arow,.arow.first{border-top:0}
+  .sheet blockquote{margin:0 0 8px;font:calc(1rem * var(--rs))/1.6 var(--serif);color:var(--ink);max-height:9.6em;overflow:auto;white-space:pre-line}
+  .bkgrp{font:600 .68rem var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink);margin:14px 0 6px}
+  .bklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px}
+  .bklist button{padding:11px 12px;border-radius:10px;background:var(--tint);text-align:left;font-size:.9rem;font-weight:500}
+  .bklist button.cur{box-shadow:inset 0 0 0 1.5px var(--accent);color:var(--accent);font-weight:600}
+  .chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(48px,1fr));gap:6px;margin-top:10px}
+  .chgrid button{aspect-ratio:1/1;border-radius:10px;background:var(--tint);font-weight:600;font-variant-numeric:tabular-nums}
+  .chgrid button.cur{background:var(--accent-fill);color:var(--on-accent)}
+  .svrow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:1px solid var(--line)}
+  .svrow .go{flex:1;min-width:0;text-align:left}
+  .svrow .go b{display:block;font:500 .95rem var(--serif)} .svrow .go span{display:block;font-size:.82rem;color:var(--muted2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .svrow .rm{color:var(--muted2);font-size:.8rem;padding:6px 4px}
+  .empty{color:var(--muted2);font-size:.88rem;padding:8px 0 4px}
+  .supName{font:500 1.08rem/1.35 var(--serif);margin:4px 0 2px}
+  .supSub{font-size:.84rem;color:var(--muted2);margin:0 0 12px}
+  .suprow{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+  .suplbl{width:74px;font:600 .68rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted2)}
+  .supval{flex:1;font:600 1.05rem var(--sans);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+  .supcopy{font-size:.8rem;font-weight:600;color:var(--accent);padding:6px 12px;border:1px solid var(--line);border-radius:9px;min-width:62px;text-align:center}
+  span.supcopy{border:0}
+  .supcopy.done{background:var(--tint)}
+  .supnote{font-size:.82rem;color:var(--muted2);margin:12px 0 0}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--navh) + env(safe-area-inset-bottom,0px) + 18px);z-index:60;
+    background:var(--ink);color:var(--bg);font-size:.86rem;font-weight:600;padding:9px 16px;border-radius:999px;box-shadow:var(--shadow);pointer-events:none}
+
+  /* ---------- bottom navigation ---------- */
+  .tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);
+    padding:0 max(4px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(4px,env(safe-area-inset-left,0px))}
+  .tabs .in{display:flex;max-width:680px;margin:0 auto;height:var(--navh)}
+  .tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--muted2);position:relative;
+    font:500 .66rem/1 var(--sans);letter-spacing:.02em}
+  .tab span{white-space:nowrap}
+  .tab.active{color:var(--accent);font-weight:700}
+  .tab.active::before{content:"";position:absolute;top:0;left:50%;width:28px;margin-left:-14px;height:2.5px;border-radius:0 0 3px 3px;background:var(--gold)}
+
+  @media (max-width:360px){
+    .top{gap:8px} .top .ibtn{width:36px;height:36px} .brand .t{font-size:1.2rem} .brand .s{font-size:.72rem}
+  }
+  @media (max-width:340px){
+    .shell{padding-left:max(12px,env(safe-area-inset-left,0px));padding-right:max(12px,env(safe-area-inset-right,0px))}
+    .card{padding:14px} .rows,.set{padding:4px 14px} .tab{font-size:.6rem}
+    .seg button{padding:7px 9px;font-size:.78rem} .brand .s{display:none} .rbody{padding:18px 14px}
+  }
+  @media (min-width:700px){
+    .card{padding:22px} .day{padding:20px 18px 18px} .rows,.set{padding:8px 22px} .rbody{padding:30px 34px}
+    .date{font-size:1.45rem}
+    .scrim{align-items:center;padding:24px} .sheet{border-radius:20px;padding-bottom:20px} .sheet .grab{display:none}
+  }
+  @media (min-width:960px){
+    :root{--rail:96px}
+    body{padding-bottom:40px}
+    .tabs{right:auto;top:0;width:var(--rail);border-top:0;border-right:1px solid var(--line);padding:0}
+    .tabs .in{flex-direction:column;height:100%;justify-content:center;gap:6px;max-width:none}
+    .tab{flex:none;height:72px;font-size:.7rem;gap:6px}
+    .tab.active::before{top:50%;left:0;margin:-14px 0 0;width:2.5px;height:28px;border-radius:0 3px 3px 0}
+    .shell{max-width:720px}
+    .toast{bottom:28px}
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
 </style>
 </head>
 <body>
 
-<header class="appbar">
-  <div class="row">
-    <span class="brand"><span class="cross">☦</span><span>Daily<b>Readings</b></span></span>
-    <span class="spacer"></span>
-    <button class="gearbtn" id="calBtn" aria-label="Open the month calendar">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm4 6h2v2H9v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM9 17h2v2H9v-2zm4 0h2v2h-2v-2z"/></svg>
-    </button>
-    <button class="iconbtn" id="shareBtn" aria-label="Share this day">
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M18 16.1c-.8 0-1.5.3-2 .8l-7.1-4.2c.1-.2.1-.5.1-.7 0-.2 0-.5-.1-.7L16 7.2c.5.5 1.2.8 2 .8 1.7 0 3-1.3 3-3s-1.3-3-3-3-3 1.3-3 3c0 .2 0 .5.1.7L8 9.9C7.5 9.4 6.8 9 6 9c-1.7 0-3 1.3-3 3s1.3 3 3 3c.8 0 1.5-.4 2-.9l7.2 4.2c-.1.2-.1.4-.1.6 0 1.6 1.3 2.9 2.9 2.9 1.6 0 2.9-1.3 2.9-2.9 0-1.6-1.3-2.8-2.9-2.8z"/></svg>
-    </button>
-    <div class="sheet hidden" id="shareMenu">
-      <button class="mrow" id="shareTextBtn"><span class="mtit">Share as text</span><span class="msub">Saints, fast &amp; readings</span></button>
-      <button class="mrow" id="shareWisdomBtn"><span class="mtit">Wisdom tile</span><span class="msub">The day’s saying as an image</span></button>
-      <button class="mrow" id="shareDayBtn"><span class="mtit">Feast-day tile</span><span class="msub">Date, saints &amp; fast as an image</span></button>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-cross" viewBox="0 0 24 28"><path d="M12 2v24M8.5 6.5h7M5.5 11.5h13M8 17.5l8 4"/></symbol>
+  <symbol id="i-today" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10.2 5.2 7.700 4.700 4.500 5v13c3.200-.300 5.700.200 7.500 1.500 1.800-1.300 4.300-1.800 7.500-1.500V5c-3.200-.300-5.700.200-7.500 1.500zM12 6.500v13"/></symbol>
+  <symbol id="i-candle" viewBox="0 0 24 24"><path d="M12 3c1.400 1.700 2.100 2.900 2.100 4a2.100 2.100 0 0 1-4.200 0c0-1.100.700-2.300 2.100-4z"/><rect x="9.500" y="11" width="5" height="10" rx="1"/></symbol>
+  <symbol id="i-set" viewBox="0 0 24 24"><path d="M4 7h8M18 7h2M4 12h2M12 12h8M4 17h10M20 17h0"/><circle cx="15" cy="7" r="2.200"/><circle cx="9" cy="12" r="2.200"/><circle cx="17" cy="17" r="2.200"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.500A8 8 0 0 1 9.500 4a8 8 0 1 0 10.500 10.500z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4M8 7.500l4-4 4 4M5 12v6.500A1.500 1.500 0 0 0 6.500 20h11a1.500 1.500 0 0 0 1.500-1.500V12"/></symbol>
+  <symbol id="i-mark" viewBox="0 0 24 24"><path d="M7 4h10v16l-5-3.500L7 20z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.500" y="8.500" width="11" height="11" rx="2"/><path d="M15.500 5.500v-.500a1.500 1.500 0 0 0-1.500-1.500H6A1.500 1.500 0 0 0 4.500 5v8A1.500 1.500 0 0 0 6 14.500h.500"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3"/></symbol>
+  <symbol id="i-focus" viewBox="0 0 24 24"><path d="M4 9V5.500A1.500 1.500 0 0 1 5.500 4H9M15 4h3.500A1.500 1.500 0 0 1 20 5.500V9M20 15v3.500a1.500 1.500 0 0 1-1.500 1.500H15M9 20H5.500A1.500 1.500 0 0 1 4 18.500V15"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-img" viewBox="0 0 24 24"><rect x="3.500" y="4.500" width="17" height="15" rx="2.500"/><path d="M3.500 16l4.500-4.500 4 4 2.500-2.500 6 6"/><circle cx="15.500" cy="9" r="1.500"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 7h14M5 12h14M5 17h9"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.400-7-9.500A4 4 0 0 1 12 8a4 4 0 0 1 7 2.500c0 5.100-7 9.500-7 9.500z"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24"><path d="M12 4v10.500M12 4h6v3h-6"/><circle cx="9.500" cy="16.500" r="3"/></symbol>
+  <symbol id="i-scroll" viewBox="0 0 24 24"><path d="M7 4h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM9 9h6M9 12.500h6M9 16h3.500"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11M8 11.500l4 4 4-4M5 20h14"/></symbol>
+</svg>
+
+<div class="shell">
+  <header class="top">
+    <span class="cross"><svg class="i"><use href="#i-cross"/></svg></span>
+    <div class="brand">
+      <p class="t">Daily Readings</p>
+      <p class="s">Your daily spiritual companion.</p>
     </div>
-  </div>
-</header>
+    <button class="ibtn" id="themeBtn" aria-label="Switch between light and dark"><svg class="i"><use href="#i-moon"/></svg></button>
+    <button class="ibtn" id="setBtn" aria-label="Settings"><svg class="i"><use href="#i-set"/></svg></button>
+  </header>
 
-<div class="headpiece" aria-hidden="true"><span>☦</span></div>
+  <main id="app">
+    <!-- ======================= TODAY ======================= -->
+    <section class="view" id="view-today">
+      <div class="install hidden" id="installBanner">
+        <span class="itxt" id="installTxt">Keep Daily Readings with you — add it to your home screen.</span>
+        <button class="ibtn2" id="installGo">Install</button>
+        <button class="ix" id="installNo" aria-label="Dismiss">✕</button>
+      </div>
 
-<div class="install hidden" id="installBanner">
-  <span class="itxt" id="installTxt">Keep DailyReadings with you — add it to your home screen.</span>
-  <button class="ibtn" id="installGo">Install</button>
-  <button class="ix" id="installNo" aria-label="Dismiss">✕</button>
+      <section class="card day" id="dayCard">
+        <div class="dayNav">
+          <button id="prev" class="hbtn" aria-label="Previous day">‹</button>
+          <div class="dayHead">
+            <h1 class="date" id="date" title="Open the calendar">—</h1>
+            <p class="altdate" id="altdate"></p>
+          </div>
+          <button id="next" class="hbtn" aria-label="Next day">›</button>
+        </div>
+        <p class="summary" id="summary"></p>
+        <div class="dayMeta">
+          <div class="mrow faststrip hidden" id="fastWrap">
+            <span class="dot" id="fastDot"></span>
+            <span class="x"><span class="k" id="fastKey">Fasting today</span><span id="fastText">—</span><span id="fastDay"></span><span id="fastExc"></span></span>
+          </div>
+          <div class="mrow hidden" id="litRow">
+            <span class="dot litdot" id="litDot"></span>
+            <span class="x"><span class="k">Liturgical colour</span><span id="litText"></span></span>
+          </div>
+          <div class="mrow"><span class="x tracker" id="tracker"></span></div>
+        </div>
+        <div class="dayActs">
+          <button id="today" class="btn hidden">Return to today</button>
+          <button id="calBtn" class="btn ghost"><svg class="i"><use href="#i-cal"/></svg>Calendar</button>
+          <button id="shareBtn" class="btn ghost"><svg class="i"><use href="#i-share"/></svg>Share</button>
+        </div>
+      </section>
+      <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
+
+      <div class="banner offline" id="offlineBanner">Showing your saved copy — you appear to be offline.</div>
+      <div class="banner error" id="errorBanner"></div>
+      <div id="loading" class="loading"><div class="spin"></div>Loading the day’s readings…</div>
+
+      <div id="content" class="hidden">
+        <section class="card quote hidden" id="quoteCard">
+          <div class="qhead">
+            <p class="eyebrow">Wisdom of the Fathers</p>
+            <button class="ibtn" id="quoteShare" aria-label="Share this saying"><svg class="i"><use href="#i-share"/></svg></button>
+          </div>
+          <p class="qtext" id="quoteText"></p>
+          <button class="linkbtn hidden" id="quoteMore">Read the whole saying</button>
+          <div class="qrule"></div>
+          <p class="qby" id="quoteBy"></p>
+        </section>
+
+        <div class="sechead" id="scriptureHead"><p class="eyebrow">Holy Scripture</p><button class="linkbtn hidden" id="openAllBtn">Open all</button>
+          <span class="seg sm" id="sizeSeg" role="group" aria-label="Reading size"><button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button></span>
+        </div>
+        <div class="rctl hidden" id="readingsCtl">
+          <span class="seg" id="langSeg" role="group" aria-label="Language">
+            <button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button>
+          </span>
+          <span class="seg" id="txtSeg" role="group" aria-label="English translation">
+            <button data-txt="kjv">KJV</button><button data-txt="nkjv" class="active">NKJV</button>
+          </span>
+        </div>
+        <div id="readings"></div>
+        <p class="note hidden" id="gkEdNote"></p>
+
+        <div class="sechead hidden" id="saintsHead"><p class="eyebrow">Saints of the Day</p></div>
+        <section class="card commem hidden" id="commemCard">
+          <div class="chead" id="commemHead" role="button" tabindex="0" aria-expanded="false">
+            <p class="eyebrow">Commemorations</p><span class="count" id="commemCount"></span><span class="chev">▼</span>
+          </div>
+          <div class="cbody">
+            <ul id="commemList"></ul>
+            <p class="tattr hidden" id="commemSuppNote">✦ From the ROCOR calendar — parish supplement, cross-checked with OrthoChristian.</p>
+            <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">The complete list of the day’s saints — OrthoChristian →</a>
+          </div>
+        </section>
+
+        <section class="card lives hidden" id="livesCard">
+          <p class="eyebrow">Lives of the Saints</p>
+          <div id="livesList"></div>
+          <p class="tattr">Lives by John Brady (Abbamoses.com), with permission.</p>
+        </section>
+
+        <section class="card hidden" id="notesCard">
+          <p class="eyebrow">Service Notes</p>
+          <div id="notesText"></div>
+        </section>
+
+        <button class="card lrow first" id="toPrayer" style="padding:14px 18px">
+          <span class="licon"><svg class="i"><use href="#i-candle"/></svg></span>
+          <span class="ltxt">Prayers &amp; study for this day<small>Daily prayers, the Prologue, St Theophan</small></span><span class="larr">›</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ======================= CALENDAR ======================= -->
+    <section class="view" id="view-calendar" hidden>
+      <h2 class="vtitle">Calendar</h2>
+      <div class="seg wide" id="calSeg" role="group" aria-label="Calendar view">
+        <button data-pane="month" class="active">Month</button><button data-pane="week">Week</button><button data-pane="year">Year</button>
+      </div>
+
+      <section class="card" id="calMonthPane">
+        <div class="calhead">
+          <button id="calPrev" class="hbtn" aria-label="Previous month">‹</button>
+          <span class="mid"><button id="calTitle" class="caltitle" title="Pick a date">Month</button><button id="calYearBtn" class="calyear" title="Year at a glance">Year</button></span>
+          <button id="calNext" class="hbtn" aria-label="Next month">›</button>
+        </div>
+        <div class="calgrid" id="calGrid"></div>
+        <div class="callegend" id="calLegend">
+          <span><i class="lg cat-fast"></i>Fast</span>
+          <span><i class="lg cat-strict"></i>Strict fast</span>
+          <span><i class="lg cat-fish"></i>Fish allowed</span>
+          <span><i class="lg cat-wine"></i>Wine &amp; oil</span>
+          <span>✚ Great feast</span>
+        </div>
+      </section>
+
+      <section class="card hidden" id="calWeekPane">
+        <div class="calhead">
+          <button id="wkPrev" class="hbtn" aria-label="Previous week">‹</button>
+          <span class="mid"><span class="caltitle" id="wkTitle">Week</span></span>
+          <button id="wkNext" class="hbtn" aria-label="Next week">›</button>
+        </div>
+        <div id="wkRows"></div>
+      </section>
+
+      <section class="card hidden" id="calYearPane">
+        <div class="calhead">
+          <button id="yrPrev" class="hbtn" aria-label="Previous year">‹</button>
+          <span class="mid"><span class="caltitle" id="yrTitle">Year</span></span>
+          <button id="yrNext" class="hbtn" aria-label="Next year">›</button>
+        </div>
+        <div id="yrBody"></div>
+        <div style="margin-top:14px"><button class="btn ghost" id="yrShare"><svg class="i"><use href="#i-img"/></svg>Share this year as an image</button></div>
+      </section>
+
+      <section class="card dp" id="dayPanel">
+        <h3 id="dpDate">—</h3>
+        <p class="sub" id="dpSub"></p>
+        <p class="eyebrow k2">Fasting · general rule</p>
+        <span class="pill" id="dpPill">—</span>
+        <p class="feast hidden" id="dpFeast"></p>
+        <div class="acts"><button class="btn" id="dpOpen">Open this day’s readings</button></div>
+        <div class="journal hidden" id="dpJournal">
+          <p class="eyebrow">My fasting note</p>
+          <div class="seg" id="logSeg" role="group" aria-label="My fasting note for this day">
+            <button data-log="k">Kept</button><button data-log="p">In part</button><button data-log="">No note</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="fastCard">
+        <p class="eyebrow">Fasting</p>
+        <div id="seasonBox" class="hidden">
+          <p class="fsum" id="seasonText"></p>
+          <div class="prog" role="img" id="seasonProg" aria-label="How far through the fasting season"><i id="seasonBar" style="width:0%"></i></div>
+        </div>
+        <p class="fsum" id="logSum"></p>
+        <p class="note" style="margin:12px 0 0">The colours show the general rule of the Church — open a day for its precise fast. Your notes stay on this device and are seen by no one else. Personal fasting should be guided by your spiritual father.</p>
+      </section>
+    </section>
+
+    <!-- ======================= SCRIPTURE ======================= -->
+    <section class="view" id="view-scripture" hidden>
+      <div class="rbar">
+        <button class="pick" id="rdPick" aria-label="Choose a book and chapter"><span id="rdPickTxt">Matthew 1</span><span class="chev">▼</span></button>
+        <span class="spacer"></span>
+        <button class="ibtn" id="rdSaved" aria-label="Bookmarks and highlights"><svg class="i"><use href="#i-mark"/></svg></button>
+        <button class="ibtn" id="rdFocus" aria-label="Distraction-free reading"><svg class="i"><use href="#i-focus"/></svg></button>
+      </div>
+      <div class="rctl" id="rdCtl">
+        <span class="seg" id="rdLangSeg" role="group" aria-label="Language">
+          <button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button>
+        </span>
+        <span class="spacer"></span>
+        <span class="seg" id="rdSizeSeg" role="group" aria-label="Reading size">
+          <button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button>
+        </span>
+      </div>
+      <article class="card rbody" id="rdCard">
+        <h2 id="rdTitle">—</h2>
+        <p class="rsub" id="rdSub"></p>
+        <div id="rdBody"><div class="loading"><div class="spin"></div>Opening…</div></div>
+      </article>
+      <div class="rnav">
+        <button class="btn soft" id="rdPrev">‹ Previous</button>
+        <button class="btn soft" id="rdNext">Next ›</button>
+      </div>
+      <p class="note" id="rdEdition"></p>
+    </section>
+    <button class="focusx" id="focusExit" aria-label="Leave distraction-free reading"><svg class="i"><use href="#i-x"/></svg></button>
+
+    <!-- ======================= PRAYER ======================= -->
+    <section class="view" id="view-prayer" hidden>
+      <h2 class="vtitle">Prayer</h2>
+      <p class="vsub">Prayers and reading for the day</p>
+      <section class="card rows" id="prayersCard">
+        <p class="eyebrow">Daily prayers</p>
+        <a class="lrow" id="prayersLink" href="https://www.myrrh-bearers.org/morning.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg class="i"><use href="#i-candle"/></svg></span><span class="ltxt"><span id="prayersTitle">Morning Prayers</span><span class="tag" id="prayersTag">Now</span><small>Daily Orthodox prayers · Holy Myrrh-bearers</small></span><span class="larr">›</span></a>
+        <a class="lrow" id="prayersAltLink" href="https://www.myrrh-bearers.org/evening.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg class="i"><use href="#i-moon"/></svg></span><span class="ltxt"><span id="prayersAltTitle">Prayers Before Sleep</span><small>Daily Orthodox prayers · Holy Myrrh-bearers</small></span><span class="larr">›</span></a>
+      </section>
+      <section class="card rows" id="linksCard">
+        <p class="eyebrow" id="studyFor">For this day</p>
+        <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg class="i"><use href="#i-pen"/></svg></span><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">On the day’s Gospel and Epistle</small></span><span class="larr">›</span></a>
+        <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg class="i"><use href="#i-book"/></svg></span><span class="ltxt">Prologue of Ohrid<small>St Nikolai — lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
+        <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg class="i"><use href="#i-cal"/></svg></span><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s ROCOR listing &amp; troparia · Holy Trinity</small></span><span class="larr">›</span></a>
+        <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg class="i"><use href="#i-note"/></svg></span><span class="ltxt">Full Service Texts<small>Church Slavonic · azbyka.ru</small></span><span class="larr">›</span></a></span>
+      </section>
+      <section class="card rows">
+        <p class="eyebrow">The parish</p>
+        <button class="lrow" id="supportLink"><span class="licon"><svg class="i"><use href="#i-heart"/></svg></span><span class="ltxt">Support Holy Dormition, Corrimal<small>Bank details for a direct gift to the parish</small></span><span class="larr">›</span></button>
+      </section>
+      <p class="note">These rows open the source’s own website in your browser.</p>
+    </section>
+
+    <!-- ======================= SETTINGS ======================= -->
+    <section class="view" id="view-settings" hidden>
+      <h2 class="vtitle">Settings</h2>
+      <section class="card set">
+        <p class="eyebrow">Appearance</p>
+        <div class="srow">
+          <span class="sl">Theme<small>Automatic follows your phone.</small></span>
+          <span class="seg" id="themeSeg" role="group" aria-label="Theme"><button data-theme="auto">Auto</button><button data-theme="light">Light</button><button data-theme="dark">Dark</button></span>
+        </div>
+        <div class="srow">
+          <span class="sl">Reading size<small id="scaleLbl">100%</small></span>
+          <span class="seg" id="setSizeSeg" role="group" aria-label="Reading size"><button data-sz="-" aria-label="Smaller text">A−</button><button data-sz="+" aria-label="Larger text">A+</button></span>
+          <p class="sample" style="flex-basis:100%">Blessed are the pure in heart: for they shall see God. <span lang="grc">Μακάριοι οἱ καθαροὶ τῇ καρδίᾳ.</span></p>
+        </div>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">Reading</p>
+        <div class="srow">
+          <span class="sl">Language<small>English, Greek, or both together.</small></span>
+          <span class="seg" id="setLangSeg" role="group" aria-label="Language"><button data-lang="en">English</button><button data-lang="par">Parallel</button><button data-lang="grc">Greek</button></span>
+        </div>
+        <div class="srow">
+          <span class="sl">English text of the daily readings<small>The Scripture reader uses the King James Version.</small></span>
+          <span class="seg" id="setTxtSeg" role="group" aria-label="English translation"><button data-txt="kjv">KJV</button><button data-txt="nkjv">NKJV</button></span>
+        </div>
+        <div class="srow col">
+          <span class="sl">Greek New Testament edition<small>Two separate editions. They are never mixed.</small></span>
+          <div id="gkEdOpts">
+            <button class="opt" data-ed="rp"><span class="rd"></span><span><b>Byzantine Textform</b><small>Robinson &amp; Pierpont, 2018. Fully accented (polytonic). Public domain.</small></span></button>
+            <button class="opt" data-ed="pt"><span class="rd"></span><span><b>Patriarchal Text</b><small>Antoniades, Constantinople 1904/1912 — the edition authorised by the Ecumenical Patriarchate. This transcription (Robinson &amp; Ala-Konni) is unaccented and in lower case. [Brackets] mark words the printed edition set in small type. Public domain.</small></span></button>
+          </div>
+        </div>
+        <div class="srow">
+          <span class="sl">New Testament offline<small id="ntOffLbl">Save both languages on this device for reading without a connection.</small></span>
+          <button class="btn soft" id="ntOffBtn"><svg class="i"><use href="#i-down"/></svg>Save</button>
+        </div>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">Calendar</p>
+        <div class="srow col">
+          <div>
+            <button class="opt active" data-cal="julian"><span class="rd"></span><span><b>Old Calendar (Julian)</b><small>The Church calendar this app follows: feasts, fasts and readings in the Slavic tradition.</small></span></button>
+            <button class="opt" data-cal="revised" disabled aria-disabled="true"><span class="rd"></span><span><b>Revised Julian (New) Calendar</b><small>Not available. It needs its own verified tables of fixed feasts, fasts and readings — it cannot be made by shifting dates — so it is held for a later version.</small></span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card set">
+        <p class="eyebrow">This app</p>
+        <div class="srow">
+          <span class="sl">Saved on this device<small id="dataLbl">—</small></span>
+        </div>
+        <div class="srow hidden" id="setInstallRow">
+          <span class="sl">Add to your home screen<small id="setInstallLbl">Opens like an app and works offline.</small></span>
+          <button class="btn soft hidden" id="setInstallBtn">Install</button>
+        </div>
+        <div class="srow"><button class="lrow first" id="supportLink2" style="padding:0"><span class="ltxt">Support Holy Dormition, Corrimal<small>Bank details for a direct gift to the parish</small></span><span class="larr">›</span></button></div>
+        <details class="about" id="about" style="border-top:1px solid var(--line)"><summary>About &amp; sources</summary>
+          <p>Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition. English text of the daily readings: King James Version.</p>
+          <p>Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
+          <p id="nkjvNote" class="hidden">New King James Version® © 1982 Thomas Nelson (unofficial text; KJV shown if unavailable). Shown for the daily readings only.</p>
+          <p>Scripture reader: King James Version (public domain; text from eBible.org).</p>
+          <p>Greek New Testament: Byzantine Textform, ed. Robinson &amp; Pierpont (2018) — public domain. Patriarchal Text of 1904/1912 (Antoniades), transcribed by M. A. Robinson &amp; J. Ala-Konni — public domain.</p>
+          <p>Sayings of the Fathers are a parish selection; some are adapted or paraphrased and are marked so. Liturgical colours follow common Russian practice and are a guide only.</p>
+          <p><span id="stamp"></span><span id="verLbl"></span></p>
+        </details>
+      </section>
+    </section>
+  </main>
 </div>
 
-<main class="wrap" id="app">
-  <section class="hero">
-    <div class="datecard">
-      <div class="herobar">
-        <button id="prev" class="hbtn" aria-label="Previous day">‹</button>
-        <h1 class="date" id="date" title="Tap to open the calendar">—</h1>
-        <button id="next" class="hbtn" aria-label="Next day">›</button>
-      </div>
-      <p class="altdate" id="altdate"></p>
-      <p class="summary" id="summary"></p>
-      <button id="today" class="todaybtn hidden">Go to today</button>
-      <div class="faststrip hidden" id="fastWrap">
-        <span class="fgrp"><span class="dot" id="fastDot"></span><span id="fastText">—</span><span class="fday" id="fastDay"></span></span>
-        <span class="fgrp"><span class="fsep" id="fastExc"></span><span class="fico" id="fastIco"></span></span>
-      </div>
-    </div>
-  </section>
-  <input type="date" id="datePick" class="vh" tabindex="-1" aria-hidden="true">
-
-  <div class="calov hidden" id="calOverlay">
-    <div class="calpanel">
-      <div class="calhead">
-        <button id="calPrev" class="hbtn" aria-label="Previous month">‹</button>
-        <button id="calTitle" class="caltitle" title="Tap for date picker">Month</button>
-        <button id="calYearBtn" class="calyear" title="Year at a glance">Year ▸</button>
-        <button id="calNext" class="hbtn" aria-label="Next month">›</button>
-        <button id="calClose" class="hbtn" aria-label="Close">✕</button>
-      </div>
-      <div class="calgrid" id="calGrid"></div>
-      <div class="callegend">
-        <span><i class="lg lg1"></i> fast day</span>
-        <span><i class="lg lg2"></i> strict fast</span>
-        <span>🐟 fish allowed</span>
-        <span>🍇 wine &amp; oil</span>
-        <span>✚ great feast</span>
-      </div>
-      <p class="calnote">The grid shows the general rule of the Church — open any day for its precise fast and feast. Tap the year above for the year at a glance.</p>
-    </div>
+<!-- ======================= bottom navigation ======================= -->
+<nav class="tabs" id="tabs" aria-label="Sections">
+  <div class="in">
+    <button class="tab active" data-tab="today" aria-current="page"><svg class="i"><use href="#i-today"/></svg><span>Today</span></button>
+    <button class="tab" data-tab="calendar"><svg class="i"><use href="#i-cal"/></svg><span>Calendar</span></button>
+    <button class="tab" data-tab="scripture"><svg class="i"><use href="#i-book"/></svg><span>Scripture</span></button>
+    <button class="tab" data-tab="prayer"><svg class="i"><use href="#i-candle"/></svg><span>Prayer</span></button>
+    <button class="tab" data-tab="settings"><svg class="i"><use href="#i-set"/></svg><span>Settings</span></button>
   </div>
+</nav>
 
-  <div class="calov hidden" id="supportOverlay">
-    <div class="calpanel supPanel">
-      <div class="calhead">
-        <span class="yrtitle">Support the Parish</span>
-        <button id="supClose" class="hbtn" aria-label="Close">✕</button>
-      </div>
-      <p class="supName">Russian Orthodox Church Abroad<br>Wollongong Parish</p>
-      <p class="supSub">Holy Dormition of the Mother of God, Corrimal</p>
-      <div class="suprow"><span class="suplbl">Bank</span><span class="supval">Westpac</span><span class="supcopy"></span></div>
-      <div class="suprow"><span class="suplbl">BSB</span><span class="supval">032-695</span><button class="supcopy" data-copy="032695">Copy</button></div>
-      <div class="suprow"><span class="suplbl">Account</span><span class="supval">458 013</span><button class="supcopy" data-copy="458013">Copy</button></div>
-      <p class="supnote">A direct bank transfer — every dollar goes to the parish. Please use your name as the payment reference.</p>
-      <p class="supnote"><a href="https://wollongong.cerkov.ru/" target="_blank" rel="noopener noreferrer">Parish website →</a></p>
-    </div>
-  </div>
+<!-- ======================= sheets ======================= -->
+<div class="scrim hidden" id="shareMenu"><div class="sheet" role="dialog" aria-label="Share">
+  <div class="grab"></div>
+  <div class="shead"><h3 id="shareTitle">Share</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <button class="arow" data-ctx="day" id="shareTextBtn"><svg class="i"><use href="#i-text"/></svg><span>As text<small>Date, saints, fast &amp; readings</small></span></button>
+  <button class="arow" data-ctx="day" id="shareDayBtn"><svg class="i"><use href="#i-img"/></svg><span>As an image<small>Date, feast &amp; fast on a square card</small></span></button>
+  <button class="arow" data-ctx="quote" id="shareWisdomBtn"><svg class="i"><use href="#i-img"/></svg><span>As an image<small>The saying on a square card</small></span></button>
+  <button class="arow" data-ctx="quote" id="shareQuoteTextBtn"><svg class="i"><use href="#i-text"/></svg><span>As text<small>The saying with its attribution</small></span></button>
+  <button class="arow" data-ctx="quote" id="copyQuoteBtn"><svg class="i"><use href="#i-copy"/></svg><span>Copy<small>To paste anywhere</small></span></button>
+</div></div>
 
-  <div class="calov hidden" id="yearOverlay">
-    <div class="calpanel yearpanel">
-      <div class="calhead">
-        <button id="yrPrev" class="hbtn" aria-label="Previous year">‹</button>
-        <span class="yrtitle" id="yrTitle">Year</span>
-        <button id="yrNext" class="hbtn" aria-label="Next year">›</button>
-        <button id="yrClose" class="hbtn" aria-label="Close">✕</button>
-      </div>
-      <div id="yrBody"></div>
-      <div class="yrfoot"><button class="tbtn" id="yrShare">Share this year ▤</button></div>
-      <p class="calnote">The Twelve Great Feasts with Pascha, and the fasting seasons — tap a feast to open its day.</p>
-    </div>
-  </div>
+<div class="scrim hidden" id="supportOverlay"><div class="sheet supPanel" role="dialog" aria-label="Support the parish">
+  <div class="grab"></div>
+  <div class="shead"><h3>Support the Parish</h3><button class="ibtn" id="supClose" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <p class="supName">Russian Orthodox Church Abroad<br>Wollongong Parish</p>
+  <p class="supSub">Holy Dormition of the Mother of God, Corrimal</p>
+  <div class="suprow"><span class="suplbl">Bank</span><span class="supval">Westpac</span><span class="supcopy"></span></div>
+  <div class="suprow"><span class="suplbl">BSB</span><span class="supval">032-695</span><button class="supcopy" data-copy="032695">Copy</button></div>
+  <div class="suprow"><span class="suplbl">Account</span><span class="supval">458 013</span><button class="supcopy" data-copy="458013">Copy</button></div>
+  <p class="supnote">A direct bank transfer — every dollar goes to the parish. Please use your name as the payment reference.</p>
+  <p class="supnote"><a href="https://wollongong.cerkov.ru/" target="_blank" rel="noopener noreferrer">Parish website →</a></p>
+</div></div>
 
-  <div class="banner offline" id="offlineBanner">Showing saved copy — you appear to be offline.</div>
-  <div class="banner error" id="errorBanner"></div>
+<div class="scrim hidden" id="pickSheet"><div class="sheet" role="dialog" aria-label="Choose a book and chapter">
+  <div class="grab"></div>
+  <div class="shead"><button class="linkbtn hidden" id="pickBack">‹ Books</button><h3 id="pickTitle">New Testament</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="pickBody"></div>
+</div></div>
 
-  <div id="loading" class="loading"><div class="spin"></div>Loading the day’s readings…</div>
+<div class="scrim hidden" id="verseSheet"><div class="sheet" role="dialog" aria-label="Verse">
+  <div class="grab"></div>
+  <div class="shead"><h3 id="vsRef">—</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <blockquote id="vsText"></blockquote>
+  <button class="arow" id="vsCopy"><svg class="i"><use href="#i-copy"/></svg><span>Copy</span></button>
+  <button class="arow" id="vsShare"><svg class="i"><use href="#i-share"/></svg><span>Share</span></button>
+  <button class="arow" id="vsMark"><svg class="i"><use href="#i-mark"/></svg><span id="vsMarkTxt">Bookmark</span></button>
+  <button class="arow" id="vsHl"><svg class="i"><use href="#i-pen"/></svg><span id="vsHlTxt">Highlight</span></button>
+</div></div>
 
-  <div id="content" class="hidden">
-    <div class="tracker" id="tracker"></div>
+<div class="scrim hidden" id="savedSheet"><div class="sheet" role="dialog" aria-label="Bookmarks and highlights">
+  <div class="grab"></div>
+  <div class="shead"><h3>Saved verses</h3><button class="ibtn" data-close aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></div>
+  <div id="savedBody"></div>
+</div></div>
 
-    <section class="card quote hidden" id="quoteCard">
-      <p class="label">Wisdom of the Fathers</p>
-      <p class="qtext" id="quoteText"></p>
-      <button class="qmore hidden" id="quoteMore">Read the whole saying ▾</button>
-      <p class="qby" id="quoteBy"></p>
-    </section>
-
-    <div class="rctl hidden" id="readingsCtl">
-      <span class="seg2" id="txtSeg">
-        <button data-txt="kjv">KJV</button>
-        <button data-txt="nkjv" class="active">NKJV</button>
-      </span>
-      <span class="seg2" id="sizeSeg">
-        <button data-sz="-" aria-label="Smaller text">A−</button>
-        <button data-sz="+" aria-label="Larger text">A+</button>
-      </span>
-      <span class="seg2"><button id="greekBtn" aria-pressed="false" aria-label="Show the Greek text under each verse">Greek</button></span>
-      <button id="openAllBtn" class="hidden">Open all ▾</button>
-    </div>
-    <div id="readings"></div>
-
-    <section class="card commem collapsible hidden" id="commemCard">
-      <p class="label" id="commemHead">Commemorations<span class="cchev">▼</span></p>
-      <ul id="commemList"></ul>
-      <p class="tattr hidden" id="commemSuppNote">✦ From the ROCOR calendar — parish supplement, cross-checked with OrthoChristian.</p>
-      <a class="clink" id="commemLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">The complete list of the day’s saints — OrthoChristian →</a>
-    </section>
-
-    <section class="card lives hidden" id="livesCard">
-      <p class="label">Lives of the Saints</p>
-      <div id="livesList"></div>
-      <p class="tattr">Lives by John Brady (Abbamoses.com), with permission.</p>
-    </section>
-
-    <section class="card hidden" id="notesCard">
-      <p class="label">Service Notes</p>
-      <div id="notesText"></div>
-    </section>
-
-    <section class="card linksCard" id="linksCard">
-      <p class="label">For Prayer &amp; Study</p>
-      <a class="lrow" id="prayersLink" href="https://www.myrrh-bearers.org/morning.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 2c1.6 2 2.6 3.4 2.6 4.8A2.6 2.6 0 0 1 12 9.4a2.6 2.6 0 0 1-2.6-2.6C9.4 5.4 10.4 4 12 2zM9.5 11h5a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z"/></svg></span><span class="ltxt"><span id="prayersTitle">Morning Prayers</span><small>Daily Orthodox prayers · Holy Myrrh-bearers</small></span><span class="larr">›</span></a>
-      <a class="lrow" id="troparLink" href="https://www.holytrinityorthodox.com/calendar/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zm6 4h2v2h2v2h-2v2h-2v-2H9v-2h2v-2z"/></svg></span><span class="ltxt">Jordanville Calendar (ROCOR)<small>The day’s ROCOR listing &amp; troparia · Holy Trinity</small></span><span class="larr">›</span></a>
-      <a class="lrow" id="prologueLink" href="https://www.myrrh-bearers.org/prologue.htm" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M21 5c-1.1-.35-2.3-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg></span><span class="ltxt">Prologue of Ohrid<small>St Nikolai — lives, reflection &amp; homily</small></span><span class="larr">›</span></a>
-      <span id="azbykaCard" class="hidden" style="display:block"><a class="lrow" id="azbykaLink" href="https://azbyka.ru/worships/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></span><span class="ltxt">Full Service Texts<small>Church Slavonic · azbyka.ru</small></span><span class="larr">›</span></a></span>
-      <a class="lrow" id="theophanLink" href="https://orthochristian.com/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer"><span class="licon"><svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></span><span class="ltxt">A Thought for the Day · St Theophan<small id="theophanSub">His reflection follows the daily Gospel. OrthoChristian (official English text).</small></span><span class="larr">›</span></a>
-    </section>
-  </div>
-
-  <footer class="footer">
-    <a class="support" id="supportLink" href="#">♡ Support Holy Dormition, Corrimal</a>
-    <details class="about" id="about"><summary>About &amp; sources</summary>
-      <p>Readings &amp; calendar via <a href="https://orthocal.info/" target="_blank" rel="noopener">orthocal.info</a> — Slavic Old-Calendar tradition (KJV text).</p>
-      <p>Lives of the Saints: <a href="https://www.abbamoses.com/" target="_blank" rel="noopener">Abbamoses.com</a> (John Brady), used with permission via orthocal. The Lives follow the Greek Horologion, whose date for a saint occasionally differs from the Slavic calendar by a day or two.</p>
-      <p id="nkjvNote" class="hidden">New King James Version® © Thomas Nelson (unofficial text; KJV shown if unavailable).</p>
-      <p>Greek New Testament: Byzantine Textform, ed. Robinson &amp; Pierpont (2018) — public domain.</p>
-      <p><span id="stamp"></span></p>
-    </details>
-  </footer>
-</main>
-
+<div class="toast hidden" id="toast" role="status"></div>
 <script>
 (function(){
   "use strict";
+  var APP_VERSION = "v34";
   // Storage shim: real localStorage where available, in-memory fallback where it's blocked
   // (sandboxed previews, some private-browsing modes) so the app always boots.
   var store = (function(){
@@ -523,22 +810,34 @@
       };
     }
   })();
+  function jget(k, def){ try{ var r=store.getItem(k); return r ? JSON.parse(r) : def; }catch(e){ return def; } }
+  function jset(k, v){ try{ store.setItem(k, JSON.stringify(v)); }catch(e){} }
 
   var API = "https://orthocal.info/api";      // {cal}/{yyyy}/{m}/{d}/
   var PROXY = "https://api.allorigins.win/raw?url="; // fallback if direct fetch is blocked
+  // Saved preferences. Every key written by earlier versions keeps its name and format:
+  //   pref:txt (kjv|nkjv) · pref:scale (percent) · pref:greek ("1"/"0") · pref:installDismissed
+  //   day:julian:Y-M-D (saved days) · nkjv:book:chapter (saved NKJV chapters)
+  // New in v34: pref:lang (en|par|grc) · pref:theme (auto|light|dark) · pref:gkEd (rp|pt)
+  //   reader:pos · user:bookmarks · user:highlights · user:fastlog
+  function initialLang(){
+    var l = store.getItem("pref:lang");
+    if(l==="en" || l==="par" || l==="grc") return l;
+    return store.getItem("pref:greek")==="1" ? "par" : "en";   // carry the old Greek switch over
+  }
+  function initialTheme(){ var t=store.getItem("pref:theme"); return (t==="light"||t==="dark") ? t : "auto"; }
   var state = {
     cal: "julian",   // the app follows the Old Calendar — a stored "gregorian" pref from old versions is deliberately ignored
-    txt: store.getItem("pref:txt") || "nkjv",   // Bible text: "kjv" (bundled data) or "nkjv" (fetched)
-    greek: store.getItem("pref:greek")==="1",    // show the Greek New Testament under each verse
+    txt: store.getItem("pref:txt") || "nkjv",   // English text of the daily readings: "kjv" (in the calendar data) or "nkjv" (fetched)
+    lang: initialLang(),                          // en = English · par = English with Greek · grc = Greek
+    gkEd: store.getItem("pref:gkEd")==="pt" ? "pt" : "rp",   // Greek edition: Robinson–Pierpont or Patriarchal 1904
+    theme: initialTheme(),
     scale: parseInt(store.getItem("pref:scale")||"100",10) || 100,
     date: startOfToday(),
+    tab: "today",
     renderSeq: 0
   };
   var lastRender = null;
-
-  // ── Optional donations: set DONATE_URL to your Ko-fi / PayPal.me / parish donation link to show a
-  //    discreet "Support this app" button in the footer. Leave it "" to hide the button entirely.
-  // Support: the footer button opens the in-app parish bank-transfer sheet (#supportOverlay).
 
   // ---------- helpers ----------
   function startOfToday(){ var n=new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
@@ -551,31 +850,155 @@
   }
   function el(id){ return document.getElementById(id); }
   function show(node,on){ node.classList[on?"remove":"add"]("hidden"); }
-
-  // ---------- fasting colour ----------
-  function fastColour(desc){
-    var s=(desc||"").toLowerCase();
-    if(s.indexOf("no fast")>-1 || s.indexOf("fast-free")>-1 || s.indexOf("fast free")>-1) return "#2e8b4f"; // green
-    if(s.indexOf("fish")>-1) return "#3f7fbf";       // blue
-    if(s.indexOf("wine")>-1 || s.indexOf("oil")>-1) return "#c79a3a"; // gold
-    if(s.indexOf("caviar")>-1) return "#3f7fbf";
-    if(s.indexOf("fast")>-1) return "#8a2b2b";       // strict-ish red
-    return "#a9791f";
+  function sameDay(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function dayOnly(d){ return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
+  function isoKey(d){ return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+  function each(sel, fn){ Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
+  function mk(tag, cls, text){ var n=document.createElement(tag); if(cls) n.className=cls; if(text!=null) n.textContent=text; return n; }
+  var toastT=null;
+  function toast(msg){
+    var t=el("toast"); t.textContent=msg; show(t,true);
+    clearTimeout(toastT); toastT=setTimeout(function(){ show(t,false); }, 1800);
+  }
+  function copyText(text, done){
+    function fallback(){
+      var t=document.createElement("textarea"); t.value=text; t.style.position="fixed"; t.style.opacity="0";
+      document.body.appendChild(t); t.select();
+      try{ document.execCommand("copy"); if(done) done(); }catch(e){}
+      t.remove();
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ if(done) done(); }).catch(fallback);
+    } else fallback();
   }
 
-  // ---------- rendering ----------
+  // ---------- layers: sheets, focus mode and "away from Today" each take one Back press ----------
+  var layers=[], expectPop=[];
+  function pushLayer(closeFn, kind){
+    var L={close:closeFn, kind:kind, pushed:false};
+    try{ history.pushState({l:layers.length+1}, ""); L.pushed=true; }catch(e){}
+    layers.push(L);
+  }
+  function dropLayer(run){                       // programmatic close of the top layer
+    var L=layers.pop(); if(!L) return;
+    if(run) L.close();
+    if(L.pushed){ expectPop.push(Date.now()); try{ history.back(); }catch(e){ expectPop.pop(); } }
+  }
+  function closeLayer(){ dropLayer(true); }
+  function topKind(){ return layers.length ? layers[layers.length-1].kind : ""; }
+  window.addEventListener("popstate", function(){
+    var now=Date.now();
+    while(expectPop.length && now-expectPop[0] > 1500) expectPop.shift();
+    if(expectPop.length){ expectPop.shift(); return; }       // our own history.back()
+    var L=layers.pop(); if(L) L.close();                        // the phone's Back button
+  });
+  function openSheet(id){
+    show(el(id), true);
+    pushLayer(function(){ show(el(id), false); }, "sheet");
+  }
+  each(".scrim", function(s){
+    s.addEventListener("click", function(e){
+      if(e.target===s || (e.target.closest && e.target.closest("[data-close]"))) closeLayer();
+    });
+  });
+  document.addEventListener("keydown", function(e){
+    if(e.key==="Escape" && layers.length && topKind()!=="tab") closeLayer();
+  });
+
+  // ---------- the five views ----------
+  var TABS=["today","calendar","scripture","prayer","settings"], scrollMem={};
+  function showTab(name, fromLayer){
+    if(TABS.indexOf(name)<0) return;
+    if(name===state.tab){ window.scrollTo(0,0); return; }
+    scrollMem[state.tab]=window.pageYOffset||0;
+    var prev=state.tab; state.tab=name;
+    TABS.forEach(function(t){ el("view-"+t).hidden = (t!==name); document.body.classList.toggle("tab-"+t, t===name); });
+    each(".tab", function(b){
+      var on=b.getAttribute("data-tab")===name;
+      b.classList.toggle("active", on);
+      if(on) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current");
+    });
+    if(name==="calendar"){ syncCalToDay(false); renderCalendar(); }
+    if(name==="scripture") ensureReader();
+    if(name==="prayer") renderPrayersLink();
+    if(name==="settings") renderSettings();
+    window.scrollTo(0, scrollMem[name]||0);
+    if(fromLayer) return;
+    if(prev==="today") pushLayer(function(){ showTab("today", true); }, "tab");
+    else if(name==="today" && topKind()==="tab") dropLayer(false);
+  }
+  each(".tab", function(b){ b.addEventListener("click", function(){ showTab(b.getAttribute("data-tab")); }); });
+  el("setBtn").addEventListener("click", function(){ showTab("settings"); });
+  el("toPrayer").addEventListener("click", function(){ showTab("prayer"); });
+
+  // ---------- theme ----------
+  function effectiveTheme(){
+    var a=document.documentElement.getAttribute("data-theme");
+    if(a==="dark"||a==="light") return a;
+    return (window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  }
+  function paintTheme(){
+    var dark = effectiveTheme()==="dark";
+    var meta=document.querySelector('meta[name="theme-color"]');
+    if(meta) meta.setAttribute("content", dark ? "#15110F" : "#FAF7EF");
+    el("themeBtn").querySelector("use").setAttribute("href", dark ? "#i-today" : "#i-moon");
+    each("#themeSeg button", function(b){ b.classList.toggle("active", b.getAttribute("data-theme")===state.theme); });
+  }
+  function setTheme(t){
+    state.theme=t; store.setItem("pref:theme", t);
+    if(t==="auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", t);
+    paintTheme();
+  }
+  el("themeBtn").addEventListener("click", function(){ setTheme(effectiveTheme()==="dark" ? "light" : "dark"); });
+  each("#themeSeg button", function(b){ b.addEventListener("click", function(){ setTheme(b.getAttribute("data-theme")); }); });
+  if(window.matchMedia){
+    var mq=matchMedia("(prefers-color-scheme: dark)");
+    if(mq.addEventListener) mq.addEventListener("change", paintTheme); else if(mq.addListener) mq.addListener(paintTheme);
+  }
+
+  // ---------- reading size (applies to Scripture, sayings and lives; the interface keeps its size) ----------
+  var SCALES=[90,100,110,120,130,145,160];
+  function applyScale(){
+    document.documentElement.style.setProperty("--rs", String(state.scale/100));
+    el("scaleLbl").textContent = state.scale+"%";
+  }
+  function bumpScale(dir){
+    var i=SCALES.indexOf(state.scale); if(i<0) i=1;
+    i=Math.max(0, Math.min(SCALES.length-1, i+dir));
+    state.scale=SCALES[i]; store.setItem("pref:scale", String(state.scale)); applyScale();
+  }
+  each("#sizeSeg button, #rdSizeSeg button, #setSizeSeg button", function(b){
+    b.addEventListener("click", function(){ bumpScale(b.getAttribute("data-sz")==="+" ? 1 : -1); });
+  });
+
+  // ---------- rendering the day ----------
+  var LIT_NAME = { blue:"Blue", red:"Red", green:"Green", violet:"Violet", white:"White", gold:"Gold" };
+  var LIT_DOT  = { burgundy:"#641E28", blue:"#2F4F86", red:"#A3262A", green:"#2F6B3F", violet:"#5B3A86", white:"#F3EEDF", gold:"#C5A46D" };
+  var CAT_SHORT = { free:"No fast", fast:"Fast", strict:"Strict fast", fish:"Fish allowed", wine:"Wine & oil" };
+
   function render(data, opts){
     opts = opts || {};
-    state.renderSeq++;                       // invalidates any in-flight NKJV swaps from a previous day
-    lastRender = { data: data, opts: opts }; // lets the KJV/NKJV toggle re-render instantly
-    el("date").textContent = fmtDate(state.date);
-
-    // Optional alternate (Julian civil) date if the API supplies it
-    var alt = data && (data.julian_calendar_date || data.date_julian || data.jdate);
+    var dkey = keyOf(state.cal, state.date), keepOpen = [], livesOpen = [];
+    if(lastRender && lastRender.key===dkey){          // same day again (fresh data, or a reading setting changed)
+      each("#readings .reading", function(r,i){ if(r.classList.contains("open")) keepOpen.push(i); });
+      each("#livesList .life", function(d,i){ if(d.open) livesOpen.push(i); });
+    }
+    state.renderSeq++;                       // invalidates any in-flight NKJV/Greek swaps from a previous day
+    lastRender = { data: data, opts: opts, key: dkey }; // lets the reading controls re-render instantly
+    var t0 = dayOnly(state.date);
+    var dEl=el("date"); dEl.textContent="";            // weekday as a small line above the date
+    dEl.appendChild(mk("span","wd",state.date.toLocaleDateString("en-AU",{weekday:"long"})));
+    dEl.appendChild(document.createTextNode(" "));
+    dEl.appendChild(mk("span","dmy",state.date.toLocaleDateString("en-AU",{day:"numeric",month:"long",year:"numeric"})));
     var tone = toneOfWeek(state.date);
-    el("altdate").textContent = tMonthDay(menaionOf(state.date)) + ", Old Style" + (tone ? " · Tone " + tone : "");
+    // non-breaking spaces keep "Old Style" and "Tone 8" whole on narrow screens
+    el("altdate").textContent = tMonthDay(menaionOf(state.date)).replace(" ", "\u00a0") + ", Old\u00a0Style" + (tone ? " · Tone\u00a0" + tone : "");
 
-    el("summary").textContent = (data && (data.summary_title || (data.titles && data.titles[0]))) || "";
+    // With no saved copy and no connection the app still shows what it can work out by itself:
+    // the date, tone, great feast and the general fasting rule. Nothing else is invented.
+    var rule = dayRule(t0);
+    el("summary").textContent = data ? ((data.summary_title || (data.titles && data.titles[0])) || "") : (rule.feast || "");
 
     // Fast — when the calendar notes no relaxation, the traditional strict norm applies; say so.
     var fdesc = (data && (data.fast_level_desc || data.fast_level_description)) || "";
@@ -585,25 +1008,35 @@
     // An allowance only means something on an actual fast day. Some calendar records
     // carry a great saint's allowance (e.g. St Vladimir: fish) that applies only when
     // his feast falls on a Wednesday or Friday — on non-fast years it must be suppressed.
-    var showExc = hasExc && isFastDay;
-    var fico = showExc ? (/fish/i.test(fexc) ? "🐟" : (/wine|oil/i.test(fexc) ? "🍇" : "")) : "";
+    var showExc = hasExc && isFastDay, cat;
     el("fastWrap").classList.remove("hidden","strict");
-    el("fastText").textContent = fdesc || "—";
-    if(showExc){
-      el("fastDot").style.background = fastColour(fdesc + " " + fexc); // colour reflects what is permitted
-      el("fastExc").textContent = fexc;
-    } else if(isFastDay){
-      el("fastDot").style.background = "#8a2b2b";
-      el("fastWrap").classList.add("strict");
-      el("fastExc").textContent = "traditionally strict — many saints’ days allow wine & oil";
+    if(!data){
+      isFastDay = rule.r.f>0; cat = rule.cat;
+      el("fastKey").textContent = "Fasting · general rule";
+      el("fastText").textContent = rule.label;
+      el("fastExc").textContent = "";
     } else {
-      el("fastDot").style.background = fastColour(fdesc);
-      el("fastExc").textContent = (hasExc && /fast[\s-]?free/i.test(fexc)) ? "fast-free week" : "";
+      el("fastKey").textContent = "Fasting";
+      el("fastText").textContent = fdesc || "—";
+      if(showExc){
+        cat = /fish|caviar/i.test(fexc) ? "fish" : (/wine|oil/i.test(fexc) ? "wine" : "fast");
+        el("fastExc").textContent = " · " + fexc;
+      } else if(isFastDay){
+        cat = "strict";
+        el("fastWrap").classList.add("strict");
+        el("fastExc").textContent = " · traditionally strict — many saints’ days allow wine & oil";
+      } else {
+        cat = "free";
+        el("fastExc").textContent = (hasExc && /fast[\s-]?free/i.test(fexc)) ? " · fast-free week" : "";
+      }
     }
-    el("fastIco").textContent = fico;
+    el("fastWrap").setAttribute("data-cat", cat);
+    el("fastDot").style.background = "var(--k-"+cat+")";
     // Day of the fasting season (only inside a real season: 1–49 covers the longest, Great Lent)
-    var fseason = isFastDay ? seasonInfo(new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()), fdesc) : null;
-    el("fastDay").textContent = (fseason && fseason.day>=1 && fseason.day<=49) ? (" · day "+fseason.day) : "";
+    var so = seasonOf(t0);
+    var fseason = isFastDay ? (data ? seasonInfo(t0, fdesc) : so) : null;
+    el("fastDay").textContent = (fseason && fseason.day>=1 && fseason.day<=49)
+      ? (" · day "+fseason.day+((so && so.day===fseason.day) ? " of "+so.len : "")) : "";
 
     // Commemorations — show the FULL list: union of titles + feasts + saints (deduped), minus the headline
     var summary = el("summary").textContent;
@@ -627,14 +1060,13 @@
       });
     });
     var ul = el("commemList"); ul.innerHTML="";
-    list.forEach(function(t){ var li=document.createElement("li"); li.textContent=t; ul.appendChild(li); });
+    list.forEach(function(t){ ul.appendChild(mk("li", "", t)); });
     // Parish supplement: ROCOR commemorations the upstream data lacks (see SUPPLEMENT)
-    var supp = supplementFor(state.date, [summary].concat(list));
-    supp.forEach(function(t){
-      var li=document.createElement("li"); li.className="supp"; li.textContent=t; ul.appendChild(li);
-    });
+    var supp = data ? supplementFor(state.date, [summary].concat(list)) : [];
+    supp.forEach(function(t){ ul.appendChild(mk("li", "supp", t)); });
     show(el("commemSuppNote"), supp.length>0);
     el("commemLink").setAttribute("href", orthoChristianURL(state.date));
+    el("commemCount").textContent = String(list.length+supp.length);
     show(el("commemCard"), (list.length+supp.length)>0);
 
     // Service notes
@@ -645,15 +1077,21 @@
 
     // Readings
     var wrap = el("readings"); wrap.innerHTML="";
+    wrap.className = "lang-"+state.lang;
     var readings = (data && data.readings) || [];
-    if(readings.length===0){
-      var none=document.createElement("div"); none.className="card"; none.style.color="var(--muted)";
-      none.textContent="No readings are listed for this day.";
+    if(!data){
+      var off=mk("div","card"); off.id="offlineDay";
+      off.appendChild(mk("p","eyebrow","Readings and saints"));
+      var op=mk("p","note","The readings and saints for this day need a connection the first time. Once a day has been opened it is kept on this device. The New Testament is in the Scripture tab.");
+      op.style.margin="8px 0 0"; off.appendChild(op);
+      wrap.appendChild(off);
+    } else if(readings.length===0){
+      var none=mk("div","card","No readings are listed for this day."); none.style.color="var(--muted2)";
       wrap.appendChild(none);
     }
-    readings.forEach(function(r){
-      var card=document.createElement("div"); card.className="reading";
-      var head=document.createElement("div"); head.className="head";
+    readings.forEach(function(r, idx){
+      var card=mk("div","reading"+(keepOpen.indexOf(idx)>-1 ? " open" : ""));
+      var head=mk("div","head"), h=mk("div","h");
       // Full lectionary label: e.g. "Vespers", "6th Matins Gospel", "Epistle — Apostles"
       var qual = String(r.desc || r.description || r.commemorated || "").trim();
       var srcLabel = String(r.source || "").trim();
@@ -661,48 +1099,67 @@
         var sp = srcLabel.split(/,\s*/); srcLabel = sp[0]; qual = sp.slice(1).join(", ");
       }
       var fullLabel = srcLabel + (qual ? " — " + qual : "");
-      if(fullLabel){ var s=document.createElement("div"); s.className="src"; s.textContent=fullLabel; head.appendChild(s); }
-      var ref=document.createElement("div"); ref.className="ref";
-      ref.textContent = r.display||r.short_display||"Reading";
-      var badge=document.createElement("span"); badge.className="ver"; badge.textContent="KJV";
-      ref.appendChild(badge); head.appendChild(ref);
-      var chev=document.createElement("span"); chev.className="chev"; chev.textContent="▼"; head.appendChild(chev);
-      head.addEventListener("click", function(){ card.classList.toggle("open"); });
+      if(fullLabel) h.appendChild(mk("div","src",fullLabel));
+      var disp = r.display||r.short_display||"";
+      var ref=mk("div","ref", disp||"Reading");
+      var badge=mk("span","ver","KJV");
+      ref.appendChild(badge); h.appendChild(ref); head.appendChild(h);
+      head.appendChild(mk("span","chev","▼"));
+      head.setAttribute("role","button"); head.setAttribute("tabindex","0");
+      head.setAttribute("aria-expanded", keepOpen.indexOf(idx)>-1 ? "true" : "false");
+      function toggle(){ card.classList.toggle("open"); head.setAttribute("aria-expanded", card.classList.contains("open") ? "true":"false"); syncOpenAll(); }
+      head.addEventListener("click", toggle);
+      head.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
       card.appendChild(head);
 
-      var body=document.createElement("div"); body.className="body";
-      renderPassageKJV(body, r);
+      var body=mk("div","body"), txt=mk("div","txt");
+      renderPassageKJV(txt, r);
+      body.appendChild(txt);
+      var pr = parseRef(disp);
+      if(pr && pr.book>=40){
+        var more=mk("button","linkbtn more","Read all of "+ntInfo(pr.book)[1]+" "+pr.segs[0].c+" →");
+        more.addEventListener("click", function(){ openReader(pr.book, pr.segs[0].c, pr.segs[0].a, true); });
+        body.appendChild(more);
+      }
       card.appendChild(body);
       wrap.appendChild(card);
 
-      if(state.greek) applyGreek(body, r.display||r.short_display, state.renderSeq);
-      if(state.txt==="nkjv"){
-        applyNKJV(body, badge, r.display||r.short_display, state.renderSeq);
-      }
+      if(state.lang!=="en") applyGreek(txt, disp, state.renderSeq);
+      if(state.txt==="nkjv") applyNKJV(txt, badge, disp, state.renderSeq);
     });
 
-    // Reading tools: version + size always with the readings; open-all only when several
+    // Reading tools: language, version and size sit with the readings; open-all only when several
     show(el("readingsCtl"), readings.length>0);
     show(el("openAllBtn"), readings.length>1);
-    el("openAllBtn").textContent = "Open all ▾";
+    syncOpenAll();
+    var gn=el("gkEdNote");
+    gn.textContent = "Greek text: " + GK_ED[state.gkEd].cite + ".";
+    show(gn, readings.length>0 && state.lang!=="en");
 
-    // Liturgical colour, lives, tracker, troparia, quote, St Theophan
+    // Liturgical colour, lives, tracker, links, quote, St Theophan
     applyLit(liturgicalKey(state.date, data, fdesc));
     renderLives(data);
+    each("#livesList .life", function(d,i){ if(livesOpen.indexOf(i)>-1) d.open=true; });
+    show(el("saintsHead"), !el("commemCard").classList.contains("hidden") || !el("livesCard").classList.contains("hidden"));
     renderTracker(fdesc);
     renderPrayersLink();
+    el("studyFor").textContent = "For " + state.date.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long"});
     el("troparLink").setAttribute("href", htmURL(state.date));
     el("prologueLink").setAttribute("href", prologueURL(state.date));
     renderAzbyka();
     renderQuote();
     renderTheophan(readings);
 
-    // stamp
-    var stamp = opts.cached ? ("Saved copy" + (opts.when? " · "+opts.when : "")) : ("Updated " + new Date().toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"}));
+    var stamp = !data ? "Not connected" : (opts.cached ? ("Saved copy" + (opts.when? " · "+opts.when : "")) : ("Updated " + new Date().toLocaleTimeString("en-AU",{hour:"numeric",minute:"2-digit"})));
     el("stamp").textContent = stamp;
 
     show(el("content"), true);
     el("loading").classList.add("hidden");
+  }
+  function syncOpenAll(){
+    var rs=document.querySelectorAll(".reading");
+    var anyClosed=Array.prototype.some.call(rs, function(r){ return !r.classList.contains("open"); });
+    el("openAllBtn").textContent = anyClosed ? "Open all" : "Close all";
   }
 
   // ---------- Paschalion + feast & fast tracker (Old Calendar, civil dates, valid 1900–2099) ----------
@@ -762,13 +1219,11 @@
     return null;
   }
   function renderTracker(fdesc){
-    var t=new Date(state.date.getFullYear(), state.date.getMonth(), state.date.getDate());
+    var t=dayOnly(state.date);
     var wrap=el("tracker"); wrap.innerHTML="";
     function chip(html, isToday){
-      var c=document.createElement("span"); c.className="chip"+(isToday?" today":"");
-      c.innerHTML=html; wrap.appendChild(c);
+      var c=mk("span","chip"+(isToday?" today":"")); c.innerHTML=html; wrap.appendChild(c);
     }
-    var season=seasonInfo(t,fdesc);
     var all=feastsFor(t.getFullYear()-1).concat(feastsFor(t.getFullYear()), feastsFor(t.getFullYear()+1));
     var today=null, next=null;
     all.forEach(function(fx){
@@ -776,19 +1231,19 @@
       if(diff===0) today=fx;
       if(diff>0 && (!next || fx.d<next.d)) next=fx;
     });
-    if(today) chip("☀ <b>"+today.n+"</b> — today", true);
+    if(today) chip("<b>"+today.n+"</b> — today", true);
     if(next){
       var nd=Math.round((next.d-t)/86400000);
       chip("Next feast: <b>"+next.n+"</b> in "+nd+(nd===1?" day":" days"));
     }
     var P=paschaCivil(t.getFullYear()); if(P<=t) P=paschaCivil(t.getFullYear()+1);
     var pd=Math.round((P-t)/86400000);
-    if(pd>0) chip("Pascha in <b>"+pd+"</b> days");
+    if(pd>0) chip("Pascha in <b>"+pd+"</b> "+(pd===1?"day":"days"));
   }
 
   // ---------- Liturgical colour of the day (Russian/ROCOR practice; adjust the table freely) ----------
-  // Colours: burgundy (default) · blue Theotokos · red martyrs & Paschaltide · green prophets/venerables/Pentecost
-  //          violet Cross & Lent · white Lord's great feasts · gold apostles & hierarchs
+  // Colours: burgundy (no specific colour determined) · blue Theotokos · red martyrs & Paschaltide
+  //          green prophets/venerables/Pentecost · violet Cross & Lent · white Lord's great feasts · gold apostles & hierarchs
   var LIT_BARS = { burgundy:"#5c161c", blue:"#1e3357", red:"#7d1518", green:"#1e4d2b",
                    violet:"#46246b", white:"#9a8a5c", gold:"#8a6a14" };
   // Fixed-feast colours by NOMINAL (menaion) date — correct on either calendar reckoning
@@ -823,8 +1278,10 @@
   }
   function applyLit(key){
     document.documentElement.setAttribute("data-lit", key);
-    var meta=document.querySelector('meta[name="theme-color"]');
-    if(meta) meta.setAttribute("content", LIT_BARS[key] || LIT_BARS.burgundy);
+    // The colour is named only when the day's feast or saint determines it; otherwise the row is left out.
+    var named = !!LIT_NAME[key];
+    show(el("litRow"), named);
+    if(named){ el("litText").textContent = LIT_NAME[key]; el("litDot").style.background = LIT_DOT[key]; }
   }
 
   // ---------- Fasting rule of the day (offline; the general rule — open a day for the precise fast) ----------
@@ -877,95 +1334,29 @@
     if(dow===3||dow===5) return {f:1,fish:false,feast:feast};
     return {f:0,fish:false,feast:feast};
   }
-
-  // ---------- Month calendar overlay ----------
-  var calMonth=null;
-  function openCal(){
-    calMonth=new Date(state.date.getFullYear(), state.date.getMonth(), 1);
-    renderCal(); show(el("calOverlay"), true);
-    try{ history.pushState({cal:1},""); calPushed=true; }catch(e){}
+  // The general rule as a colour category and a plain sentence (wraps fastRule; the rule itself is unchanged).
+  function dayRule(d){
+    var t=dayOnly(d), r=fastRule(t), P=paschaCivil(t.getFullYear()), diff=Math.round((t-P)/86400000), dow=t.getDay();
+    var cat, label;
+    if(r.f===0){ cat="free"; label=(dow===3||dow===5) ? "Fast-free" : "No fast"; }
+    else if(diff>=-55 && diff<=-49){ cat="fish"; label="Cheesefare week — no meat; dairy, eggs and fish"; }
+    else if(r.fish){ cat="fish"; label="Fast — fish, wine and oil allowed"; }
+    else if(r.wineOil){ cat="wine"; label="Fast — wine and oil allowed"; }
+    else if(r.f===2){ cat="strict"; label="Strict fast"; }
+    else { cat="fast"; label="Fast day"; }
+    return {r:r, cat:cat, label:label, feast:r.feast};
   }
-  var calPushed=false;
-  function closeCal(fromPop){
-    show(el("calOverlay"), false);
-    if(calPushed && fromPop!==true){ calPushed=false; try{ history.back(); }catch(e){} }
-    else calPushed=false;
-  }
-  window.addEventListener("popstate", function(){
-    // Android back: close whatever is open (topmost first) instead of leaving the app
-    if(!el("supportOverlay").classList.contains("hidden")) closeSupport(true);
-    else if(!el("yearOverlay").classList.contains("hidden")) closeYear(true);
-    else if(!el("calOverlay").classList.contains("hidden")) closeCal(true);
-    el("shareMenu").classList.add("hidden");
-  });
-
-  // ---------- Support the Parish sheet ----------
-  var supPushed=false;
-  function openSupport(){
-    show(el("supportOverlay"), true);
-    try{ history.pushState({sup:1},""); supPushed=true; }catch(e){}
-  }
-  function closeSupport(fromPop){
-    show(el("supportOverlay"), false);
-    if(supPushed && fromPop!==true){ supPushed=false; try{ history.back(); }catch(e){} }
-    else supPushed=false;
-  }
-  el("supportLink").addEventListener("click", function(e){ e.preventDefault(); openSupport(); });
-  el("supClose").addEventListener("click", function(){ closeSupport(); });
-  el("supportOverlay").addEventListener("click", function(e){ if(e.target===el("supportOverlay")) closeSupport(); });
-  Array.prototype.forEach.call(document.querySelectorAll(".supcopy[data-copy]"), function(b){
-    b.addEventListener("click", function(){
-      var v=b.getAttribute("data-copy");
-      function done(){ b.classList.add("done"); b.textContent="✓"; setTimeout(function(){ b.classList.remove("done"); b.textContent="Copy"; },1400); }
-      if(navigator.clipboard && navigator.clipboard.writeText){
-        navigator.clipboard.writeText(v).then(done).catch(function(){ fallback(); });
-      } else fallback();
-      function fallback(){
-        var t=document.createElement("textarea"); t.value=v; t.style.position="fixed"; t.style.opacity="0";
-        document.body.appendChild(t); t.select();
-        try{ document.execCommand("copy"); done(); }catch(e){}
-        t.remove();
-      }
+  // The fasting season containing a civil date: {name, day, len, s, e} or null.
+  function seasonOf(d){
+    var t=dayOnly(d), out=null;
+    yearEvents(t.getFullYear()).fasts.forEach(function(r){
+      if(t>=r.s && t<=r.e) out={name:r.name, day:Math.round((t-r.s)/86400000)+1, len:Math.round((r.e-r.s)/86400000)+1, s:r.s, e:r.e};
     });
-  });
-  function renderCal(){
-    var y=calMonth.getFullYear(), mo=calMonth.getMonth();
-    el("calTitle").textContent = calMonth.toLocaleDateString("en-AU",{month:"long"});
-    el("calYearBtn").textContent = y+" ▸";
-    var first=new Date(y,mo,1);
-    var startOffset=(first.getDay()+6)%7;                            // Monday-start grid
-    var start=new Date(y,mo,1-startOffset);
-    var today=startOfToday();
-    var grid=el("calGrid"); grid.innerHTML="";
-    ["M","T","W","T","F","S","S"].forEach(function(wd){
-      var h=document.createElement("div"); h.className="cwd"; h.textContent=wd; grid.appendChild(h);
-    });
-    for(var i=0;i<42;i++){
-      var d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);
-      var r=fastRule(d);
-      var cell=document.createElement("button");
-      cell.className="cd"+(r.f===1?" f1":"")+(r.f===2?" f2":"")+
-        (d.getMonth()!==mo?" om":"")+
-        (d.getTime()===today.getTime()?" tod":"")+
-        (d.getTime()===new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()).getTime()?" sel":"");
-      var lit=liturgicalKey(d, null, r.f===2?"Lenten Fast":"");
-      var n=document.createElement("span"); n.className="n"; n.textContent=d.getDate(); cell.appendChild(n);
-      var mk=document.createElement("span"); mk.className="mk";
-      mk.textContent=(r.feast?"✚":"")+(r.fish?"🐟":(r.wineOil?"🍇":"")); cell.appendChild(mk);
-      if(lit!=="burgundy"&&LIT_BARS[lit]){
-        var dot=document.createElement("span"); dot.className="ld"; dot.style.background=LIT_BARS[lit]; cell.appendChild(dot);
-      }
-      if(r.feast) cell.title=r.feast;
-      (function(dd){ cell.addEventListener("click", function(){
-        state.date=dd; syncTodayBtn(); closeCal(); load();
-      }); })(d);
-      grid.appendChild(cell);
-    }
+    return out;
   }
-  function calNav(n){ calMonth=new Date(calMonth.getFullYear(), calMonth.getMonth()+n, 1); renderCal(); }
 
   // ---------- Wisdom of the Fathers (bundled, rotates with the viewed day) ----------
-  var FATHERS=null;
+  var FATHERS=null, currentQuote=null;
   function loadFathers(){
     fetch("fathers.json").then(function(r){ return r.ok? r.json():null; }).then(function(j){
       FATHERS=j; if(lastRender) renderQuote();
@@ -973,24 +1364,27 @@
   }
   function renderQuote(){
     var card=el("quoteCard");
-    if(!FATHERS || !FATHERS.quotes || !FATHERS.quotes.length){ card.classList.add("hidden"); return; }
+    if(!FATHERS || !FATHERS.quotes || !FATHERS.quotes.length){ card.classList.add("hidden"); currentQuote=null; return; }
     var d=state.date, start=new Date(d.getFullYear(),0,1);
     var doy=Math.round((d-start)/86400000);
     var q=FATHERS.quotes[((doy % FATHERS.quotes.length)+FATHERS.quotes.length) % FATHERS.quotes.length];
+    currentQuote=q;
     el("quoteText").textContent="“"+q.q+"”";
-    el("quoteBy").textContent="— "+q.by+(q.src? (" · "+q.src):"");
-    var long = q.q.length > 180;   // long sayings fold to three lines
+    var by=el("quoteBy"); by.textContent=q.by;
+    if(q.src) by.appendChild(mk("small","",q.src));
+    var long = q.q.length > 220;   // long sayings fold to four lines
     el("quoteText").classList.toggle("clamped", long);
     show(el("quoteMore"), long);
-    el("quoteMore").textContent = "Read the whole saying ▾";
+    el("quoteMore").textContent = "Read the whole saying";
     card.classList.remove("hidden");
   }
+  function quoteLine(){ return currentQuote ? ("“"+currentQuote.q+"” — "+currentQuote.by+(currentQuote.src ? " ("+currentQuote.src+")" : "")) : ""; }
   el("quoteMore").addEventListener("click", function(){
     var clamped = el("quoteText").classList.toggle("clamped");
-    el("quoteMore").textContent = clamped ? "Read the whole saying ▾" : "Show less ▴";
+    el("quoteMore").textContent = clamped ? "Read the whole saying" : "Show less";
   });
 
-  // ---------- Lives of the Saints (Jordanville notes carried by orthocal) ----------
+  // ---------- Lives of the Saints (Abbamoses notes carried by orthocal) ----------
   function renderLives(data){
     var stories=(data && (data.stories || data.lives)) || [];
     var lw=el("livesList"); lw.innerHTML="";
@@ -1012,7 +1406,6 @@
     show(el("livesCard"), lw.childNodes.length>0);
   }
 
-  // ---------- Troparia link (Holy Trinity Jordanville calendar, civil-date params) ----------
   // ---------- Tone of the week (Octoechos) ----------
   // Thomas Sunday (Pascha + 7) begins Tone 1; the tone advances each Sunday and cycles 1–8
   // until the next Palm Sunday. Weekdays take the tone of the preceding Sunday.
@@ -1027,11 +1420,15 @@
     return ((Math.floor(diff/7)-1)%8)+1;
   }
 
-  // ---------- Daily prayers (Holy Myrrh-bearers): morning prayers by day, prayers before sleep by evening ----------
+  // ---------- Daily prayers (Holy Myrrh-bearers): the prayers for this time of day come first ----------
   function renderPrayersLink(){
-    var evening = new Date().getHours() >= 16;
+    var evening = new Date().getHours() >= 16, base="https://www.myrrh-bearers.org/";
     el("prayersTitle").textContent = evening ? "Prayers Before Sleep" : "Morning Prayers";
-    el("prayersLink").setAttribute("href", "https://www.myrrh-bearers.org/" + (evening ? "evening.htm" : "morning.htm"));
+    el("prayersLink").setAttribute("href", base + (evening ? "evening.htm" : "morning.htm"));
+    el("prayersLink").querySelector("use").setAttribute("href", evening ? "#i-moon" : "#i-candle");
+    el("prayersAltTitle").textContent = evening ? "Morning Prayers" : "Prayers Before Sleep";
+    el("prayersAltLink").setAttribute("href", base + (evening ? "morning.htm" : "evening.htm"));
+    el("prayersAltLink").querySelector("use").setAttribute("href", evening ? "#i-candle" : "#i-moon");
   }
 
   // ---------- Parish supplement: ROCOR commemorations the upstream data lacks ----------
@@ -1078,12 +1475,9 @@
     return "https://azbyka.ru/worships/?date="+d.getFullYear()+"-"+m+"-"+da;
   }
   function renderAzbyka(){
-    // Azbyka assembles the whole day (movable + fixed cycles) on the Old Calendar.
-    // On the New Calendar the two cycles cannot both be matched to one azbyka date,
-    // so the link is offered on the Old Calendar only.
-    var on = true; // Old Calendar only
-    show(el("azbykaCard"), on);
-    if(on) el("azbykaLink").setAttribute("href", azbykaURL(state.date));
+    // Azbyka assembles the whole day (movable + fixed cycles) on the Old Calendar — the calendar this app follows.
+    show(el("azbykaCard"), true);
+    el("azbykaLink").setAttribute("href", azbykaURL(state.date));
   }
 
   // ---------- Year at a glance ----------
@@ -1127,8 +1521,7 @@
     fasts.sort(function(a,b){ return a.s-b.s; });
     return {feasts:feasts, fasts:fasts};
   }
-
-  var yearShown=null, yrPushed=false;
+  var yearShown=null;
   function fmtYD(d){ return d.toLocaleDateString("en-AU",{weekday:"short",day:"numeric",month:"short"}); }
   function fmtYR(r){
     var days=Math.round((r.e-r.s)/86400000)+1, opt={day:"numeric",month:"short"};
@@ -1136,124 +1529,201 @@
     var e=r.e.toLocaleDateString("en-AU",opt)+(r.e.getFullYear()!==yearShown? " "+r.e.getFullYear() : "");
     return s+" – "+e+" · "+days+" days";
   }
+
+  // ---------- Calendar view: month · week · year, a day panel and the fasting notes ----------
+  var calMonth=null, calSel=null, calPane="month", calSyncedTo=null;
+  function fastLog(){ return jget("user:fastlog", {}) || {}; }
+  function syncCalToDay(force){
+    // The calendar opens on the day being read; if that day has not changed, the reader's place is kept.
+    if(force || !calSel || calSyncedTo!==state.date.getTime()){
+      calSel=dayOnly(state.date); calMonth=new Date(calSel.getFullYear(), calSel.getMonth(), 1);
+      calSyncedTo=state.date.getTime(); yearShown=calSel.getFullYear();
+    }
+  }
+  function openCalendar(){
+    syncCalToDay(true);
+    if(state.tab==="calendar") renderCalendar(); else showTab("calendar");
+  }
+  function openDay(d){
+    state.date=dayOnly(d); syncTodayBtn();
+    showTab("today"); window.scrollTo(0,0); load();
+  }
+  function selectDay(d, reveal){
+    calSel=dayOnly(d);
+    if(!calMonth || calSel.getMonth()!==calMonth.getMonth() || calSel.getFullYear()!==calMonth.getFullYear())
+      calMonth=new Date(calSel.getFullYear(), calSel.getMonth(), 1);
+    renderCalendar();
+    if(reveal) revealPanel();
+  }
+  function revealPanel(){
+    var p=el("dayPanel"); if(p.classList.contains("hidden")) return;
+    var r=p.getBoundingClientRect(), bottom=window.innerHeight-(el("tabs").offsetHeight||62);
+    if(r.top > bottom-110){
+      var smooth=!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+      try{ p.scrollIntoView({block:"nearest", behavior: smooth ? "smooth" : "auto"}); }catch(e){ p.scrollIntoView(false); }
+    }
+  }
+  function renderCalendar(){
+    if(!calSel) syncCalToDay(true);
+    each("#calSeg button", function(b){ b.classList.toggle("active", b.getAttribute("data-pane")===calPane); });
+    show(el("calMonthPane"), calPane==="month"); show(el("calWeekPane"), calPane==="week"); show(el("calYearPane"), calPane==="year");
+    if(calPane==="month") renderCal();
+    if(calPane==="week") renderWeek();
+    if(calPane==="year"){ if(!yearShown) yearShown=calMonth.getFullYear(); renderYear(); }
+    show(el("dayPanel"), calPane!=="year");
+    renderDayPanel(); renderFastCard();
+  }
+  each("#calSeg button", function(b){ b.addEventListener("click", function(){
+    calPane=b.getAttribute("data-pane"); if(calPane==="year") yearShown=calMonth.getFullYear(); renderCalendar();
+  }); });
+
+  function renderCal(){
+    var y=calMonth.getFullYear(), mo=calMonth.getMonth();
+    el("calTitle").textContent = calMonth.toLocaleDateString("en-AU",{month:"long"});
+    el("calYearBtn").textContent = String(y);
+    var first=new Date(y,mo,1);
+    var startOffset=(first.getDay()+6)%7;                            // Monday-start grid
+    var start=new Date(y,mo,1-startOffset);
+    var today=startOfToday(), log=fastLog();
+    var grid=el("calGrid"); grid.innerHTML="";
+    ["M","T","W","T","F","S","S"].forEach(function(wd){ grid.appendChild(mk("div","cwd",wd)); });
+    for(var i=0;i<42;i++){
+      var d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);
+      var dr=dayRule(d), r=dr.r;
+      var cell=mk("button","cd"+(r.f===1?" f1":"")+(r.f===2?" f2":"")+(dr.cat!=="free"?" cat-"+dr.cat:"")+
+        (d.getMonth()!==mo?" om":"")+(sameDay(d,today)?" tod":"")+(sameDay(d,calSel)?" sel":""));
+      var lit=liturgicalKey(d, null, r.f===2?"Lenten Fast":"");
+      cell.appendChild(mk("span","n",String(d.getDate())));
+      if(r.feast) cell.appendChild(mk("span","mk","✚"));
+      if(lit!=="burgundy"&&LIT_DOT[lit]){
+        var dot=mk("span","ld"); dot.style.background=LIT_DOT[lit]; cell.appendChild(dot);
+      }
+      var note=log[isoKey(d)];
+      if(note) cell.appendChild(mk("span","kept", note==="k" ? "✓" : "½"));
+      cell.setAttribute("aria-label", d.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long"})+" — "+dr.label+(r.feast?" — "+r.feast:""));
+      if(r.feast) cell.title=r.feast;
+      (function(dd){ cell.addEventListener("click", function(){
+        if(sameDay(dd,calSel)) openDay(dd); else selectDay(dd, true);   // first tap selects, second opens
+      }); })(d);
+      grid.appendChild(cell);
+    }
+  }
+  function calNav(n){ calMonth=new Date(calMonth.getFullYear(), calMonth.getMonth()+n, 1); renderCalendar(); }
+
+  function weekStart(d){ var t=dayOnly(d); return new Date(t.getFullYear(), t.getMonth(), t.getDate()-((t.getDay()+6)%7)); }
+  function renderWeek(){
+    var s=weekStart(calSel), e=addD(s,6), today=startOfToday(), log=fastLog();
+    var o1={day:"numeric",month:"short"}, o2={day:"numeric",month:"short",year:"numeric"};
+    el("wkTitle").textContent = s.toLocaleDateString("en-AU",o1)+" – "+e.toLocaleDateString("en-AU",o2);
+    var box=el("wkRows"); box.innerHTML="";
+    for(var i=0;i<7;i++){
+      var d=addD(s,i), dr=dayRule(d);
+      var row=mk("button","wrow"+(sameDay(d,today)?" tod":"")+(sameDay(d,calSel)?" sel":""));
+      var wd=mk("span","wd"); wd.appendChild(mk("small","",d.toLocaleDateString("en-AU",{weekday:"short"}))); wd.appendChild(mk("b","",String(d.getDate())));
+      row.appendChild(wd);
+      var wx=mk("span","wx", dr.label);
+      var sub=[tMonthDay(menaionOf(d))+" OS"]; if(dr.feast) sub.push(dr.feast);
+      var note=log[isoKey(d)]; if(note) sub.push(note==="k" ? "You noted: kept" : "You noted: kept in part");
+      wx.appendChild(mk("small","",sub.join(" · ")));
+      row.appendChild(wx);
+      var sw=mk("span","sw cat-"+dr.cat); sw.setAttribute("aria-hidden","true"); row.appendChild(sw);
+      row.setAttribute("aria-label", d.toLocaleDateString("en-AU",{weekday:"long",day:"numeric",month:"long"})+" — "+dr.label+(dr.feast?" — "+dr.feast:""));
+      (function(dd){ row.addEventListener("click", function(){ if(sameDay(dd,calSel)) openDay(dd); else selectDay(dd, true); }); })(d);
+      box.appendChild(row);
+    }
+  }
   function renderYear(){
     el("yrTitle").textContent=String(yearShown);
     var ev=yearEvents(yearShown), b=el("yrBody"); b.innerHTML="";
-    var h1=document.createElement("p"); h1.className="label"; h1.textContent="The Great Feasts"; b.appendChild(h1);
+    b.appendChild(mk("p","eyebrow","The Great Feasts"));
     ev.feasts.forEach(function(f){
-      var r=document.createElement("button"); r.className="yrow"+(f.pascha?" pascha":"");
-      var dot=document.createElement("span"); dot.className="ydot ydot-"+f.lit; r.appendChild(dot);
-      var nm=document.createElement("span"); nm.className="ynm"; nm.textContent=f.name; r.appendChild(nm);
-      var dt=document.createElement("span"); dt.className="ydt"; dt.textContent=fmtYD(f.d); r.appendChild(dt);
-      r.addEventListener("click", function(){ jumpFromYear(f.d); });
+      var r=mk("button","yrow"+(f.pascha?" pascha":""));
+      var dot=mk("span","ydot ydot-"+f.lit); dot.style.background=LIT_DOT[f.lit]||LIT_DOT.gold; r.appendChild(dot);
+      r.appendChild(mk("span","ynm",f.name));
+      r.appendChild(mk("span","ydt",fmtYD(f.d)));
+      r.addEventListener("click", function(){ openDay(f.d); });
       b.appendChild(r);
     });
-    var h2=document.createElement("p"); h2.className="label"; h2.textContent="The Fasting Seasons"; b.appendChild(h2);
+    b.appendChild(mk("p","eyebrow","The Fasting Seasons"));
     ev.fasts.forEach(function(f){
-      var r=document.createElement("div"); r.className="yfast";
-      var nm=document.createElement("span"); nm.className="ynm"; nm.textContent=f.name; r.appendChild(nm);
-      var dt=document.createElement("span"); dt.className="ydt2"; dt.textContent=fmtYR(f); r.appendChild(dt);
+      var r=mk("div","yfast");
+      r.appendChild(mk("span","ynm",f.name));
+      r.appendChild(mk("span","ydt2",fmtYR(f)));
       b.appendChild(r);
     });
   }
-  function openYear(){
-    yearShown=(calMonth?calMonth.getFullYear():state.date.getFullYear());
-    renderYear(); show(el("yearOverlay"), true);
-    try{ history.pushState({yr:1},""); yrPushed=true; }catch(e){}
+  function renderDayPanel(){
+    var dr=dayRule(calSel), tone=toneOfWeek(calSel);
+    el("dpDate").textContent = fmtDate(calSel);
+    el("dpSub").textContent = tMonthDay(menaionOf(calSel)) + ", Old Style" + (tone ? " · Tone " + tone : "");
+    var pill=el("dpPill"); pill.className="pill cat-"+dr.cat; pill.textContent=dr.label;
+    el("dpFeast").textContent = dr.feast || ""; show(el("dpFeast"), !!dr.feast);
+    show(el("dpJournal"), dr.r.f>0 && calSel<=startOfToday());   // a note can be made on the day or afterwards
+    var cur=fastLog()[isoKey(calSel)] || "";
+    each("#logSeg button", function(b){ b.classList.toggle("active", b.getAttribute("data-log")===cur); });
   }
-  function closeYear(fromPop){
-    show(el("yearOverlay"), false);
-    if(yrPushed && fromPop!==true){ yrPushed=false; try{ history.back(); }catch(e){} }
-    else yrPushed=false;
+  each("#logSeg button", function(b){ b.addEventListener("click", function(){
+    var log=fastLog(), k=isoKey(calSel), v=b.getAttribute("data-log");
+    if(v) log[k]=v; else delete log[k];
+    jset("user:fastlog", log); renderCalendar();
+  }); });
+  function renderFastCard(){
+    var so=seasonOf(calSel);
+    show(el("seasonBox"), !!so);
+    if(so){
+      el("seasonText").textContent = so.name+" — day "+so.day+" of "+so.len;
+      el("seasonBar").style.width = Math.round(so.day/so.len*100)+"%";
+    }
+    var y=calSel.getFullYear(), mo=calSel.getMonth(), log=fastLog(), fastDays=0, kept=0, part=0;
+    for(var d=new Date(y,mo,1); d.getMonth()===mo; d=addD(d,1)){
+      if(fastRule(d).f>0) fastDays++;
+      var n=log[isoKey(d)]; if(n==="k") kept++; else if(n==="p") part++;
+    }
+    var mname=calSel.toLocaleDateString("en-AU",{month:"long",year:"numeric"});
+    var s=mname+": "+fastDays+(fastDays===1?" fast day":" fast days")+" by the general rule";
+    if(kept||part) s+=". Your notes: "+kept+" kept"+(part ? ", "+part+" kept in part" : "");
+    el("logSum").textContent = s+".";
   }
-  function jumpFromYear(d){
-    var n=(yrPushed?1:0)+(calPushed?1:0);
-    yrPushed=false; calPushed=false;
-    show(el("yearOverlay"), false); show(el("calOverlay"), false);
-    if(n){ try{ history.go(-n); }catch(e){} }
-    state.date=new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    syncTodayBtn(); load();
-  }
-  el("calYearBtn").addEventListener("click", openYear);
-  el("yrClose").addEventListener("click", function(){ closeYear(); });
+  el("calPrev").addEventListener("click", function(){ calNav(-1); });
+  el("calNext").addEventListener("click", function(){ calNav(1); });
+  el("wkPrev").addEventListener("click", function(){ selectDay(addD(calSel,-7)); });
+  el("wkNext").addEventListener("click", function(){ selectDay(addD(calSel,7)); });
+  el("dpOpen").addEventListener("click", function(){ openDay(calSel); });
+  el("calYearBtn").addEventListener("click", function(){ calPane="year"; yearShown=calMonth.getFullYear(); renderCalendar(); });
   el("yrPrev").addEventListener("click", function(){ if(yearShown>1901){ yearShown--; renderYear(); } });
   el("yrNext").addEventListener("click", function(){ if(yearShown<2098){ yearShown++; renderYear(); } });
-  el("yearOverlay").addEventListener("click", function(e){ if(e.target===el("yearOverlay")) closeYear(); });
   el("yrShare").addEventListener("click", function(){ shareCanvas(buildYearTile(), "church-year-"+yearShown+".png"); });
-
-  function buildYearTile(){
-    var W=1080, H=1920;
-    var c=document.createElement("canvas"); c.width=W; c.height=H;
-    var x=c.getContext("2d");
-    var g=x.createLinearGradient(0,0,W*0.35,H);
-    g.addColorStop(0,"#f6efe0"); g.addColorStop(1,"#efe3cc");
-    x.fillStyle=g; x.fillRect(0,0,W,H);
-    x.strokeStyle="rgba(148,110,44,.55)"; x.lineWidth=3;
-    tRoundRect(x,32,32,W-64,H-64,12); x.stroke();
-    x.textAlign="center"; x.textBaseline="middle";
-    x.fillStyle="#946e2c"; x.font="34px Georgia, serif"; x.fillText("☦", W/2, 120);
-    x.fillStyle="#8a7a62";
-    try{ x.letterSpacing="6px"; }catch(e){}
-    x.font="700 28px -apple-system, 'Segoe UI', Roboto, sans-serif";
-    x.fillText("THE CHURCH YEAR", W/2, 180);
-    try{ x.letterSpacing="0px"; }catch(e){}
-    x.fillStyle="#2b1b12"; x.font="700 96px Georgia, serif";
-    x.fillText(String(yearShown), W/2, 268);
-    x.fillStyle="#8a7a62"; x.font="26px -apple-system, 'Segoe UI', Roboto, sans-serif";
-    x.fillText("Old Calendar (Julian)", W/2, 330);
-    var DOTC={blue:"#1e3a76", red:"#9e1f1f", green:"#1f5c31", violet:"#4d2a78", white:"#a8842e"};
-    var ev=yearEvents(yearShown), y=410;
-    ev.feasts.forEach(function(f){
-      x.beginPath(); x.arc(110, y, 9, 0, 7); x.fillStyle=DOTC[f.lit]||"#946e2c"; x.fill();
-      x.textAlign="left"; x.fillStyle= f.pascha? "#9e1f1f" : "#2b1b12";
-      x.font=(f.pascha? "800 ":"600 ")+"31px -apple-system, 'Segoe UI', Roboto, sans-serif";
-      var nm=f.name; if(x.measureText(nm).width>640){ nm=nm.split(" — ")[0]; }
-      x.fillText(nm, 140, y);
-      x.textAlign="right"; x.fillStyle="#8a7a62"; x.font="29px -apple-system, 'Segoe UI', Roboto, sans-serif";
-      x.fillText(fmtYD(f.d), W-110, y);
-      y+=62;
-    });
-    y+=30;
-    x.textAlign="center"; x.fillStyle="#8a7a62";
-    try{ x.letterSpacing="6px"; }catch(e){}
-    x.font="700 26px -apple-system, 'Segoe UI', Roboto, sans-serif";
-    x.fillText("THE FASTING SEASONS", W/2, y);
-    try{ x.letterSpacing="0px"; }catch(e){}
-    y+=56;
-    ev.fasts.forEach(function(f){
-      x.textAlign="left"; x.fillStyle="#2b1b12"; x.font="700 30px -apple-system, 'Segoe UI', Roboto, sans-serif";
-      x.fillText(f.name, 110, y);
-      x.textAlign="right"; x.fillStyle="#8a7a62"; x.font="28px -apple-system, 'Segoe UI', Roboto, sans-serif";
-      x.fillText(fmtYR(f), W-110, y);
-      y+=58;
-    });
-    x.textAlign="center"; x.fillStyle="#8a7a62";
-    try{ x.letterSpacing="4px"; }catch(e){}
-    x.font="26px -apple-system, 'Segoe UI', Roboto, sans-serif";
-    x.fillText("DAILYREADINGS", W/2, H-84);
-    try{ x.letterSpacing="0px"; }catch(e){}
-    return c;
-  }
+  el("calTitle").addEventListener("click", function(){
+    var dp=el("datePick"); dp.value = isoKey(calSel);
+    if(dp.showPicker){ try{ dp.showPicker(); }catch(e){ dp.click(); } } else { dp.click(); }
+  });
+  el("datePick").addEventListener("change", function(){
+    var v=el("datePick").value; if(!v) return;
+    var p=v.split("-");
+    selectDay(new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10)), true);
+  });
 
   // ---------- Share ----------
+  function appURL(){ return location.href.split("#")[0]; }
   function shareDay(){
     var d=(lastRender && lastRender.data)||{};
     var refs=((d.readings)||[]).map(function(r){ return r.display; }).filter(Boolean).join(" · ");
+    var ft=el("fastText").textContent;
     var txt="☦ "+el("date").textContent+" (Old Calendar)\n"+
-      (d.summary_title? d.summary_title+"\n":"")+
-      (el("fastText").textContent && el("fastText").textContent!=="—" ? "Fast: "+el("fastText").textContent+"\n" : "")+
-      (refs? "Readings: "+refs+"\n" : "")+ location.href;
+      (el("summary").textContent ? el("summary").textContent+"\n":"")+
+      (ft && ft!=="—" ? "Fast: "+ft+"\n" : "")+
+      (refs? "Readings: "+refs+"\n" : "")+ appURL();
+    shareText(txt, "Daily Orthodox Readings");
+  }
+  function shareText(txt, title){
     if(navigator.share){
-      navigator.share({title:"Daily Orthodox Readings", text:txt}).catch(function(){});
-    } else if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(function(){
-        var b=el("shareBtn"); b.classList.add("done");
-        setTimeout(function(){ b.classList.remove("done"); },1200);
-      }).catch(function(){});
-    }
+      navigator.share({title:title||"Daily Readings", text:txt}).catch(function(e){
+        if(!e || e.name!=="AbortError") copyText(txt, function(){ toast("Copied"); });
+      });
+    } else copyText(txt, function(){ toast("Copied"); });
   }
 
-  // ---------- Share tiles (canvas, 1080×1080, app palette) ----------
+  // ---------- Share images (canvas; flat ivory or burgundy, in the app's palette) ----------
   var TILE=1080;
   function tRoundRect(x,a,b,w,h,r){
     x.beginPath();
@@ -1280,38 +1750,30 @@
     }
     return {px:px, lines:lines};
   }
-  function tBase(x, dark){
-    var g=x.createLinearGradient(0,0,TILE*0.35,TILE);
-    if(dark){ g.addColorStop(0,"#5c161c"); g.addColorStop(1,"#3d0f14"); }
-    else { g.addColorStop(0,"#f6efe0"); g.addColorStop(1,"#efe3cc"); }
-    x.fillStyle=g; x.fillRect(0,0,TILE,TILE);
-    x.strokeStyle= dark? "rgba(212,175,110,.5)":"rgba(148,110,44,.55)";
-    x.lineWidth=3; tRoundRect(x,32,32,TILE-64,TILE-64,12); x.stroke();
+  function tCross(x, cx, cy, s, colour){            // three-bar cross; the foot-bar is higher on the viewer's left
+    x.save(); x.strokeStyle=colour; x.lineWidth=Math.max(2, s*0.07); x.lineCap="round";
+    x.beginPath();
+    x.moveTo(cx, cy-s/2); x.lineTo(cx, cy+s/2);
+    x.moveTo(cx-s*0.14, cy-s*0.31); x.lineTo(cx+s*0.14, cy-s*0.31);
+    x.moveTo(cx-s*0.27, cy-s*0.11); x.lineTo(cx+s*0.27, cy-s*0.11);
+    x.moveTo(cx-s*0.17, cy+s*0.17); x.lineTo(cx+s*0.17, cy+s*0.33);
+    x.stroke(); x.restore();
+  }
+  var TP = { light:{bg:"#FAF7EF", ink:"#302B25", muted:"#79736A", gold:"#86672C", rule:"rgba(197,164,109,.75)"},
+             dark: {bg:"#641E28", ink:"#FAF7EF", muted:"#DCC9A6", gold:"#C5A46D", rule:"rgba(197,164,109,.6)"} };
+  var T_SANS="-apple-system, 'Segoe UI', Roboto, sans-serif", T_SERIF='Georgia, "Times New Roman", serif';
+  function tBase(x, dark, W, H){
+    var p=dark?TP.dark:TP.light;
+    x.fillStyle=p.bg; x.fillRect(0,0,W,H);
+    x.strokeStyle=p.rule; x.lineWidth=2; tRoundRect(x,36,36,W-72,H-72,18); x.stroke();
     x.textAlign="center"; x.textBaseline="middle";
+    return p;
   }
-  function tOrnament(x, y, dark){
-    var gold= dark? "#d4af6e":"#946e2c";
-    x.fillStyle=gold; x.font="34px Georgia, serif";
-    x.fillText("☦", TILE/2, y);
-    x.strokeStyle=gold; x.globalAlpha=.55; x.lineWidth=1.5;
-    [[TILE/2-140,TILE/2-60],[TILE/2+60,TILE/2+140]].forEach(function(seg){
-      x.beginPath(); x.moveTo(seg[0],y); x.lineTo(seg[1],y); x.stroke();
-    });
-    x.globalAlpha=1;
-  }
-  function tLabel(x, text, y, dark){
-    x.fillStyle= dark? "#cdb68f":"#8a7a62";
-    try{ x.letterSpacing="6px"; }catch(e){}
-    x.font="700 26px -apple-system, 'Segoe UI', Roboto, sans-serif";
-    x.fillText(String(text).toUpperCase(), TILE/2, y);
-    try{ x.letterSpacing="0px"; }catch(e){}
-  }
-  function tFoot(x, dark){
-    x.fillStyle= dark? "#cdb68f":"#8a7a62";
-    try{ x.letterSpacing="4px"; }catch(e){}
-    x.font="26px -apple-system, 'Segoe UI', Roboto, sans-serif";
-    var lbl="DAILYREADINGS · OLD CALENDAR";
-    x.fillText(lbl, TILE/2, TILE-84);
+  function tSpaced(x, text, cx, y, px, colour, weight, spacing){
+    x.fillStyle=colour;
+    try{ x.letterSpacing=spacing+"px"; }catch(e){}
+    x.font=(weight||"600")+" "+px+"px "+T_SANS;
+    x.fillText(String(text).toUpperCase(), cx, y);
     try{ x.letterSpacing="0px"; }catch(e){}
   }
   function tMonthDay(d){
@@ -1320,54 +1782,80 @@
   }
   function buildTile(kind){
     var c=document.createElement("canvas"); c.width=TILE; c.height=TILE;
-    var x=c.getContext("2d");
-    var d=(lastRender && lastRender.data)||{};
+    var x=c.getContext("2d"), p;
     if(kind==="wisdom"){
-      tBase(x,false); tOrnament(x,236,false);
-      tLabel(x,"Wisdom of the Fathers",320,false);
+      p=tBase(x,false,TILE,TILE); tCross(x,TILE/2,214,64,"#C5A46D");
+      tSpaced(x,"Wisdom of the Fathers",TILE/2,318,25,p.gold,"700",6);
       var q=el("quoteText").textContent||"";
-      var by=el("quoteBy").textContent||"";
-      var f=tFit(x,q,880,6,60,34,'{px}px Georgia, "Times New Roman", serif');
-      x.font=f.px+'px Georgia, "Times New Roman", serif';
-      x.fillStyle="#2b1b12";
-      var lh=f.px*1.5, block=f.lines.length*lh;
-      var y0=560-block/2+lh/2;
+      var by=currentQuote ? currentQuote.by : "";
+      var f=tFit(x,q,860,7,58,32,'{px}px '+T_SERIF);
+      x.font=f.px+'px '+T_SERIF; x.fillStyle=p.ink;
+      var lh=f.px*1.5, block=f.lines.length*lh, y0=570-block/2+lh/2;
       f.lines.forEach(function(L,i){ x.fillText(L, TILE/2, y0+i*lh); });
-      x.fillStyle="#946e2c"; x.font="700 34px -apple-system, 'Segoe UI', Roboto, sans-serif";
-      x.fillText(by, TILE/2, y0+f.lines.length*lh+40);
-      tFoot(x,false);
+      x.fillStyle=p.gold; x.font="600 32px "+T_SANS;
+      x.fillText(by ? "— "+by : "", TILE/2, y0+f.lines.length*lh+34);
+      tSpaced(x,"Daily Readings · Old Calendar",TILE/2,TILE-92,23,p.muted,"500",4);
     } else {
-      tBase(x,true); tOrnament(x,236,true);
-      x.fillStyle="#f3e4c4"; x.font="700 78px Georgia, serif";
+      p=tBase(x,true,TILE,TILE); tCross(x,TILE/2,214,64,p.gold);
       var dateTxt=el("date").textContent||"";
-      var df=tFit(x,dateTxt,900,2,78,54,'700 {px}px Georgia, serif');
-      x.font='700 '+df.px+'px Georgia, serif';
+      var df=tFit(x,dateTxt,900,2,74,52,'700 {px}px '+T_SERIF);
+      x.font='700 '+df.px+'px '+T_SERIF; x.fillStyle=p.ink;
       var dy=360;
       df.lines.forEach(function(L,i){ x.fillText(L, TILE/2, dy+i*df.px*1.25); });
       dy+= df.lines.length*df.px*1.25 + 8;
-      x.fillStyle="#cdb68f"; x.font="30px -apple-system, 'Segoe UI', Roboto, sans-serif";
-      var osLine = tMonthDay(menaionOf(state.date))+" on the Old Calendar";
-      x.fillText(osLine, TILE/2, dy);
-      var feast=d.summary_title||"";
-      var ff=tFit(x,feast,880,3,50,32,'700 {px}px Georgia, serif');
-      x.font='700 '+ff.px+'px Georgia, serif'; x.fillStyle="#f3e4c4";
-      var flh=ff.px*1.45, fy=dy+90;
+      x.fillStyle=p.muted; x.font="30px "+T_SANS;
+      x.fillText(tMonthDay(menaionOf(state.date))+" on the Old Calendar", TILE/2, dy);
+      var feast=el("summary").textContent||"";
+      var ff=tFit(x,feast,880,3,48,32,'600 {px}px '+T_SERIF);
+      x.font='600 '+ff.px+'px '+T_SERIF; x.fillStyle=p.ink;
+      var flh=ff.px*1.45, fy=dy+92;
       ff.lines.forEach(function(L,i){ x.fillText(L, TILE/2, fy+i*flh); });
       var fastT=el("fastText").textContent||"";
-      var exc=el("fastExc").textContent||"";
+      var exc=(el("fastExc").textContent||"").replace(/^\s*·\s*/,"");
       if(fastT && fastT!=="—"){
-        var pill=fastT+(exc? " — "+exc.replace(/^\s*·\s*/,"") : "");
-        x.font="32px -apple-system, 'Segoe UI', Roboto, sans-serif";
+        var pill=fastT+(exc? " — "+exc : "");
+        x.font="30px "+T_SANS;
         if(x.measureText(pill).width>820){ pill=fastT; }
         var pw=x.measureText(pill).width+80, py=fy+ff.lines.length*flh+50;
-        x.fillStyle="rgba(212,175,110,.14)";
-        tRoundRect(x,TILE/2-pw/2,py-34,pw,68,34); x.fill();
-        x.strokeStyle="rgba(212,175,110,.4)"; x.lineWidth=1.5;
+        x.strokeStyle=p.rule; x.lineWidth=1.5;
         tRoundRect(x,TILE/2-pw/2,py-34,pw,68,34); x.stroke();
-        x.fillStyle="#f3e4c4"; x.fillText(pill, TILE/2, py);
+        x.fillStyle=p.ink; x.fillText(pill, TILE/2, py);
       }
-      tFoot(x,true);
+      tSpaced(x,"Daily Readings · Old Calendar",TILE/2,TILE-92,23,p.muted,"500",4);
     }
+    return c;
+  }
+  function buildYearTile(){
+    var W=1080, H=1920;
+    var c=document.createElement("canvas"); c.width=W; c.height=H;
+    var x=c.getContext("2d"), p=tBase(x,false,W,H);
+    tCross(x,W/2,122,60,"#C5A46D");
+    tSpaced(x,"The Church Year",W/2,196,27,p.gold,"700",6);
+    x.fillStyle=p.ink; x.font="700 96px "+T_SERIF; x.fillText(String(yearShown), W/2, 284);
+    x.fillStyle=p.muted; x.font="26px "+T_SANS; x.fillText("Old Calendar (Julian)", W/2, 346);
+    var ev=yearEvents(yearShown), y=424;
+    ev.feasts.forEach(function(f){
+      x.beginPath(); x.arc(110, y, 9, 0, 7); x.fillStyle=LIT_DOT[f.lit]||"#C5A46D"; x.fill();
+      if(f.lit==="white"){ x.strokeStyle="rgba(48,43,37,.35)"; x.lineWidth=1.5; x.stroke(); }
+      x.textAlign="left"; x.fillStyle= f.pascha? "#641E28" : p.ink;
+      x.font=(f.pascha? "800 ":"600 ")+"31px "+T_SANS;
+      var nm=f.name; if(x.measureText(nm).width>640){ nm=nm.split(" — ")[0]; }
+      x.fillText(nm, 140, y);
+      x.textAlign="right"; x.fillStyle=p.muted; x.font="29px "+T_SANS;
+      x.fillText(fmtYD(f.d), W-110, y);
+      y+=62;
+    });
+    y+=30;
+    x.textAlign="center"; tSpaced(x,"The Fasting Seasons",W/2,y,25,p.gold,"700",6);
+    y+=56;
+    ev.fasts.forEach(function(f){
+      x.textAlign="left"; x.fillStyle=p.ink; x.font="700 30px "+T_SANS;
+      x.fillText(f.name, 110, y);
+      x.textAlign="right"; x.fillStyle=p.muted; x.font="28px "+T_SANS;
+      x.fillText(fmtYR(f), W-110, y);
+      y+=58;
+    });
+    x.textAlign="center"; tSpaced(x,"Daily Readings",W/2,H-92,24,p.muted,"500",4);
     return c;
   }
   function shareCanvas(c, name){
@@ -1388,15 +1876,6 @@
   }
   function shareTile(kind){
     try{ shareCanvas(buildTile(kind), "dailyreadings-"+kind+".png"); }catch(e){}
-  }
-
-  // ---------- Text size ----------
-  var SCALES=[90,100,110,120,130];
-  function applyScale(){ document.body.style.zoom = (state.scale/100); }
-  function bumpScale(dir){
-    var i=SCALES.indexOf(state.scale); if(i<0) i=1;
-    i=Math.max(0, Math.min(SCALES.length-1, i+dir));
-    state.scale=SCALES[i]; store.setItem("pref:scale", String(state.scale)); applyScale();
   }
 
   // ---------- St Theophan: link to the official English reflection for the day ----------
@@ -1563,26 +2042,49 @@
       if(!frag.childNodes.length) return; // verses not found — keep KJV
       bodyEl.innerHTML=""; bodyEl.appendChild(frag);
       badgeEl.textContent="NKJV";
-      if(state.greek) applyGreek(bodyEl, display, seq);
+      if(state.lang!=="en") applyGreek(bodyEl, display, seq);
     }).catch(function(){ /* fetch failed — KJV stays, badge already says so */ });
   }
 
-  // ---------- Greek New Testament (Byzantine Textform, Robinson–Pierpont 2018; public domain) ----------
-  // Bundled with the app as greek/{book}/{chapter}.json = {verse: text}. New Testament only (books 40–66).
-  var greekMem = {};
+  // ---------- Greek New Testament: two separate editions, never mixed ----------
+  //   rp  Byzantine Textform, Robinson–Pierpont 2018 (public domain) — greek/{book}/{chapter}.json = {verse: text}
+  //   pt  Patriarchal Text, Antoniades 1904/1912, transcribed by Robinson & Ala-Konni (public domain; unaccented)
+  //       — greek-pt/{book}.json = {chapter: {verse: text}}
+  // New Testament only (books 40–66).
+  var GK_ED = {
+    rp:{ name:"Byzantine Textform", cite:"Byzantine Textform (Robinson–Pierpont, 2018)" },
+    pt:{ name:"Patriarchal Text",   cite:"Patriarchal Text (Antoniades, 1904/1912; unaccented transcription)" }
+  };
+  var greekMem = {}, ptMem = {}, kjvMem = {};
+  function fetchBookFile(dir, mem, book){
+    if(mem[book]) return Promise.resolve(mem[book]);
+    return fetch(dir+"/"+book+".json").then(function(r){
+      if(!r.ok) throw new Error("HTTP "+r.status); return r.json();
+    }).then(function(obj){ mem[book]=obj; return obj; });
+  }
   function fetchGreekChapter(book, ch){
+    if(state.gkEd==="pt"){
+      return fetchBookFile("greek-pt", ptMem, book).then(function(o){
+        var c=o[String(ch)]; if(!c) throw new Error("no chapter"); return c;
+      });
+    }
     var key = book+"/"+ch;
     if(greekMem[key]) return Promise.resolve(greekMem[key]);
     return fetch("greek/"+key+".json").then(function(r){
       if(!r.ok) throw new Error("HTTP "+r.status); return r.json();
     }).then(function(obj){ greekMem[key]=obj; return obj; });
   }
+  function gkPara(n, text){
+    var gp=mk("p","gk"); gp.setAttribute("lang","grc");
+    gp.appendChild(mk("sup","",String(n))); gp.appendChild(document.createTextNode(text));
+    return gp;
+  }
   function clearGreek(bodyEl){
+    bodyEl.classList.remove("has-gk");
     Array.prototype.forEach.call(bodyEl.querySelectorAll(".gk,.gknote"), function(n){ n.remove(); });
+    Array.prototype.forEach.call(bodyEl.querySelectorAll(".haspair"), function(n){ n.classList.remove("haspair"); });
   }
-  function greekNote(bodyEl, text){
-    var n=document.createElement("p"); n.className="gknote"; n.textContent=text; bodyEl.appendChild(n);
-  }
+  function greekNote(bodyEl, text){ bodyEl.appendChild(mk("p","gknote",text)); }
   function applyGreek(bodyEl, display, seq){
     clearGreek(bodyEl);
     var parsed = parseRef(display);
@@ -1590,11 +2092,12 @@
       if(bodyEl.querySelector(".v")) greekNote(bodyEl, "The Greek text is shown for New Testament readings.");
       return;
     }
+    var ed=state.gkEd;
     var chs=[]; parsed.segs.forEach(function(s){ if(chs.indexOf(s.c)<0) chs.push(s.c); });
     Promise.all(chs.map(function(c){
       return fetchGreekChapter(parsed.book, c).then(function(o){ return [c,o]; });
     })).then(function(pairs){
-      if(seq!==state.renderSeq || !state.greek) return;   // day changed or switched off meanwhile
+      if(seq!==state.renderSeq || state.lang==="en" || ed!==state.gkEd) return;   // day, language or edition changed meanwhile
       var map={}; pairs.forEach(function(p){ map[p[0]]=p[1]; });
       // The reading's verses in order, as (chapter, verse)
       var refs=[];
@@ -1615,32 +2118,323 @@
             ptr=i+1;
             var g=(map[refs[i].c]||{})[String(n)];
             if(g){
-              var gp=document.createElement("p"); gp.className="gk"; gp.setAttribute("lang","grc"); gp.textContent=g;
-              p.parentNode.insertBefore(gp, p.nextSibling);
+              p.parentNode.insertBefore(gkPara(n, g), p.nextSibling);
+              p.classList.add("haspair");     // in Greek-only view the English of a paired verse is hidden
             }
             break;
           }
         }
       });
+      if(bodyEl.querySelector(".gk")) bodyEl.classList.add("has-gk");
     }).catch(function(){
-      if(seq===state.renderSeq && state.greek && !bodyEl.querySelector(".gknote"))
+      if(seq===state.renderSeq && state.lang!=="en" && !bodyEl.querySelector(".gknote"))
         greekNote(bodyEl, "The Greek text could not be loaded — it needs a connection the first time.");
     });
   }
-  function setGreek(on){
-    state.greek = !!on; store.setItem("pref:greek", on ? "1" : "0");
-    var b=el("greekBtn"); b.classList.toggle("active", state.greek); b.setAttribute("aria-pressed", state.greek ? "true" : "false");
-    if(lastRender) render(lastRender.data, lastRender.opts);
-  }
 
+  // ---------- reading preferences (shared by the daily readings, the reader and Settings) ----------
+  function paintPrefs(){
+    document.body.classList.toggle("par", state.lang==="par");
+    each("#langSeg button, #rdLangSeg button, #setLangSeg button", function(b){ b.classList.toggle("active", b.getAttribute("data-lang")===state.lang); });
+    each("#txtSeg button, #setTxtSeg button", function(b){ b.classList.toggle("active", b.getAttribute("data-txt")===state.txt); });
+    each("#gkEdOpts .opt", function(b){ b.classList.toggle("active", b.getAttribute("data-ed")===state.gkEd); });
+    show(el("nkjvNote"), state.txt==="nkjv");
+  }
+  function refreshTexts(){
+    if(lastRender) render(lastRender.data, lastRender.opts);
+    if(rd.inited) renderReader(false);
+  }
+  function setLang(l){
+    state.lang=l; store.setItem("pref:lang", l);
+    store.setItem("pref:greek", l==="en" ? "0" : "1");     // kept in step for earlier versions of the app
+    paintPrefs(); refreshTexts();
+  }
   function setTxt(t){
     state.txt = t; store.setItem("pref:txt", t);
-    Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
-      b.classList.toggle("active", b.getAttribute("data-txt")===t);
-    });
-    show(el("nkjvNote"), t==="nkjv");
+    paintPrefs();
     if(lastRender) render(lastRender.data, lastRender.opts);
   }
+  function setGkEd(e){
+    state.gkEd = (e==="pt") ? "pt" : "rp"; store.setItem("pref:gkEd", state.gkEd);
+    paintPrefs(); refreshTexts();
+  }
+  each("#langSeg button, #rdLangSeg button, #setLangSeg button", function(b){ b.addEventListener("click", function(){ setLang(b.getAttribute("data-lang")); }); });
+  each("#txtSeg button, #setTxtSeg button", function(b){ b.addEventListener("click", function(){ setTxt(b.getAttribute("data-txt")); }); });
+  each("#gkEdOpts .opt", function(b){ b.addEventListener("click", function(){ setGkEd(b.getAttribute("data-ed")); }); });
+
+  // ---------- Scripture reader: the New Testament by book and chapter ----------
+  // English: King James Version, bundled per book (kjv/{book}.json, public domain). The NKJV is not offered
+  // here: its publisher's terms do not allow whole books to be reproduced without a licence.
+  var NT=[[40,"Matthew",28],[41,"Mark",16],[42,"Luke",24],[43,"John",21],[44,"Acts",28],[45,"Romans",16],
+    [46,"1 Corinthians",16],[47,"2 Corinthians",13],[48,"Galatians",6],[49,"Ephesians",6],[50,"Philippians",4],
+    [51,"Colossians",4],[52,"1 Thessalonians",5],[53,"2 Thessalonians",3],[54,"1 Timothy",6],[55,"2 Timothy",4],
+    [56,"Titus",3],[57,"Philemon",1],[58,"Hebrews",13],[59,"James",5],[60,"1 Peter",5],[61,"2 Peter",3],
+    [62,"1 John",5],[63,"2 John",1],[64,"3 John",1],[65,"Jude",1],[66,"Revelation",22]];
+  var NT_GROUPS=[["The Holy Gospels",40,43],["Acts of the Apostles",44,44],["Epistles of St Paul",45,58],["General Epistles",59,65],["Revelation",66,66]];
+  function ntInfo(b){ return NT[b-40] || NT[0]; }
+  var rd={ b:40, c:1, v:1, inited:false, seq:0, en:null, gk:null };
+  function ensureReader(){
+    if(rd.inited) return;
+    var p=jget("reader:pos", null);
+    if(p && p.b>=40 && p.b<=66 && p.c>=1 && p.c<=ntInfo(p.b)[2]){ rd.b=p.b; rd.c=p.c; rd.v=p.v||1; }
+    rd.inited=true; renderReader(true);
+  }
+  function saveRdPos(){ jset("reader:pos", {b:rd.b, c:rd.c, v:rd.v}); }
+  function openReader(b, c, v, flash){
+    rd.b=b; rd.c=c; rd.v=v||1; rd.inited=true; saveRdPos();
+    showTab("scripture");
+    renderReader(true, flash);
+  }
+  function rdRef(v){ return ntInfo(rd.b)[1]+" "+rd.c+(v ? ":"+v : ""); }
+  function renderReader(scrollToVerse, flash){
+    var info=ntInfo(rd.b), seq=++rd.seq, lang=state.lang, ed=state.gkEd, b=rd.b, c=rd.c;
+    el("rdPickTxt").textContent = info[1]+" "+c;
+    el("rdTitle").textContent = info[1];
+    el("rdSub").textContent = (info[2]>1 ? "Chapter "+c : "") ;
+    show(el("rdSub"), info[2]>1);
+    var pv=rdStepTarget(-1), nx=rdStepTarget(1);
+    el("rdPrev").disabled=!pv; el("rdPrev").textContent = pv ? "‹ "+ntInfo(pv.b)[1]+" "+pv.c : "‹";
+    el("rdNext").disabled=!nx; el("rdNext").textContent = nx ? ntInfo(nx.b)[1]+" "+nx.c+" ›" : "›";
+    el("rdEdition").textContent = (lang!=="grc" ? "English: King James Version. " : "") + (lang!=="en" ? "Greek: "+GK_ED[ed].cite+"." : "");
+    var body=el("rdBody"), want=b+":"+c;
+    if(body.getAttribute("data-ch")!==want){        // another chapter: clear the old text while this one opens
+      body.removeAttribute("data-ch"); body.removeAttribute("data-mode");
+      body.innerHTML='<div class="loading"><div class="spin"></div>Opening…</div>';
+    }
+    var pEn = fetchBookFile("kjv", kjvMem, b).then(function(o){ return o[String(c)] || null; }).catch(function(){ return null; });
+    var pGk = (lang==="en") ? Promise.resolve(null) : fetchGreekChapter(b, c).catch(function(){ return null; });
+    Promise.all([pEn, pGk]).then(function(res){
+      if(seq!==rd.seq) return;
+      var en=res[0], gk=res[1], gkNote="", moved={};
+      if(gk && b===45 && c===16 && gk["25"]){
+        // Both Greek editions print the closing doxology at Romans 14:24–26; the data repeats it at 16:25–27
+        // only so the daily readings (cited by KJV numbers) find it. The reader shows each edition as printed.
+        gk=JSON.parse(JSON.stringify(gk)); delete gk["25"]; delete gk["26"]; delete gk["27"]; moved={"25":1,"26":1,"27":1};
+        gkNote="In the Greek text the closing doxology (verses 25–27) stands at Romans 14:24–26.";
+      }
+      rd.en=en; rd.gk=gk;
+      body.innerHTML=""; body.className="lang-"+lang;
+      body.setAttribute("data-ch", want); body.setAttribute("data-mode", lang+":"+ed);
+      if(!en && !gk){
+        body.appendChild(mk("p","none","This chapter could not be loaded — it needs a connection the first time it is opened."));
+        return;
+      }
+      var nums={};
+      Object.keys(en||{}).forEach(function(k){ nums[k]=1; });
+      Object.keys(gk||{}).forEach(function(k){ nums[k]=1; });
+      var list=Object.keys(nums).map(function(k){ return parseInt(k,10); }).filter(Boolean).sort(function(a,b2){ return a-b2; });
+      var bms=savedSet("user:bookmarks"), hls=savedSet("user:highlights");
+      list.forEach(function(n){
+        var e=en && en[String(n)], g=gk && gk[String(n)], key=b+":"+c+":"+n;
+        var showEn = !!e && (lang==="en" || lang==="par");
+        var showGk = !!g && lang!=="en";
+        var lacking = lang==="grc" && !!gk && !g && !!e && !moved[String(n)];   // the verse is not in this Greek edition
+        if(!showEn && !showGk && !lacking) return;
+        var vs=mk("div","vs"+(showEn&&showGk?" pair":"")+(bms[key]?" bm":"")+(hls[key]?" hl":"")); vs.setAttribute("data-v", String(n));
+        if(showEn){ var p=mk("p","v"); p.appendChild(mk("sup","",String(n))); p.appendChild(document.createTextNode(e)); vs.appendChild(p); }
+        if(showGk) vs.appendChild(gkPara(n, g));
+        if(lacking) vs.appendChild(mk("p","gknote","Verse "+n+" is not in the "+GK_ED[ed].name+"."));
+        if(!showGk && lang==="par" && gk && !g && !moved[String(n)]) vs.appendChild(mk("p","gknote","Not in the "+GK_ED[ed].name+"."));
+        vs.addEventListener("click", function(){ openVerse(n); });
+        body.appendChild(vs);
+      });
+      if(lang!=="en" && !gk) body.appendChild(mk("p","gknote","The Greek text could not be loaded — it needs a connection the first time."));
+      if(lang!=="en" && gkNote) body.appendChild(mk("p","gknote",gkNote));
+      if(scrollToVerse && state.tab==="scripture"){
+        var target = rd.v>1 ? body.querySelector('.vs[data-v="'+rd.v+'"]') : null;
+        if(target){
+          var top=target.getBoundingClientRect().top + (window.pageYOffset||0) - 16;   // matches the position check below
+          window.scrollTo(0, Math.max(0, top));
+          if(flash){ target.classList.add("flash"); }
+        } else window.scrollTo(0,0);
+      }
+    });
+  }
+  function rdStepTarget(dir){
+    var c=rd.c+dir, b=rd.b;
+    if(c<1){ b--; if(b<40) return null; c=ntInfo(b)[2]; }
+    else if(c>ntInfo(b)[2]){ b++; if(b>66) return null; c=1; }
+    return {b:b, c:c};
+  }
+  function rdStep(dir){
+    var t=rdStepTarget(dir); if(!t) return;
+    rd.b=t.b; rd.c=t.c; rd.v=1; saveRdPos(); renderReader(true);
+  }
+  el("rdPrev").addEventListener("click", function(){ rdStep(-1); });
+  el("rdNext").addEventListener("click", function(){ rdStep(1); });
+
+  // remember how far down the chapter the reader is
+  var rdScrollT=null;
+  window.addEventListener("scroll", function(){
+    if(state.tab!=="scripture" || !rd.inited) return;
+    clearTimeout(rdScrollT);
+    rdScrollT=setTimeout(function(){
+      var vsl=el("rdBody").querySelectorAll(".vs"), v=1;
+      for(var i=0;i<vsl.length;i++){ if(vsl[i].getBoundingClientRect().bottom>20){ v=parseInt(vsl[i].getAttribute("data-v"),10)||1; break; } }
+      if(v!==rd.v){ rd.v=v; saveRdPos(); }
+    }, 350);
+  }, {passive:true});
+
+  // book and chapter picker
+  function openPicker(){ pickBooks(); openSheet("pickSheet"); }
+  function pickBooks(){
+    el("pickTitle").textContent="New Testament"; show(el("pickBack"), false);
+    var body=el("pickBody"); body.innerHTML="";
+    NT_GROUPS.forEach(function(g){
+      body.appendChild(mk("p","bkgrp",g[0]));
+      var list=mk("div","bklist");
+      NT.forEach(function(bk){
+        if(bk[0]<g[1] || bk[0]>g[2]) return;
+        var btn=mk("button", bk[0]===rd.b ? "cur" : "", bk[1]);
+        btn.addEventListener("click", function(){ if(bk[2]===1) pickGo(bk[0],1); else pickChapters(bk); });
+        list.appendChild(btn);
+      });
+      body.appendChild(list);
+    });
+  }
+  function pickChapters(bk){
+    el("pickTitle").textContent=bk[1]; show(el("pickBack"), true);
+    var body=el("pickBody"); body.innerHTML="";
+    var grid=mk("div","chgrid");
+    for(var c=1;c<=bk[2];c++){ (function(cc){
+      var btn=mk("button", (bk[0]===rd.b && cc===rd.c) ? "cur" : "", String(cc));
+      btn.setAttribute("aria-label", bk[1]+" chapter "+cc);
+      btn.addEventListener("click", function(){ pickGo(bk[0], cc); });
+      grid.appendChild(btn);
+    })(c); }
+    body.appendChild(grid);
+  }
+  function pickGo(b, c){ closeLayer(); rd.b=b; rd.c=c; rd.v=1; saveRdPos(); renderReader(true); }
+  el("rdPick").addEventListener("click", openPicker);
+  el("pickBack").addEventListener("click", pickBooks);
+
+  // bookmarks and highlights: arrays of {b,c,v,s,t} (book, chapter, verse, snippet, time)
+  function savedList(key){ var a=jget(key, []); return Array.isArray(a) ? a : []; }
+  function savedSet(key){ var o={}; savedList(key).forEach(function(x){ o[x.b+":"+x.c+":"+x.v]=1; }); return o; }
+  function toggleSaved(key, v){
+    var a=savedList(key), i=-1;
+    a.forEach(function(x,ix){ if(x.b===rd.b && x.c===rd.c && x.v===v) i=ix; });
+    if(i>-1){ a.splice(i,1); jset(key,a); return false; }
+    var s=(rd.en && rd.en[String(v)]) || (rd.gk && rd.gk[String(v)]) || "";
+    a.push({b:rd.b, c:rd.c, v:v, s:s.slice(0,110), t:Date.now()}); jset(key,a); return true;
+  }
+  var vsCur=0;
+  function verseText(v){
+    var e=rd.en && rd.en[String(v)], g=rd.gk && rd.gk[String(v)], lang=state.lang, parts=[], src=[];
+    if(e && (lang!=="grc" || !g)){ parts.push(e); src.push("KJV"); }                 // same order as on the page
+    if(g && lang!=="en"){ parts.push(g); src.push(GK_ED[state.gkEd].name); }
+    return { body:parts.join("\n"), cite:rdRef(v)+" ("+src.join(" · ")+")" };
+  }
+  function openVerse(v){
+    vsCur=v;
+    var t=verseText(v), key=rd.b+":"+rd.c+":"+v;
+    el("vsRef").textContent=rdRef(v);
+    el("vsText").textContent=t.body;
+    el("vsMarkTxt").textContent = savedSet("user:bookmarks")[key] ? "Remove bookmark" : "Bookmark";
+    el("vsHlTxt").textContent = savedSet("user:highlights")[key] ? "Remove highlight" : "Highlight";
+    openSheet("verseSheet");
+  }
+  function vsNode(){ return el("rdBody").querySelector('.vs[data-v="'+vsCur+'"]'); }
+  el("vsCopy").addEventListener("click", function(){
+    var t=verseText(vsCur); copyText(t.body+"\n— "+t.cite, function(){ toast("Copied"); }); closeLayer();
+  });
+  el("vsShare").addEventListener("click", function(){
+    var t=verseText(vsCur); closeLayer(); shareText(t.body+"\n— "+t.cite, rdRef(vsCur));
+  });
+  el("vsMark").addEventListener("click", function(){
+    var on=toggleSaved("user:bookmarks", vsCur), n=vsNode(); if(n) n.classList.toggle("bm", on);
+    closeLayer(); toast(on ? "Bookmarked" : "Bookmark removed");
+  });
+  el("vsHl").addEventListener("click", function(){
+    var on=toggleSaved("user:highlights", vsCur), n=vsNode(); if(n) n.classList.toggle("hl", on);
+    closeLayer(); toast(on ? "Highlighted" : "Highlight removed");
+  });
+  function renderSaved(){
+    var body=el("savedBody"); body.innerHTML="";
+    [["user:bookmarks","Bookmarks","No bookmarks yet. Tap any verse to add one."],
+     ["user:highlights","Highlights","No highlights yet. Tap any verse to highlight it."]].forEach(function(g){
+      body.appendChild(mk("p","bkgrp",g[1]));
+      var a=savedList(g[0]).slice().sort(function(p,q){ return (p.b-q.b)||(p.c-q.c)||(p.v-q.v); });
+      if(!a.length){ body.appendChild(mk("p","empty",g[2])); return; }
+      a.forEach(function(x){
+        var row=mk("div","svrow"), go=mk("button","go");
+        go.appendChild(mk("b","",ntInfo(x.b)[1]+" "+x.c+":"+x.v)); go.appendChild(mk("span","",x.s||""));
+        go.addEventListener("click", function(){ closeLayer(); rd.b=x.b; rd.c=x.c; rd.v=x.v; saveRdPos(); renderReader(true, true); });
+        var rm=mk("button","rm","Remove");
+        rm.addEventListener("click", function(){
+          jset(g[0], savedList(g[0]).filter(function(y){ return !(y.b===x.b && y.c===x.c && y.v===x.v); }));
+          renderSaved(); if(rd.inited) renderReader(false);
+        });
+        row.appendChild(go); row.appendChild(rm); body.appendChild(row);
+      });
+    });
+  }
+  el("rdSaved").addEventListener("click", function(){ renderSaved(); openSheet("savedSheet"); });
+
+  // distraction-free reading: only the text; Back or the ✕ returns
+  el("rdFocus").addEventListener("click", function(){
+    document.documentElement.classList.add("focus");
+    pushLayer(function(){ document.documentElement.classList.remove("focus"); }, "focus");
+  });
+  el("focusExit").addEventListener("click", function(){ if(topKind()==="focus") closeLayer(); else document.documentElement.classList.remove("focus"); });
+
+  // save the whole New Testament for reading without a connection (the service worker keeps what is fetched)
+  var ntSaving=false;
+  function saveNT(){
+    if(ntSaving) return;
+    var lbl=el("ntOffLbl");
+    if(!("serviceWorker" in navigator) || !navigator.serviceWorker.controller){
+      lbl.textContent="Offline saving starts once the app has finished installing itself — close and reopen the app, then try again."; return;
+    }
+    var urls=[], ed=state.gkEd;
+    NT.forEach(function(bk){
+      urls.push("kjv/"+bk[0]+".json");
+      if(ed==="pt") urls.push("greek-pt/"+bk[0]+".json");
+      else for(var c=1;c<=bk[2];c++) urls.push("greek/"+bk[0]+"/"+c+".json");
+    });
+    var i=0, ok=0, total=urls.length; ntSaving=true;
+    function next(){
+      if(i>=total){
+        ntSaving=false;
+        if(ok===total){ store.setItem("pref:ntSaved", ed); lbl.textContent="Saved — the New Testament (KJV and "+GK_ED[ed].name+") is on this device."; }
+        else lbl.textContent="Saved "+ok+" of "+total+" parts. Check your connection and try again to finish.";
+        return;
+      }
+      var u=urls[i++];
+      fetch(u).then(function(r){ if(r.ok) ok++; }).catch(function(){}).then(function(){
+        if(i%8===0 || i===total) lbl.textContent="Saving… "+i+" of "+total;
+        next();
+      });
+    }
+    lbl.textContent="Saving… 0 of "+total;
+    next(); next(); next(); next();
+  }
+  el("ntOffBtn").addEventListener("click", saveNT);
+
+  // ---------- Settings view ----------
+  function renderSettings(){
+    paintPrefs(); paintTheme(); applyScale(); renderInstallRow();
+    var days=0;
+    try{ for(var i=0;i<localStorage.length;i++){ if(/^day:julian:/.test(localStorage.key(i)||"")) days++; } }catch(e){}
+    var nb=savedList("user:bookmarks").length, nh=savedList("user:highlights").length, nf=Object.keys(fastLog()).length;
+    el("dataLbl").textContent = days+(days===1?" day":" days")+" of readings · "+nb+(nb===1?" bookmark":" bookmarks")+" · "+nh+(nh===1?" highlight":" highlights")+" · "+nf+(nf===1?" fasting note":" fasting notes")+". Kept in this browser only.";
+    var sv=store.getItem("pref:ntSaved");
+    if(sv && !ntSaving) el("ntOffLbl").textContent="Saved — the New Testament (KJV and "+GK_ED[sv==="pt"?"pt":"rp"].name+") is on this device.";
+    el("verLbl").textContent = " · "+APP_VERSION;
+  }
+
+  // ---------- Support the Parish sheet ----------
+  function openSupport(e){ if(e) e.preventDefault(); openSheet("supportOverlay"); }
+  el("supportLink").addEventListener("click", openSupport);
+  el("supportLink2").addEventListener("click", openSupport);
+  each(".supcopy[data-copy]", function(b){
+    b.addEventListener("click", function(){
+      copyText(b.getAttribute("data-copy"), function(){
+        b.classList.add("done"); b.textContent="✓";
+        setTimeout(function(){ b.classList.remove("done"); b.textContent="Copy"; },1400);
+      });
+    });
+  });
 
   // ---------- data ----------
   function readCache(cal,d){
@@ -1667,7 +2461,7 @@
     el("offlineBanner").classList.remove("show");
     el("errorBanner").classList.remove("show");
 
-    // instant paint from cache if we have it
+    // instant paint from the saved copy if we have it
     var cached = readCache(state.cal, state.date);
     if(cached && cached.data){
       render(cached.data, {cached:true, when:new Date(cached.t).toLocaleDateString("en-AU")});
@@ -1675,18 +2469,21 @@
       show(el("content"), false);
       el("loading").classList.remove("hidden");
     }
-
+    var asked = state.date.getTime();
     fetchDay(state.cal, state.date).then(function(data){
-      writeCache(state.cal, state.date, data);
+      writeCache(state.cal, new Date(asked), data);
+      if(asked!==state.date.getTime()) return;                 // the reader has moved to another day meanwhile
       render(data, {cached:false});
       prefetchWeek();
     }).catch(function(err){
+      if(asked!==state.date.getTime()) return;
       if(cached && cached.data){
         el("offlineBanner").classList.add("show");   // showing saved copy
       } else {
-        el("loading").classList.add("hidden");
+        // nothing saved for this day: show what the app can work out by itself, and say so plainly
+        render(null, {offline:true});
         var b=el("errorBanner");
-        b.innerHTML = "Couldn’t load the readings. Check your connection, or open "+
+        b.innerHTML = "Couldn’t load the readings for this day. Check your connection, or open "+
           "<a href='https://orthocal.info/' target='_blank' rel='noopener'>orthocal.info</a>.";
         b.classList.add("show");
       }
@@ -1710,7 +2507,7 @@
     setTimeout(next, 3000);
   }
 
-  // ---------- Install banner ----------
+  // ---------- Install ----------
   var deferredInstall=null;
   function isStandalone(){
     return (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone===true;
@@ -1740,17 +2537,21 @@
   el("installNo").addEventListener("click", function(){
     show(el("installBanner"), false); store.setItem("pref:installDismissed","1");
   });
-
-  // ---------- Open/close all readings ----------
-  el("greekBtn").addEventListener("click", function(){ setGreek(!state.greek); });
-  el("openAllBtn").addEventListener("click", function(){
-    var rs=document.querySelectorAll(".reading");
-    var anyClosed=Array.prototype.some.call(rs, function(r){ return !r.classList.contains("open"); });
-    Array.prototype.forEach.call(rs, function(r){ r.classList.toggle("open", anyClosed); });
-    el("openAllBtn").textContent = anyClosed ? "Close all ▴" : "Open all ▾";
+  function renderInstallRow(){
+    var ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    if(isStandalone()){ show(el("setInstallRow"), false); return; }
+    show(el("setInstallRow"), !!deferredInstall || ios);
+    show(el("setInstallBtn"), !!deferredInstall);
+    if(ios && !deferredInstall) el("setInstallLbl").textContent="In Safari, tap Share, then “Add to Home Screen”.";
+  }
+  window.addEventListener("beforeinstallprompt", function(){ setTimeout(renderInstallRow, 0); });
+  el("setInstallBtn").addEventListener("click", function(){
+    if(!deferredInstall) return;
+    deferredInstall.prompt();
+    (deferredInstall.userChoice || Promise.resolve()).then(function(){ deferredInstall=null; renderInstallRow(); });
   });
 
-  // ---------- navigation ----------
+  // ---------- day navigation ----------
   function goDays(n){ state.date=new Date(state.date.getFullYear(),state.date.getMonth(),state.date.getDate()+n); syncTodayBtn(); load(); }
   function goToday(){ state.date=startOfToday(); syncTodayBtn(); load(); }
   function syncTodayBtn(){ el("today").classList.toggle("hidden", isToday(state.date)); }
@@ -1758,68 +2559,79 @@
   el("prev").addEventListener("click", function(){ goDays(-1); });
   el("next").addEventListener("click", function(){ goDays(1); });
   el("today").addEventListener("click", goToday);
-  Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
-    b.addEventListener("click", function(){ setTxt(b.getAttribute("data-txt")); });
-  });
-  el("shareBtn").addEventListener("click", function(){
-    el("shareMenu").classList.toggle("hidden");
-  });
-  el("shareTextBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareDay(); });
-  el("shareWisdomBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareTile("wisdom"); });
-  el("shareDayBtn").addEventListener("click", function(){ el("shareMenu").classList.add("hidden"); shareTile("day"); });
-  el("commemHead").addEventListener("click", function(){ el("commemCard").classList.toggle("open"); });
-  el("date").addEventListener("click", openCal);
-  el("calBtn").addEventListener("click", openCal);
-  el("calPrev").addEventListener("click", function(){ calNav(-1); });
-  el("calNext").addEventListener("click", function(){ calNav(1); });
-  el("calClose").addEventListener("click", function(){ closeCal(); });
-  el("calOverlay").addEventListener("click", function(e){ if(e.target===el("calOverlay")) closeCal(); });
-  el("calTitle").addEventListener("click", function(){
-    var dp=el("datePick"), d=state.date;
-    dp.value = d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);
-    if(dp.showPicker){ try{ dp.showPicker(); }catch(e){ dp.click(); } } else { dp.click(); }
-  });
-  el("datePick").addEventListener("change", function(){
-    var v=el("datePick").value; if(!v) return;
-    var p=v.split("-");
-    state.date=new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
-    syncTodayBtn(); closeCal(); load();
-  });
-  Array.prototype.forEach.call(document.querySelectorAll("#sizeSeg button"), function(b){
-    b.addEventListener("click", function(){ bumpScale(b.getAttribute("data-sz")==="+" ? 1 : -1); });
+  el("date").addEventListener("click", openCalendar);
+  el("calBtn").addEventListener("click", openCalendar);
+  function openShare(ctx){
+    el("shareTitle").textContent = ctx==="quote" ? "Share the saying" : "Share this day";
+    var first=true;
+    each("#shareMenu .arow", function(r){
+      var on=r.getAttribute("data-ctx")===ctx; show(r, on);
+      r.classList.toggle("first", on && first); if(on) first=false;
+    });
+    openSheet("shareMenu");
+  }
+  el("shareBtn").addEventListener("click", function(){ openShare("day"); });
+  el("quoteShare").addEventListener("click", function(){ openShare("quote"); });
+  el("shareTextBtn").addEventListener("click", function(){ closeLayer(); shareDay(); });
+  el("shareDayBtn").addEventListener("click", function(){ closeLayer(); shareTile("day"); });
+  el("shareWisdomBtn").addEventListener("click", function(){ closeLayer(); shareTile("wisdom"); });
+  el("shareQuoteTextBtn").addEventListener("click", function(){ closeLayer(); var q=quoteLine(); if(q) shareText(q+"\n"+appURL(), "Wisdom of the Fathers"); });
+  el("copyQuoteBtn").addEventListener("click", function(){ closeLayer(); var q=quoteLine(); if(q) copyText(q, function(){ toast("Copied"); }); });
+  function toggleCommem(){
+    var open=el("commemCard").classList.toggle("open");
+    el("commemHead").setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  el("commemHead").addEventListener("click", toggleCommem);
+  el("commemHead").addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleCommem(); } });
+  el("openAllBtn").addEventListener("click", function(){
+    var rs=document.querySelectorAll(".reading");
+    var anyClosed=Array.prototype.some.call(rs, function(r){ return !r.classList.contains("open"); });
+    Array.prototype.forEach.call(rs, function(r){ r.classList.toggle("open", anyClosed); });
+    syncOpenAll();
   });
 
-  // swipe left/right to change day
-  var tx=0, ty=0;
-  document.addEventListener("touchstart", function(e){ tx=e.touches[0].clientX; ty=e.touches[0].clientY; }, {passive:true});
+  // swipe left/right on the Today view to change day; arrow keys do the same on a keyboard
+  var tx=0, ty=0, tOK=false;
+  document.addEventListener("touchstart", function(e){
+    tx=e.touches[0].clientX; ty=e.touches[0].clientY;
+    tOK = state.tab==="today" && !layers.some(function(L){ return L.kind!=="tab"; }) && !(e.target.closest && e.target.closest(".seg,.tabs"));
+  }, {passive:true});
   document.addEventListener("touchend", function(e){
+    if(!tOK) return;
     var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
     if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.6){ goDays(dx<0?1:-1); }
   }, {passive:true});
+  document.addEventListener("keydown", function(e){
+    if(layers.some(function(L){ return L.kind!=="tab"; })) return;
+    if(e.target && /input|textarea|select/i.test(e.target.tagName||"")) return;
+    if(e.key==="ArrowLeft"){ if(state.tab==="today") goDays(-1); else if(state.tab==="scripture") rdStep(-1); }
+    if(e.key==="ArrowRight"){ if(state.tab==="today") goDays(1); else if(state.tab==="scripture") rdStep(1); }
+  });
 
   // ---------- boot ----------
-  Array.prototype.forEach.call(document.querySelectorAll("#txtSeg button"), function(b){
-    b.classList.toggle("active", b.getAttribute("data-txt")===state.txt);
-  });
-  show(el("nkjvNote"), state.txt==="nkjv");
-  el("greekBtn").classList.toggle("active", state.greek);
-  el("greekBtn").setAttribute("aria-pressed", state.greek ? "true" : "false");
   if(SCALES.indexOf(state.scale)<0) state.scale=100;
-  applyScale();
+  if(state.theme!=="auto") document.documentElement.setAttribute("data-theme", state.theme);
+  paintTheme(); applyScale(); paintPrefs();
   loadFathers();
   window.__parseRef = parseRef;       // exposed for automated tests
-  window.__paschaCivil = paschaCivil; // exposed for automated tests
-  window.__litKey = liturgicalKey;    // exposed for automated tests
-  window.__fastRule = fastRule;       // exposed for automated tests
-  window.__azbykaURL = azbykaURL;     // exposed for automated tests
-  window.__prologueURL = prologueURL; // exposed for automated tests
-  window.__supplementFor = supplementFor; // exposed for automated tests
-  window.__toneOfWeek = toneOfWeek;       // exposed for automated tests
-  window.__buildTile = buildTile;     // exposed for automated tests
-  window.__gospelRef = findGospelRef; // exposed for automated tests
-  window.__setFathers = function(f){ var old=FATHERS; FATHERS=f; renderQuote(); return old; }; // exposed for automated tests
-  window.__yearEvents = yearEvents;   // exposed for automated tests
-  window.__buildYearTile = function(y){ yearShown=y||state.date.getFullYear(); return buildYearTile(); }; // exposed for automated tests
+  window.__paschaCivil = paschaCivil;
+  window.__litKey = liturgicalKey;
+  window.__fastRule = fastRule;
+  window.__dayRule = dayRule;
+  window.__seasonOf = seasonOf;
+  window.__azbykaURL = azbykaURL;
+  window.__prologueURL = prologueURL;
+  window.__supplementFor = supplementFor;
+  window.__toneOfWeek = toneOfWeek;
+  window.__buildTile = buildTile;
+  window.__gospelRef = findGospelRef;
+  window.__setFathers = function(f){ var old=FATHERS; FATHERS=f; renderQuote(); return old; };
+  window.__yearEvents = yearEvents;
+  window.__buildYearTile = function(y){ yearShown=y||state.date.getFullYear(); return buildYearTile(); };
+  window.__showTab = showTab;
+  window.__openReader = openReader;
+  window.__state = state;
+  window.__selectDay = selectDay;
   maybeInstallBanner();
   load();              // first load (Old Calendar)
   syncTodayBtn();

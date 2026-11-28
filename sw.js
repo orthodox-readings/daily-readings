@@ -1,61 +1,80 @@
-/* Minimal offline shell. Data caching is handled in-page via localStorage. */
-var CACHE = "orthodox-readings-v33";
-var GREEK_CACHE = "orthodox-readings-greek-1";   // Greek NT chapters, kept across app updates
+/* Daily Readings — offline support. Day data is kept in the page (localStorage); this file keeps the app itself.
+   Cache names carry the version: changing CACHE makes every installed copy fetch the new app on its next open. */
+var PREFIX = "orthodox-readings-";
+var CACHE = PREFIX + "v34";
+var GREEK_CACHE = PREFIX + "greek-1";    // Greek NT by chapter (Robinson–Pierpont), kept across app updates
+var TEXT_CACHE = PREFIX + "texts-1";     // KJV and Patriarchal Text by book, kept across app updates
+var KEEP = [CACHE, GREEK_CACHE, TEXT_CACHE];
 var ASSETS = [
   "./", "./index.html", "./manifest.webmanifest", "./fathers.json",
-  "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-32.png"
+  "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png", "./favicon-32.png",
+  "./fonts/literata-latin-400-normal.woff2",
+  "./fonts/literata-greek-400-normal.woff2",
+  "./fonts/literata-greek-ext-400-normal.woff2",
+  "./fonts/literata-latin-500-normal.woff2",
+  "./fonts/literata-greek-500-normal.woff2",
+  "./fonts/literata-greek-ext-500-normal.woff2"
 ];
+var SCOPE = new URL("./", self.location.href).pathname;   // e.g. /daily-readings/
 
 self.addEventListener("install", function(e){
-  e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(ASSETS); }).then(function(){ return self.skipWaiting(); }));
+  // cache:"reload" fetches fresh copies, never ones the browser kept from an earlier version
+  e.waitUntil(caches.open(CACHE).then(function(c){
+    return c.addAll(ASSETS.map(function(u){ return new Request(u, {cache: "reload"}); }));
+  }).then(function(){ return self.skipWaiting(); }));
 });
 
 self.addEventListener("activate", function(e){
+  // Remove only this app's own older caches. Caches with other names (another build on this site) are left alone.
   e.waitUntil(
     caches.keys().then(function(keys){
-      return Promise.all(keys.map(function(k){ if(k!==CACHE && k!==GREEK_CACHE) return caches.delete(k); }));
+      return Promise.all(keys.map(function(k){
+        if(k.indexOf(PREFIX) === 0 && KEEP.indexOf(k) < 0) return caches.delete(k);
+      }));
     }).then(function(){ return self.clients.claim(); })
   );
 });
 
+function cacheFirst(cacheName, req){
+  return caches.open(cacheName).then(function(c){
+    return c.match(req).then(function(hit){
+      return hit || fetch(req).then(function(res){
+        if(res && res.ok) c.put(req, res.clone());
+        return res;
+      });
+    });
+  });
+}
+
 self.addEventListener("fetch", function(e){
+  if(e.request.method !== "GET") return;
   var url = new URL(e.request.url);
-  if(url.origin !== self.location.origin) return;   // API/network calls pass straight through
-
-  var isShellPage = e.request.mode === "navigate" ||
-    url.pathname.endsWith("/index.html") || url.pathname.endsWith("/");
-
-  if(isShellPage){
-    // NETWORK-FIRST for the page itself: every online open gets the newest
-    // version immediately; the cached copy serves offline. (Cache-first here
-    // once left phones stuck on an old version — v28.)
+  if(url.origin !== self.location.origin) return;            // readings API and other sites: straight to the network
+  var path = url.pathname;
+  if(path.indexOf(SCOPE) !== 0) return;                      // outside this app
+  var rel = path.slice(SCOPE.length);
+  if(rel.indexOf("preview/") === 0) return;                // the review copy has its own service worker
+  if(e.request.mode === "navigate" || rel === "" || rel === "index.html"){
+    // NETWORK-FIRST for the page: every online open gets the newest version; the saved copy serves offline.
+    var isApp = (rel === "" || rel === "index.html");
+    var req = e.request;
+    try{ req = new Request(e.request, {cache: "no-cache"}); }catch(err){}   // always ask the server whether the page changed
     e.respondWith(
-      fetch(e.request).then(function(res){
-        var copy = res.clone();
-        caches.open(CACHE).then(function(c){ c.put("./index.html", copy); });
+      fetch(req).then(function(res){
+        if(isApp && res && res.ok){ var copy = res.clone(); caches.open(CACHE).then(function(c){ c.put("./index.html", copy); }); }
         return res;
       }).catch(function(){
-        return caches.match("./index.html");
+        return caches.match("./index.html", {cacheName: CACHE}).then(function(hit){ return hit || caches.match("./index.html"); });
       })
     );
-  } else if(url.pathname.indexOf("/greek/") > -1){
-    // Greek New Testament chapters: cache-first, saved as they are read so they work offline afterwards.
-    e.respondWith(
-      caches.open(GREEK_CACHE).then(function(c){
-        return c.match(e.request).then(function(hit){
-          return hit || fetch(e.request).then(function(res){
-            if(res && res.ok) c.put(e.request, res.clone());
-            return res;
-          });
-        });
-      })
-    );
+  } else if(rel.indexOf("greek/") === 0){
+    e.respondWith(cacheFirst(GREEK_CACHE, e.request));
+  } else if(rel.indexOf("kjv/") === 0 || rel.indexOf("greek-pt/") === 0){
+    e.respondWith(cacheFirst(TEXT_CACHE, e.request));
   } else {
-    // Cache-first for static assets (icons, quotes), refreshed by version bump.
+    // Cache-first for the app's own files (icons, fonts, sayings), refreshed by the version change.
     e.respondWith(
-      caches.match(e.request).then(function(hit){
-        return hit || fetch(e.request).catch(function(){ return caches.match("./index.html"); });
-      })
+      caches.match(e.request, {cacheName: CACHE}).then(function(hit){ return hit || fetch(e.request); })
     );
   }
 });

@@ -1,95 +1,73 @@
-DAILY ORTHODOX READINGS  —  your home-screen app
-=================================================
+DAILY READINGS  —  v34  (Old Calendar Orthodox daily readings, a home-screen web app)
+=====================================================================================
 
 WHAT THIS IS
-A small web app showing each day's Orthodox calendar — the full list of
-saints & feasts, the fast, and the Epistle & Gospel in full — on the OLD
-CALENDAR (Julian) by default. It also has a "Thought for the Day" card that
-opens St Theophan the Recluse's official English reflection for the day on
-OrthoChristian. Data is pulled live from orthocal.info (Old-Calendar
-reckoning of Holy Trinity Monastery, Jordanville), so it stays correct every
-day with nothing to update.
+Each day's Orthodox calendar on the OLD CALENDAR (Julian): the Epistle and Gospel in
+full, the saints and Lives of the Saints, the fast with a plain explanation, a saying
+from the Fathers, and links for prayer and study. A New Testament reader (English and
+Greek) and a fasting calendar sit alongside. Day data comes live from orthocal.info
+(Slavic Old-Calendar tradition); everything else is in this folder and works offline.
 
-FILES (keep them all together in one folder)
-  index.html            the app
-  manifest.webmanifest  app name + icons
-  sw.js                 offline support
-  icon-192.png / icon-512.png / apple-touch-icon.png / favicon-32.png  icons
+THE FIVE TABS
+  Today      The day card (civil date, Old Style date, tone, feast, fasting guidance,
+             liturgical colour when the day determines one, next feast and Pascha),
+             Wisdom of the Fathers, Holy Scripture (Epistle and Gospel; English,
+             Parallel or Greek; KJV or NKJV; text size), Saints of the Day (com-
+             memorations, Lives), service notes. ‹ › or swipe to change day.
+  Calendar   Month, Week and Year views. Colours show the general fasting rule
+             (fast, strict fast, fish allowed, wine & oil); a cross marks the great
+             feasts. Tap a day once to see it, again (or "Open this day's readings")
+             to open it. On a fast day, today or earlier, you can make a private note
+             (Kept / In part). The Fasting card shows the season's progress.
+  Scripture  The New Testament by book and chapter: English (KJV), Greek, or both.
+             Tap a verse to copy, share, bookmark or highlight it. The bookmark icon
+             lists saved verses; the frame icon gives distraction-free reading. The
+             app remembers where you were.
+  Prayer     Morning prayers / prayers before sleep, St Theophan's thought for the
+             day, the Prologue of Ohrid, the Jordanville (ROCOR) calendar, the full
+             service texts (azbyka.ru), and the parish support details.
+  Settings   Theme (Auto / Light / Dark), reading size, language, the English text of
+             the daily readings, the Greek edition (Byzantine Textform or Patriarchal
+             Text), saving the New Testament for offline use, the calendar, About &
+             sources.
 
+FILES
+  index.html              the whole app (HTML, CSS and JavaScript in one file)
+  sw.js                   offline support (service worker). CHANGE "v34" WHENEVER THE APP CHANGES.
+  manifest.webmanifest    name and icons for the home screen
+  fathers.json            the 115 sayings of the Fathers
+  greek/{book}/{ch}.json  Greek NT, Byzantine Textform (Robinson–Pierpont 2018), one file per chapter
+  greek-pt/{book}.json    Greek NT, Patriarchal Text (Antoniades 1904/1912; Robinson & Ala-Konni
+                          transcription, unaccented), one file per book
+  kjv/{book}.json         English NT, King James Version (eBible.org text), one file per book
+  fonts/                  Literata (SIL Open Font License) — Latin, Greek and polytonic Greek
+  icon-*.png, apple-touch-icon.png, favicon-32.png
+  test.js                 automated checks (node test.js; needs Playwright)
+  tools/                  build scripts for the Greek and KJV files; make_preview.py
 
-STEP 1  —  PUT IT ONLINE (once, on a computer)
-The app has to live at a web address (https) before a phone can install it.
-Easiest, free, no coding:
-  1. Go to   app.netlify.com/drop
-  2. Drag this whole folder onto the page.
-  3. In a few seconds you get a link like  https://your-name.netlify.app
-  4. (Optional) Make a free Netlify account to keep the link permanently and
-     rename it to something tidy.
+PUBLISHING (GitHub Pages: github.com/orthodox-readings/daily-readings)
+  The live site is served from the gh-pages branch; main is kept identical.
+  1. Change the version in sw.js (CACHE = PREFIX + "v35") and APP_VERSION in index.html.
+  2. Run the checks:            node test.js        (all must pass)
+  3. Commit to main, then push main and push the same commit to gh-pages.
+  4. Wait for Pages to rebuild (4–10 minutes). Check the ROOT address with a cache-buster,
+     e.g. https://orthodox-readings.github.io/daily-readings/?fresh=1
+  Installed phones get the new version the next time the app is opened online (the page
+  is fetched network-first; the new service worker then replaces the old cache).
+  Saved preferences, saved days and bookmarks live in the phone's browser storage and are
+  never touched by an update.
 
-STEP 2  —  ADD IT TO YOUR PHONE
-  iPhone (must use Safari):
-    1. Open the link in Safari.
-    2. Tap Share (the square with an up-arrow).
-    3. Tap "Add to Home Screen"  ->  Add.
-  Android (Chrome):
-    1. Open the link in Chrome.
-    2. Tap the  three-dot menu  ->  "Add to Home screen" / "Install app".
+REVIEW COPY (preview)
+  python3 tools/make_preview.py ../preview-build
+  Publish the output as the folder "preview/" on gh-pages. It is served at
+  https://orthodox-readings.github.io/daily-readings/preview/ with its own service worker
+  and cache names, so it never replaces or clears the live app. Remove the folder when done.
 
-A gold-cross icon appears on your home screen. Tap it each morning.
-
-
-USING IT
-  - ‹ › arrows beside the date (or swipe) move a day; TAP THE DATE to open
-    the visual month calendar — fast days shaded, fish-allowed marks, great
-    feasts marked with a cross, liturgical-colour dots; tap any day to open
-    it. (Tap the month title for a quick year picker.) "Go to today" appears
-    when you're away from today.
-  - Settings live behind the GEAR (top right):
-    Bible text (KJV / NKJV), and A−/A+ text size — all remembered.
-  - NKJV loads per reading (unofficial source; © Thomas Nelson) and falls
-    back to KJV automatically; the badge beside each reference tells you
-    which text you are reading.
-  - Commemorations, Epistle and Gospel fold into slim bars — tap to open.
-  - Fast days with no noted relaxation show the traditional strict norm.
-  - Feast & fast tracker: current fast day count, next Great Feast,
-    Pascha countdown.
-  - Lives of the Saints: tap a name to read the Jordanville note.
-  - Year at a glance: in the month calendar, tap the year to see the whole
-    church year — the Great Feasts with Pascha, and the fasting seasons —
-    for planning ahead. Tap any feast to open its day, or share the year
-    as a single image.
-  - The page reads top-down as a morning rule: the day's saying from the
-    Fathers, then the Epistle & Gospel, then commemorations and lives.
-  - Greek: the "Greek" switch above the readings shows the Greek New
-    Testament under each verse (Byzantine Textform, Robinson-Pierpont 2018,
-    public domain; bundled in the greek/ folder, one file per chapter).
-    Off by default; New Testament readings only.
-  - The tone of the week (Octoechos) is shown beside the Old Style date.
-  - Daily prayers: the first Prayer & Study row opens Morning Prayers by
-    day and Prayers Before Sleep from 4 pm (Holy Myrrh-bearers).
-  - "For Prayer & Study" card: slim tap-rows to the day's Troparia &
-    Kontakia (Jordanville calendar), the day's Prologue of Ohrid entry
-    (St Nikolai of Zica — lives, reflection & homily, Lazarica translation
-    hosted by Holy Myrrh-bearers), the Full Service Texts in Church
-    Slavonic on azbyka.ru (Old Calendar mode), and St Theophan's daily
-    reflection on OrthoChristian.
-  - Share button (top right) now offers three things: the day as text, a
-    "Wisdom tile" (the day's saying as a square image for social media),
-    and a "Feast-day tile" (date, saints & fast as a burgundy image card).
-  - The coming week is saved quietly in the background, so the readings
-    work offline — at church, travelling, or with no signal.
-  - Days you've already opened are saved too.
-  - On first visit the app offers to install itself to your home screen
-    (on iPhone: tap Share, then "Add to Home Screen").
-  - Design: burgundy & parchment, with liturgical colours that follow the
-    feast day; dark mode follows your phone.
-
-
-NOTES
-  - Double-clicking index.html on your computer (file://) will NOT load the
-    readings — it must be hosted online first (Step 1). This is normal.
-  - Permanent free alternative to Netlify — GitHub Pages:
-    create a repository, upload these files, then Settings -> Pages ->
-    deploy from the main branch (root). Your URL becomes
-    https://<username>.github.io/<repository>/
-  - If orthocal.info is ever unreachable, the app shows your last saved day.
+SOURCES AND LICENCES (see also Settings → About & sources)
+  Readings & calendar: orthocal.info (Slavic Old-Calendar tradition), KJV text.
+  Lives of the Saints: Abbamoses.com (John Brady), used with permission via orthocal.
+  NKJV: © 1982 Thomas Nelson — fetched from an unofficial source; NOT cleared for a public
+        or store release (see the v34 report). KJV is shown whenever NKJV is unavailable.
+  KJV: public domain (eBible.org). Byzantine Textform: public domain. Patriarchal Text
+        transcription: public domain. Literata: SIL Open Font License (fonts/OFL-Literata.txt).
+  Sayings of the Fathers: parish selection; some adapted or paraphrased and marked so.
